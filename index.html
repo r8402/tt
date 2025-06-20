@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gratuitos!</title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 20px 120px 20px;
+            transition: background-color .3s ease, color .3s ease;
+            position: relative;
+        }
+        body.no-scroll, body.modal-open {
+            overflow: hidden;
+        }
+        body.dark-mode {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+        }
+
+        /* SOBREPOSIÇÃO PARA O MODO DE PESQUISA */
+        body.search-active::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            backdrop-filter: blur(3px);
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+        body:not(.search-active)::before {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Oculta e desabilita interações no conteúdo principal quando a pesquisa está ativa */
+        .category-container {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        body.search-active .category-container {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        body.search-active #top-fixed-bar {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* --- Container para a barra flutuante e resultados --- */
+        #floating-bar-wrapper {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Container para os resultados rápidos */
+        #quick-results-container {
+            display: none;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body.dark-mode #quick-results-container {
+             background-color: rgba(58, 58, 58, 0.95);
+             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #quick-results-content {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Estilo para os ícones dentro da barra de resultados rápidos */
+        .quick-result-item {
+            box-sizing: border-box;
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            flex-basis: auto;
+        }
+        .quick-result-item .icon-label {
+            font-size: 0.9em !important;
+        }
+        
+        .no-results-message {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            color: #777;
+        }
+        body.dark-mode .no-results-message {
+            color: #bbb;
+        }
+
+        /* Barra de pesquisa em si */
+        #search-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: background-color .3s ease, box-shadow .3s ease;
+        }
+        body.dark-mode #search-container {
+            background-color: #3a3a3a;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #search-input {
+            flex-grow: 1;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            background-color: transparent;
+            color: #333;
+            box-shadow: none;
+            outline: none;
+            transition: color .3s ease;
+        }
+
+        body.dark-mode #search-input {
+            color: #e0e0e0;
+        }
+
+        #theme-toggle, #open-generator-modal-btn {
+            flex-shrink: 0;
+            margin-left: 8px;
+            background-color: #e9ecef;
+            color: #333;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color .3s ease, color .3s ease, transform .2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+        
+        body.dark-mode #theme-toggle, body.dark-mode #open-generator-modal-btn {
+            background-color: #555;
+            color: #e0e0e0;
+        }
+        #theme-toggle:hover, #open-generator-modal-btn:hover {
+            transform: scale(1.1);
+            opacity: .9;
+        }
+        
+        #theme-toggle span {
+             font-size: 0.7em;
+             font-weight: bold;
+        }
+        #open-generator-modal-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .category-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            width: 100%;
+        }
+        .color-category {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s, display 0.3s;
+            border-top: 5px solid;
+        }
+        body.dark-mode .color-category {
+            background-color: #3a3a3a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .color-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        body.dark-mode .color-category:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .color-category h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            color: #0056b3;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 10px;
+        }
+        body.dark-mode .color-category h2 {
+            color: #007bff;
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            justify-items: center;
+        }
+        .icon-item {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            text-decoration: none;
+            color: #fff;
+            overflow: hidden;
+            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
+            width: 100px;
+            height: 100px;
+            min-width: 100px;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .icon-item.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            height: 0;
+            width: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+        }
+        .icon-item.showing {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        body.dark-mode .icon-item {
+            box-shadow: 0 2px 5px rgba(0,0,0,.3);
+        }
+        .icon-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,.15);
+        }
+        body.dark-mode .icon-item:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,.4);
+        }
+        .icon-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .icon-label {
+            font-size: 0.9em;
+            text-align: center;
+            padding: 5px;
+            word-break: break-word;
+            font-weight: bold;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+        /* Cores de ícones */
+        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
+        .copilot-icon {
+            background-image: linear-gradient(to bottom right,#2196F3,#4CAF50,#FFEB3B,#FF9800,#9C27B0);
+        }
+        .custom-icon-color .icon-content {
+            background-color: var(--icon-background-color);
+        }
+        
+        /* --- Estilos do Modal --- */
+        #generator-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1040;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #generator-modal-overlay.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        #generate-icon-code-section {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1050;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-top: 5px solid #007bff;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        #generate-icon-code-section.visible {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        body.dark-mode #generate-icon-code-section {
+            background-color: #3a3a3a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-top-color: #0056b3;
+        }
+        #generate-icon-code-section h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            padding-bottom: 10px;
+            transition: color .3s ease, border-bottom-color .3s ease;
+        }
+        body.dark-mode #generate-icon-code-section h2 {
+            color: #007bff;
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+        
+        #close-generator-modal-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+            transition: background-color .2s, color .2s;
+        }
+        #close-generator-modal-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+         body.dark-mode #close-generator-modal-btn {
+            background-color: #555;
+            color: #e0e0e0;
+        }
+        body.dark-mode #close-generator-modal-btn:hover {
+             background-color: #c82333;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            transition: color .3s ease;
+        }
+        body.dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: #fff;
+            color: #333;
+            transition: border-color .3s ease, background-color .3s ease, color .3s ease;
+        }
+        body.dark-mode .form-group input[type="text"],
+        body.dark-mode .form-group input[type="url"],
+        body.dark-mode .form-group select {
+            background-color: #3c3c3c;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        .form-group input[type="color"] {
+            width: 100%;
+            padding: 5px;
+            height: 45px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            cursor: pointer;
+            background-color: #fff;
+            transition: border-color .3s ease, background-color .3s ease;
+        }
+        body.dark-mode .form-group input[type="color"] {
+            border-color: #555;
+            background-color: #3c3c3c;
+        }
+        #add-icon-button {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color .3s ease;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        #add-icon-button:hover {
+            background-color: #0056b3;
+        }
+        body.dark-mode #add-icon-button {
+            background-color: #0056b3;
+        }
+        body.dark-mode #add-icon-button:hover {
+            background-color: #004a8f;
+        }
+        .label-hint {
+            font-size: 0.85em;
+            color: #777;
+            font-weight: 400;
+        }
+        body.dark-mode .label-hint {
+            color: #bbb;
+        }
+
+        /* Estilo para a mensagem de status no modal */
+        #form-status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+        }
+        #form-status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        #form-status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        /* Media Queries para responsividade */
+        @media (max-width: 768px) {
+            .category-container {
+                grid-template-columns: 1fr;
+            }
+            .color-category {
+                padding: 15px;
+            }
+            .color-category h2 {
+                font-size: 1.4em;
+            }
+            .links-grid {
+                grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+                gap: 10px;
+            }
+            .icon-item {
+                width: 100%;
+                height: 90px;
+                min-width: unset;
+            }
+            .quick-result-item {
+                 width: 90px !important;
+                 height: 90px !important;
+                 min-width: 90px;
+                 max-width: 90px;
+                 flex-basis: auto;
+            }
+            .icon-label, .quick-result-item .icon-label {
+                font-size: 0.75em !important;
+            }
+            #generate-icon-code-section {
+                padding: 20px 15px;
+                 h2 {
+                    font-size: 1.4em;
+                }
+            }
+            #quick-results-content {
+                gap: 10px;
+            }
+             #search-input {
+                padding: 10px 12px;
+                font-size: 1em;
+            }
+            #theme-toggle, #open-generator-modal-btn {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="category-container" id="allCategoriesGrid">
+        <!-- O conteúdo das categorias e ícones será carregado aqui pelo JavaScript a partir do Firestore -->
+    </div>
+
+    <!-- Modal do Gerador de Código -->
+    <div id="generator-modal-overlay"></div>
+    <div id="generate-icon-code-section">
+        <button id="close-generator-modal-btn">×</button>
+        <h2>Adicionar Novo Ícone</h2>
+        <form id="add-icon-form">
+            <div class="form-group">
+                <label for="iconNameInput">Texto do Ícone:</label>
+                <input type="text" id="iconNameInput" required>
+            </div>
+            <div class="form-group">
+                <label for="iconLinkInput">Link do Ícone (URL):</label>
+                <input type="url" id="iconLinkInput" required>
+            </div>
+            <div class="form-group">
+                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2 ou deixe em branco)</span></label>
+                <input type="text" id="iconColorClassInput">
+            </div>
+            <div class="form-group">
+                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(ignorado se classe de cor for preenchida)</span></label>
+                <input type="color" id="iconCustomBgColorInput" value="#cccccc">
+            </div>
+            <div class="form-group">
+                <label for="iconCategorySelect">Categoria Onde Adicionar:</label>
+                <select id="iconCategorySelect" required>
+                    <!-- SÓ VOCÊ: SE QUISER ALTERAR AS CATEGORIAS, EDITE AS OPÇÕES ABAIXO -->
+                    <option value="" disabled selected>Selecione uma categoria</option>
+                    <option value="servicos-utilidades">Serviços & Utilidades</option>
+                    <option value="cursos-concursos">Cursos & Concursos</option>
+                    <option value="ferramentas-downloads">Ferramentas & Downloads</option>
+                    <option value="compras-produtividade">Compras & Produtividade</option>
+                    <option value="design-audio">Design & Áudio</option>
+                    <option value="midia-entretenimento">Mídia & Entretenimento</option>
+                </select>
+            </div>
+            <button type="submit" id="add-icon-button">Adicionar Ícone ao Banco de Dados</button>
+        </form>
+        <div id="form-status-message"></div>
+    </div>
+
+    <!-- Barra Flutuante de Pesquisa -->
+    <div id="floating-bar-wrapper">
+        <div id="quick-results-container">
+            <div id="quick-results-content"></div>
+        </div>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Pesquise Aqui...">
+            <button id="open-generator-modal-btn" title="Adicionar novo Ícone">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </button>
+            <button id="theme-toggle" title="Alternar Modo"><span>Escuro</span></button>
+        </div>
+    </div>
+    
+    <!-- Importações do Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- SÓ VOCÊ: A CONFIGURAÇÃO DO FIREBASE SERÁ INJETADA AQUI PELO AMBIENTE ---
+        // Em um ambiente local, você pode substituir isso pela sua configuração real.
+          const firebaseConfig = {
+    apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
+    authDomain: "iconesutil.firebaseapp.com",
+    projectId: "iconesutil",
+    storageBucket: "iconesutil.firebasestorage.app",
+    messagingSenderId: "88285859566",
+    appId: "1:88285859566:web:e15fdb0c615b494455edff"
+  };
+
+        // Inicialização do Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // --- Constantes de Elementos do DOM ---
+        const searchInput = document.getElementById('search-input');
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const allCategoriesGrid = document.getElementById('allCategoriesGrid');
+        const quickResultsContainer = document.getElementById('quick-results-container');
+        const quickResultsContent = document.getElementById('quick-results-content');
+        
+        // Elementos do Modal
+        const generatorModal = document.getElementById('generate-icon-code-section');
+        const modalOverlay = document.getElementById('generator-modal-overlay');
+        const openModalBtn = document.getElementById('open-generator-modal-btn');
+        const closeModalBtn = document.getElementById('close-generator-modal-btn');
+        const addIconForm = document.getElementById('add-icon-form');
+        const formStatusMessage = document.getElementById('form-status-message');
+
+        let typingTimer;
+        const doneTypingInterval = 200; //ms
+
+        // --- Funções do Tema ---
+        function applyTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggle.querySelector('span').textContent = 'Claro';
+            } else {
+                body.classList.remove('dark-mode');
+                themeToggle.querySelector('span').textContent = 'Escuro';
+            }
+        }
+
+        function toggleTheme() {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeToggle.querySelector('span').textContent = 'Claro';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggle.querySelector('span').textContent = 'Escuro';
+            }
+        }
+
+        // --- Funções de Renderização a partir do Banco de Dados ---
+
+        // Mapeamento de categorias e cores das bordas
+        const categoryDetails = {
+            'servicos-utilidades': { name: 'Serviços & Utilidades', color: 'rgb(111, 66, 193)' },
+            'cursos-concursos': { name: 'Cursos & Concursos', color: 'rgb(40, 167, 69)' },
+            'ferramentas-downloads': { name: 'Ferramentas & Downloads', color: 'rgb(0, 123, 255)' },
+            'compras-produtividade': { name: 'Compras & Produtividade', color: 'rgb(253, 126, 20)' },
+            'design-audio': { name: 'Design & Áudio', color: 'rgb(255, 193, 7)' },
+            'midia-entretenimento': { name: 'Mídia & Entretenimento', color: 'rgb(220, 53, 69)' }
+        };
+
+        function renderIcons(iconList) {
+            // Agrupa os ícones por categoria
+            const iconsByCategory = iconList.reduce((acc, icon) => {
+                const category = icon.category || 'outros';
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(icon);
+                return acc;
+            }, {});
+
+            allCategoriesGrid.innerHTML = ''; // Limpa a grid antes de renderizar
+
+            // Itera sobre as categorias e cria o HTML
+            for (const categoryId in iconsByCategory) {
+                if (categoryDetails[categoryId]) {
+                    const details = categoryDetails[categoryId];
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'color-category';
+                    categoryDiv.style.borderColor = details.color;
+                    categoryDiv.dataset.category = categoryId;
+
+                    let linksHtml = '';
+                    iconsByCategory[categoryId].forEach(icon => {
+                        const colorClass = icon.colorClass ? ` ${icon.colorClass}` : ' custom-icon-color';
+                        const style = !icon.colorClass ? ` style="--icon-background-color: ${icon.customBgColor}; background-color: var(--icon-background-color);"` : '';
+                        linksHtml += `
+                            <a href="${icon.link}" class="icon-item${colorClass}" data-label="${icon.name}" target="_blank">
+                                <div class="icon-content"${style}>
+                                    <div class="icon-label">${icon.name}</div>
+                                </div>
+                            </a>`;
+                    });
+
+                    categoryDiv.innerHTML = `
+                        <h2>${details.name}</h2>
+                        <div class="links-grid">
+                            ${linksHtml}
+                        </div>
+                    `;
+                    allCategoriesGrid.appendChild(categoryDiv);
+                }
+            }
+            // Após renderizar, aplica o filtro de pesquisa atual, se houver
+            filterLinks();
+        }
+
+
+        // --- Funções de Pesquisa e Filtro (adaptadas) ---
+        function filterLinks() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const allCategoryDivs = document.querySelectorAll('.color-category');
+
+            allCategoryDivs.forEach(categoryDiv => {
+                let hasVisibleLinksInCategory = false;
+                const linksInThisCategory = categoryDiv.querySelectorAll('.icon-item');
+                
+                linksInThisCategory.forEach(item => {
+                    const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
+                    if (label.includes(searchTerm)) {
+                        item.classList.remove('hidden');
+                        item.classList.add('showing');
+                        hasVisibleLinksInCategory = true;
+                    } else {
+                        item.classList.remove('showing');
+                        item.classList.add('hidden');
+                    }
+                });
+                
+                categoryDiv.style.display = hasVisibleLinksInCategory ? 'block' : 'none';
+            });
+        }
+        
+        function updateQuickResults(searchTerm) {
+            quickResultsContent.innerHTML = ''; 
+
+            if (searchTerm.length === 0) {
+                quickResultsContainer.style.display = 'none';
+                body.classList.remove('no-scroll', 'search-active');
+                return;
+            }
+            
+            quickResultsContainer.style.display = 'block';
+            body.classList.add('no-scroll', 'search-active');
+
+            let found = false;
+            // Busca nos ícones renderizados no DOM principal
+            const allIcons = document.querySelectorAll('#allCategoriesGrid .icon-item');
+
+            allIcons.forEach(item => {
+                const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
+                if (label.includes(searchTerm)) {
+                    const clone = item.cloneNode(true);
+                    clone.classList.remove('hidden', 'showing');
+                    clone.classList.add('quick-result-item');
+                    quickResultsContent.appendChild(clone);
+                    found = true;
+                }
+            });
+
+            if (!found) {
+                quickResultsContent.innerHTML = '<p class="no-results-message">Nenhum ícone encontrado.</p>';
+            }
+        }
+
+        function handleSearchFocus() {
+            body.classList.add('search-active', 'no-scroll');
+            document.querySelectorAll('.color-category').forEach(categoryDiv => {
+                categoryDiv.style.display = 'block';
+            });
+        }
+
+        // --- Funções do Modal ---
+        function openGeneratorModal() {
+            modalOverlay.classList.add('visible');
+            generatorModal.classList.add('visible');
+            body.classList.add('modal-open');
+        }
+
+        function closeGeneratorModal() {
+            modalOverlay.classList.remove('visible');
+            generatorModal.classList.remove('visible');
+            body.classList.remove('modal-open');
+            // Limpa o formulário e a mensagem de status ao fechar
+            addIconForm.reset();
+            formStatusMessage.style.display = 'none';
+            formStatusMessage.className = '';
+        }
+
+        // --- Adicionar Ícone ao Firestore ---
+        async function handleAddIcon(e) {
+            e.preventDefault();
+            const addButton = e.target.querySelector('button');
+            addButton.disabled = true;
+            addButton.textContent = 'Adicionando...';
+            
+            const newIcon = {
+                name: document.getElementById('iconNameInput').value.trim(),
+                link: document.getElementById('iconLinkInput').value.trim(),
+                colorClass: document.getElementById('iconColorClassInput').value.trim(),
+                customBgColor: document.getElementById('iconCustomBgColorInput').value,
+                category: document.getElementById('iconCategorySelect').value,
+                createdAt: new Date() // Adiciona um timestamp
+            };
+            
+            try {
+                // SÓ VOCÊ: "ICONS" É O NOME DA COLEÇÃO NO FIRESTORE. VOCÊ PODE MUDAR SE PRECISAR.
+                const docRef = await addDoc(collection(db, "icones"), newIcon);
+                console.log("Ícone adicionado com ID: ", docRef.id);
+                
+                formStatusMessage.textContent = 'Ícone adicionado com sucesso!';
+                formStatusMessage.className = 'success';
+                
+                setTimeout(() => {
+                    closeGeneratorModal();
+                    addButton.disabled = false;
+                    addButton.textContent = 'Adicionar Ícone ao Banco de Dados';
+                }, 1500);
+
+            } catch (error) {
+                console.error("Erro ao adicionar ícone: ", error);
+                formStatusMessage.textContent = 'Erro ao adicionar. Tente novamente.';
+                formStatusMessage.className = 'error';
+                addButton.disabled = false;
+                addButton.textContent = 'Adicionar Ícone ao Banco de Dados';
+            }
+        }
+        
+        // --- Conexão e Autenticação com o Firebase ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                console.log('Usuário autenticado:', user.uid);
+                // O usuário está logado, agora podemos carregar os dados.
+                // SÓ VOCÊ: "ICONS" É O NOME DA COLEÇÃO NO FIRESTORE. DEVE SER O MESMO USADO AO ADICIONAR.
+                const iconsCollection = collection(db, "icones");
+                onSnapshot(iconsCollection, (querySnapshot) => {
+                    const iconList = [];
+                    querySnapshot.forEach((doc) => {
+                        iconList.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderIcons(iconList); // Renderiza os ícones na tela
+                });
+            } else {
+                console.log('Nenhum usuário logado. Tentando login anônimo...');
+            }
+        });
+
+        async function authenticate() {
+            try {
+                // Tenta autenticar com o token fornecido pelo ambiente, se existir
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    // Caso contrário, faz login anônimo como fallback
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Falha na autenticação: ", error);
+                allCategoriesGrid.innerHTML = '<p>Erro de autenticação. Não foi possível carregar os ícones.</p>';
+            }
+        }
+
+
+        // --- Event Listeners ---
+        themeToggle.addEventListener('click', toggleTheme);
+        openModalBtn.addEventListener('click', openGeneratorModal);
+        closeModalBtn.addEventListener('click', closeGeneratorModal);
+        modalOverlay.addEventListener('click', closeGeneratorModal);
+        addIconForm.addEventListener('submit', handleAddIcon);
+        
+        searchInput.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                filterLinks();
+                updateQuickResults(searchTerm);
+            }, doneTypingInterval);
+        });
+
+        searchInput.addEventListener('focus', handleSearchFocus);
+        
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                if(searchInput.value.trim().length === 0) {
+                    quickResultsContainer.style.display = 'none';
+                    body.classList.remove('no-scroll', 'search-active');
+                    document.querySelectorAll('.color-category').forEach(div => div.style.display = 'block');
+                    filterLinks();
+                }
+            }, 200);
+        });
+
+        // --- Inicialização ---
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            authenticate(); // Inicia o processo de autenticação ao carregar a página
+        });
+
+    </script>
+
+</body>
+</html>
+
