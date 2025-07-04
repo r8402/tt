@@ -30,27 +30,6 @@
             color: #e0e0e0;
         }
 
-        /* SOBREPOSIÇÃO PARA O MODO DE PESQUISA (REMOVIDA) */
-        /*
-        body.search-active::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 999;
-            backdrop-filter: blur(3px);
-            transition: opacity 0.3s ease;
-            opacity: 1;
-        }
-        body:not(.search-active)::before {
-            opacity: 0;
-            pointer-events: none;
-        }
-        */
-
         /* Oculta e desabilita interações no conteúdo principal quando a pesquisa está ativa */
         .category-container {
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -343,6 +322,45 @@
             background-color: var(--icon-background-color);
         }
         
+        /* NOVO: Estilo para o botão de edição */
+        .edit-icon-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0; /* Começa invisível */
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+            z-index: 10;
+        }
+        .icon-item:hover .edit-icon-btn {
+            opacity: 1; /* Fica visível ao passar o mouse */
+        }
+        .edit-icon-btn svg {
+            width: 14px;
+            height: 14px;
+            color: #333;
+        }
+        .edit-icon-btn:hover {
+            background-color: #e0e0e0;
+        }
+        body.dark-mode .edit-icon-btn {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        body.dark-mode .edit-icon-btn svg {
+            color: #eee;
+        }
+        body.dark-mode .edit-icon-btn:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
         /* --- Estilos do Modal --- */
         #generator-modal-overlay {
             position: fixed;
@@ -488,7 +506,7 @@
             border-color: #555;
             background-color: #3c3c3c;
         }
-        #add-icon-button {
+        #submit-icon-button { /* NOVO: ID renomeado para ser mais genérico (add/edit) */
             width: 100%;
             padding: 12px 15px;
             background-color: #007bff;
@@ -501,13 +519,13 @@
             font-weight: 500;
             margin-top: 10px;
         }
-        #add-icon-button:hover {
+        #submit-icon-button:hover {
             background-color: #0056b3;
         }
-        body.dark-mode #add-icon-button {
+        body.dark-mode #submit-icon-button {
             background-color: #0056b3;
         }
-        body.dark-mode #add-icon-button:hover {
+        body.dark-mode #submit-icon-button:hover {
             background-color: #004a8f;
         }
         .label-hint {
@@ -600,9 +618,7 @@
     <div id="generator-modal-overlay"></div>
     <div id="generate-icon-code-section">
         <button id="close-generator-modal-btn">×</button>
-        <h2>Adicionar Novo Ícone</h2>
-        <form id="add-icon-form">
-            <div class="form-group">
+        <h2 id="modal-title">Adicionar Novo Ícone</h2> <form id="icon-form"> <input type="hidden" id="iconIdInput"> <div class="form-group">
                 <label for="iconNameInput">Texto do Ícone:</label>
                 <input type="text" id="iconNameInput" required>
             </div>
@@ -630,8 +646,7 @@
                     <option value="midia-entretenimento">Mídia & Entretenimento</option>
                 </select>
             </div>
-            <button type="submit" id="add-icon-button">Adicionar Ícone ao Banco de Dados</button>
-        </form>
+            <button type="submit" id="submit-icon-button">Adicionar Ícone ao Banco de Dados</button> </form>
         <div id="form-status-message"></div>
     </div>
 
@@ -652,7 +667,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // NOVO: Importa updateDoc do Firestore
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- SÓ VOCÊ: A CONFIGURAÇÃO DO FIREBASE SERÁ INJETADA AQUI PELO AMBIENTE ---
         // Em um ambiente local, você pode substituir isso pela sua configuração real.
@@ -683,11 +699,23 @@
         const modalOverlay = document.getElementById('generator-modal-overlay');
         const openModalBtn = document.getElementById('open-generator-modal-btn');
         const closeModalBtn = document.getElementById('close-generator-modal-btn');
-        const addIconForm = document.getElementById('add-icon-form');
+        const iconForm = document.getElementById('icon-form'); // NOVO: ID renomeado
         const formStatusMessage = document.getElementById('form-status-message');
+
+        // NOVO: Elementos do formulário do modal
+        const modalTitle = document.getElementById('modal-title');
+        const iconIdInput = document.getElementById('iconIdInput');
+        const iconNameInput = document.getElementById('iconNameInput');
+        const iconLinkInput = document.getElementById('iconLinkInput');
+        const iconColorClassInput = document.getElementById('iconColorClassInput');
+        const iconCustomBgColorInput = document.getElementById('iconCustomBgColorInput');
+        const iconCategorySelect = document.getElementById('iconCategorySelect');
+        const submitIconButton = document.getElementById('submit-icon-button'); // NOVO: ID renomeado
 
         let typingTimer;
         const doneTypingInterval = 200; //ms
+        let currentIconList = []; // NOVO: Armazena a lista atual de ícones para acesso rápido
+        let isEditMode = false; // NOVO: Flag para controlar o modo do modal
 
         // --- Funções do Tema ---
         function applyTheme() {
@@ -725,6 +753,7 @@
         };
 
         function renderIcons(iconList) {
+            currentIconList = iconList; // NOVO: Atualiza a lista global
             // Agrupa os ícones por categoria
             const iconsByCategory = iconList.reduce((acc, icon) => {
                 const category = icon.category || 'outros';
@@ -751,10 +780,13 @@
                         const colorClass = icon.colorClass ? ` ${icon.colorClass}` : ' custom-icon-color';
                         const style = !icon.colorClass ? ` style="--icon-background-color: ${icon.customBgColor}; background-color: var(--icon-background-color);"` : '';
                         linksHtml += `
-                            <a href="${icon.link}" class="icon-item${colorClass}" data-label="${icon.name}" target="_blank">
+                            <a href="${icon.link}" class="icon-item${colorClass}" data-label="${icon.name}" data-id="${icon.id}" target="_blank">
                                 <div class="icon-content"${style}>
                                     <div class="icon-label">${icon.name}</div>
                                 </div>
+                                <button class="edit-icon-btn" data-id="${icon.id}" title="Editar Ícone">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                </button>
                             </a>`;
                     });
 
@@ -767,6 +799,16 @@
                     allCategoriesGrid.appendChild(categoryDiv);
                 }
             }
+            // NOVO: Adiciona event listeners aos botões de edição
+            document.querySelectorAll('.edit-icon-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault(); // Evita que o link seja clicado
+                    e.stopPropagation(); // Evita que o clique no botão de edição propague para o ícone
+                    const iconId = button.dataset.id;
+                    openEditModal(iconId);
+                });
+            });
+
             // Após renderizar, aplica o filtro de pesquisa atual, se houver
             filterLinks();
         }
@@ -836,6 +878,11 @@
                     const clone = item.cloneNode(true);
                     clone.classList.remove('hidden', 'showing');
                     clone.classList.add('quick-result-item');
+                    // NOVO: Remove o botão de edição dos resultados rápidos
+                    const editBtn = clone.querySelector('.edit-icon-btn');
+                    if (editBtn) {
+                        editBtn.remove();
+                    }
                     quickResultsContent.appendChild(clone);
                     found = true;
                 }
@@ -858,9 +905,44 @@
 
         // --- Funções do Modal ---
         function openGeneratorModal() {
+            isEditMode = false; // NOVO: Define o modo como adição
+            modalTitle.textContent = 'Adicionar Novo Ícone';
+            submitIconButton.textContent = 'Adicionar Ícone ao Banco de Dados';
+            iconForm.reset(); // Limpa o formulário para uma nova adição
+            iconIdInput.value = ''; // Garante que o ID do ícone esteja vazio
+            formStatusMessage.style.display = 'none';
+            formStatusMessage.className = '';
             modalOverlay.classList.add('visible');
             generatorModal.classList.add('visible');
             body.classList.add('modal-open');
+        }
+
+        // NOVO: Função para abrir o modal em modo de edição
+        function openEditModal(iconId) {
+            isEditMode = true; // NOVO: Define o modo como edição
+            modalTitle.textContent = 'Editar Ícone Existente';
+            submitIconButton.textContent = 'Salvar Alterações';
+            
+            // Encontra o ícone na lista atual
+            const iconToEdit = currentIconList.find(icon => icon.id === iconId);
+
+            if (iconToEdit) {
+                iconIdInput.value = iconToEdit.id;
+                iconNameInput.value = iconToEdit.name;
+                iconLinkInput.value = iconToEdit.link;
+                iconColorClassInput.value = iconToEdit.colorClass || '';
+                iconCustomBgColorInput.value = iconToEdit.customBgColor || '#cccccc';
+                iconCategorySelect.value = iconToEdit.category || '';
+                
+                formStatusMessage.style.display = 'none';
+                formStatusMessage.className = '';
+                modalOverlay.classList.add('visible');
+                generatorModal.classList.add('visible');
+                body.classList.add('modal-open');
+            } else {
+                console.error('Ícone não encontrado para edição:', iconId);
+                alert('Erro: Ícone não encontrado para edição.');
+            }
         }
 
         function closeGeneratorModal() {
@@ -868,47 +950,60 @@
             generatorModal.classList.remove('visible');
             body.classList.remove('modal-open');
             // Limpa o formulário e a mensagem de status ao fechar
-            addIconForm.reset();
+            iconForm.reset();
             formStatusMessage.style.display = 'none';
             formStatusMessage.className = '';
+            iconIdInput.value = ''; // Zera o ID do ícone
         }
 
-        // --- Adicionar Ícone ao Firestore ---
-        async function handleAddIcon(e) {
+        // --- Adicionar/Editar Ícone no Firestore ---
+        async function handleSubmitIcon(e) { // NOVO: Função unificada para adicionar/editar
             e.preventDefault();
-            const addButton = e.target.querySelector('button');
-            addButton.disabled = true;
-            addButton.textContent = 'Adicionando...';
+            const button = e.target.querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.textContent = isEditMode ? 'Salvando...' : 'Adicionando...';
             
-            const newIcon = {
-                name: document.getElementById('iconNameInput').value.trim(),
-                link: document.getElementById('iconLinkInput').value.trim(),
-                colorClass: document.getElementById('iconColorClassInput').value.trim(),
-                customBgColor: document.getElementById('iconCustomBgColorInput').value,
-                category: document.getElementById('iconCategorySelect').value,
-                createdAt: new Date() // Adiciona um timestamp
+            const iconData = {
+                name: iconNameInput.value.trim(),
+                link: iconLinkInput.value.trim(),
+                colorClass: iconColorClassInput.value.trim(),
+                customBgColor: iconCustomBgColorInput.value,
+                category: iconCategorySelect.value
             };
+
+            // Limpa customBgColor se houver colorClass
+            if (iconData.colorClass) {
+                iconData.customBgColor = '';
+            }
             
             try {
-                // SÓ VOCÊ: "ICONS" É O NOME DA COLEÇÃO NO FIRESTORE. VOCÊ PODE MUDAR SE PRECISAR.
-                const docRef = await addDoc(collection(db, "icones"), newIcon);
-                console.log("Ícone adicionado com ID: ", docRef.id);
+                if (isEditMode) {
+                    const idToUpdate = iconIdInput.value;
+                    const iconRef = doc(db, "icones", idToUpdate); // SÓ VOCÊ: "icones" é o nome da coleção
+                    await updateDoc(iconRef, iconData);
+                    console.log("Ícone atualizado com ID: ", idToUpdate);
+                    formStatusMessage.textContent = 'Ícone atualizado com sucesso!';
+                } else {
+                    iconData.createdAt = new Date(); // Adiciona timestamp apenas para novos ícones
+                    const docRef = await addDoc(collection(db, "icones"), iconData); // SÓ VOCÊ: "icones" é o nome da coleção
+                    console.log("Ícone adicionado com ID: ", docRef.id);
+                    formStatusMessage.textContent = 'Ícone adicionado com sucesso!';
+                }
                 
-                formStatusMessage.textContent = 'Ícone adicionado com sucesso!';
                 formStatusMessage.className = 'success';
                 
                 setTimeout(() => {
                     closeGeneratorModal();
-                    addButton.disabled = false;
-                    addButton.textContent = 'Adicionar Ícone ao Banco de Dados';
+                    button.disabled = false;
+                    button.textContent = isEditMode ? 'Salvar Alterações' : 'Adicionar Ícone ao Banco de Dados';
                 }, 1500);
 
             } catch (error) {
-                console.error("Erro ao adicionar ícone: ", error);
-                formStatusMessage.textContent = 'Erro ao adicionar. Tente novamente.';
+                console.error("Erro ao processar ícone: ", error);
+                formStatusMessage.textContent = 'Erro ao processar. Tente novamente.';
                 formStatusMessage.className = 'error';
-                addButton.disabled = false;
-                addButton.textContent = 'Adicionar Ícone ao Banco de Dados';
+                button.disabled = false;
+                button.textContent = isEditMode ? 'Salvar Alterações' : 'Adicionar Ícone ao Banco de Dados';
             }
         }
         
@@ -949,10 +1044,10 @@
 
         // --- Event Listeners ---
         themeToggle.addEventListener('click', toggleTheme);
-        openModalBtn.addEventListener('click', openGeneratorModal);
+        openModalBtn.addEventListener('click', openGeneratorModal); // Abre para adição
         closeModalBtn.addEventListener('click', closeGeneratorModal);
         modalOverlay.addEventListener('click', closeGeneratorModal);
-        addIconForm.addEventListener('submit', handleAddIcon);
+        iconForm.addEventListener('submit', handleSubmitIcon); // NOVO: Event listener para o formulário de ícones
         
         searchInput.addEventListener('input', () => {
             clearTimeout(typingTimer);
