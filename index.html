@@ -30,7 +30,8 @@
             color: #e0e0e0;
         }
 
-        /* SOBREPOSIÇÃO PARA O MODO DE PESQUISA */
+        /* SOBREPOSIÇÃO PARA O MODO DE PESQUISA (REMOVIDA) */
+        /*
         body.search-active::before {
             content: '';
             position: fixed;
@@ -48,6 +49,7 @@
             opacity: 0;
             pointer-events: none;
         }
+        */
 
         /* Oculta e desabilita interações no conteúdo principal quando a pesquisa está ativa */
         .category-container {
@@ -64,10 +66,11 @@
             pointer-events: none;
         }
 
-        /* --- Container para a barra flutuante e resultados --- */
+        /* --- Container para a barra flutuante --- */
         #floating-bar-wrapper {
             position: fixed;
-            bottom: 20px;
+            bottom: 20px; /* Padrão: na parte inferior */
+            top: auto;   /* Garante que não está fixado no topo por padrão */
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
@@ -76,20 +79,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: top 0.3s ease, bottom 0.3s ease, transform 0.3s ease; /* Transição para a movimentação */
+        }
+        
+        /* Ajusta a barra para o topo quando a pesquisa está ativa */
+        body.search-active #floating-bar-wrapper {
+             top: 20px;   /* Move para o topo */
+             bottom: auto; /* Desprende da parte inferior */
+             transform: translateX(-50%); /* Mantém centralizado horizontalmente */
         }
 
-        /* Container para os resultados rápidos */
+        /* Container para os resultados rápidos (agora fora da barra) */
         #quick-results-container {
-            display: none;
-            width: 100%;
+            position: fixed; /* Fixa na tela */
+            top: 75px; /* Ajusta para aparecer abaixo da barra de pesquisa no topo (20px da barra + altura da barra) */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
             border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
             padding: 10px;
             box-sizing: border-box;
             overflow: hidden;
+            max-height: calc(100vh - 100px); /* Limita a altura para caber na tela, deixando espaço */
+            overflow-y: auto; /* Adiciona scroll se os resultados forem muitos */
+            z-index: 998; /* Abaixo da barra de pesquisa, mas acima do conteúdo principal */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        body.search-active #quick-results-container {
+            opacity: 1;
+            visibility: visible;
         }
 
         body.dark-mode #quick-results-container {
@@ -99,10 +124,10 @@
         
         #quick-results-content {
             display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
             gap: 10px;
-            overflow-x: auto;
             padding: 5px;
-            -webkit-overflow-scrolling: touch;
+            justify-content: center; /* Centraliza os ícones */
         }
         
         /* Estilo para os ícones dentro da barra de resultados rápidos */
@@ -560,16 +585,18 @@
                 width: 36px;
                 height: 36px;
             }
+            #quick-results-container {
+                top: 85px; /* Ajuste para telas menores */
+                max-height: calc(100vh - 100px);
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="category-container" id="allCategoriesGrid">
-        <!-- O conteúdo das categorias e ícones será carregado aqui pelo JavaScript a partir do Firestore -->
-    </div>
+        </div>
 
-    <!-- Modal do Gerador de Código -->
     <div id="generator-modal-overlay"></div>
     <div id="generate-icon-code-section">
         <button id="close-generator-modal-btn">×</button>
@@ -594,7 +621,6 @@
             <div class="form-group">
                 <label for="iconCategorySelect">Categoria Onde Adicionar:</label>
                 <select id="iconCategorySelect" required>
-                    <!-- SÓ VOCÊ: SE QUISER ALTERAR AS CATEGORIAS, EDITE AS OPÇÕES ABAIXO -->
                     <option value="" disabled selected>Selecione uma categoria</option>
                     <option value="servicos-utilidades">Serviços & Utilidades</option>
                     <option value="cursos-concursos">Cursos & Concursos</option>
@@ -609,11 +635,7 @@
         <div id="form-status-message"></div>
     </div>
 
-    <!-- Barra Flutuante de Pesquisa -->
     <div id="floating-bar-wrapper">
-        <div id="quick-results-container">
-            <div id="quick-results-content"></div>
-        </div>
         <div id="search-container">
             <input type="text" id="search-input" placeholder="Pesquise Aqui...">
             <button id="open-generator-modal-btn" title="Adicionar novo Ícone">
@@ -623,7 +645,10 @@
         </div>
     </div>
     
-    <!-- Importações do Firebase -->
+    <div id="quick-results-container">
+        <div id="quick-results-content"></div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -632,13 +657,13 @@
         // --- SÓ VOCÊ: A CONFIGURAÇÃO DO FIREBASE SERÁ INJETADA AQUI PELO AMBIENTE ---
         // Em um ambiente local, você pode substituir isso pela sua configuração real.
           const firebaseConfig = {
-    apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
-    authDomain: "iconesutil.firebaseapp.com",
-    projectId: "iconesutil",
-    storageBucket: "iconesutil.firebasestorage.app",
-    messagingSenderId: "88285859566",
-    appId: "1:88285859566:web:e15fdb0c615b494455edff"
-  };
+            apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
+            authDomain: "iconesutil.firebaseapp.com",
+            projectId: "iconesutil",
+            storageBucket: "iconesutil.firebasestorage.app",
+            messagingSenderId: "88285859566",
+            appId: "1:88285859566:web:e15fdb0c615b494955edff" 
+          };
 
         // Inicialização do Firebase
         const app = initializeApp(firebaseConfig);
@@ -768,7 +793,12 @@
                     }
                 });
                 
-                categoryDiv.style.display = hasVisibleLinksInCategory ? 'block' : 'none';
+                // Esconde a categoria inteira se não houver links visíveis E se a pesquisa estiver ativa
+                if (searchTerm.length > 0) { // Só esconde categorias vazias durante a pesquisa
+                    categoryDiv.style.display = hasVisibleLinksInCategory ? 'block' : 'none';
+                } else {
+                    categoryDiv.style.display = 'block'; // Mostra todas as categorias quando a pesquisa está vazia
+                }
             });
         }
         
@@ -776,13 +806,25 @@
             quickResultsContent.innerHTML = ''; 
 
             if (searchTerm.length === 0) {
-                quickResultsContainer.style.display = 'none';
-                body.classList.remove('no-scroll', 'search-active');
+                quickResultsContainer.classList.remove('visible'); // Oculta a caixa de resultados
+                body.classList.remove('no-scroll', 'search-active'); 
+                document.querySelectorAll('.category-container').forEach(div => {
+                    div.style.opacity = '1';
+                    div.style.visibility = 'visible';
+                    div.style.pointerEvents = 'auto';
+                });
+                document.querySelectorAll('.color-category').forEach(div => div.style.display = 'block'); // Garante que todas as categorias voltem a ser exibidas
+                filterLinks(); 
                 return;
             }
             
-            quickResultsContainer.style.display = 'block';
+            quickResultsContainer.classList.add('visible'); // Mostra a caixa de resultados
             body.classList.add('no-scroll', 'search-active');
+            document.querySelectorAll('.category-container').forEach(div => {
+                div.style.opacity = '0';
+                div.style.visibility = 'hidden';
+                div.style.pointerEvents = 'none';
+            });
 
             let found = false;
             // Busca nos ícones renderizados no DOM principal
@@ -806,8 +848,11 @@
 
         function handleSearchFocus() {
             body.classList.add('search-active', 'no-scroll');
-            document.querySelectorAll('.color-category').forEach(categoryDiv => {
-                categoryDiv.style.display = 'block';
+            quickResultsContainer.classList.add('visible'); // Mostra a caixa de resultados ao focar
+            document.querySelectorAll('.category-container').forEach(div => {
+                div.style.opacity = '0';
+                div.style.visibility = 'hidden';
+                div.style.pointerEvents = 'none';
             });
         }
 
@@ -913,8 +958,8 @@
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 const searchTerm = searchInput.value.toLowerCase().trim();
-                filterLinks();
                 updateQuickResults(searchTerm);
+                filterLinks(); 
             }, doneTypingInterval);
         });
 
@@ -923,10 +968,15 @@
         searchInput.addEventListener('blur', () => {
             setTimeout(() => {
                 if(searchInput.value.trim().length === 0) {
-                    quickResultsContainer.style.display = 'none';
+                    quickResultsContainer.classList.remove('visible'); // Oculta a caixa de resultados
                     body.classList.remove('no-scroll', 'search-active');
-                    document.querySelectorAll('.color-category').forEach(div => div.style.display = 'block');
-                    filterLinks();
+                    document.querySelectorAll('.category-container').forEach(div => {
+                        div.style.opacity = '1';
+                        div.style.visibility = 'visible';
+                        div.style.pointerEvents = 'auto';
+                    });
+                    document.querySelectorAll('.color-category').forEach(div => div.style.display = 'block'); 
+                    filterLinks(); 
                 }
             }, 200);
         });
@@ -934,11 +984,10 @@
         // --- Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme();
-            authenticate(); // Inicia o processo de autenticação ao carregar a página
+            authenticate(); 
         });
 
     </script>
 
 </body>
 </html>
-
