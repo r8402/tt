@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gratuitos! - Acesso Rápido</title>
     <link rel="icon" type="image/png" href="logo1.png">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        /* CSS Variables para Theming Fácil */
+        /* CSS idêntico ao anterior */
         :root {
             --bg-color: #f0f2f5;
             --text-color: #333;
@@ -22,7 +21,6 @@
             --primary-color-hover: #0056b3;
             --separator-color: rgba(0, 0, 0, 0.05);
         }
-
         body.dark-mode {
             --bg-color: #22272e;
             --text-color: #e0e0e0;
@@ -37,25 +35,16 @@
             --primary-color-hover: #0062cc;
             --separator-color: rgba(255, 255, 255, 0.1);
         }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-top: 90px; /* Espaço para o header fixo */
+            padding-top: 90px;
             transition: background-color .3s ease, color .3s ease;
         }
-        
-        body.modal-open {
-            overflow: hidden;
-        }
-
-        /* --- Header Fixo --- */
+        body.modal-open { overflow: hidden; }
         #page-header {
             position: fixed;
             top: 0;
@@ -116,8 +105,6 @@
         }
         .header-button svg { width: 22px; height: 22px; }
         #theme-toggle span { font-size: 0.7em; font-weight: bold; }
-
-        /* --- Conteúdo Principal --- */
         main {
             padding: 20px;
             width: 100%;
@@ -125,26 +112,12 @@
             margin: 0 auto;
             box-sizing: border-box;
         }
-
-        /* --- Seção de Itens Fixados --- */
-        #pinned-section {
-            margin-bottom: 20px;
-        }
-        #pinned-section-title {
-            font-size: 1.5em;
-            color: var(--text-color);
-            border-bottom: 2px solid var(--separator-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* --- Grid de Categorias --- */
+        #pinned-section { margin-bottom: 20px; }
         .category-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
-
         .category-card {
             background-color: var(--card-bg-color);
             border-radius: 12px;
@@ -152,11 +125,9 @@
             padding: 25px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             border-top: 5px solid;
-            display: block; /* Garante que 'display: none' do filtro funcione */
+            display: block;
         }
-        .category-card.hidden {
-            display: none;
-        }
+        .category-card.hidden { display: none; }
         .category-header {
             display: flex;
             justify-content: space-between;
@@ -170,8 +141,6 @@
             font-size: 1.6em;
             color: var(--primary-color);
         }
-
-        /* --- Botões de Fixar --- */
         .pin-btn {
             background: none;
             border: none;
@@ -184,15 +153,12 @@
         .pin-btn svg { width: 22px; height: 22px; color: var(--text-color); }
         .pin-btn.pinned svg { color: var(--primary-color); }
         .pin-btn.pinned { opacity: 1; }
-        
-        /* --- Grid de Ícones --- */
         .icons-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 15px;
             justify-items: center;
         }
-
         .icon-item {
             box-sizing: border-box;
             display: flex;
@@ -205,14 +171,13 @@
             color: #fff;
             overflow: hidden;
             transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
-            width: 100%; /* Ocupa 100% da célula do grid */
-            aspect-ratio: 1 / 1; /* Mantém o ícone quadrado */
+            width: 100%;
+            aspect-ratio: 1 / 1;
             position: relative;
         }
         .icon-item.hidden { display: none; }
         body.dark-mode .icon-item { box-shadow: 0 2px 5px rgba(0,0,0,.3); }
         .icon-item:hover { transform: scale(1.05); }
-
         .icon-content {
             display: flex;
             flex-direction: column;
@@ -231,14 +196,8 @@
             line-height: 1.2;
             text-transform: uppercase;
         }
-
-        /* Cores de Ícones (mesmas classes de antes) */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
-        .copilot-icon {
-            background-image: linear-gradient(to bottom right,#2196F3,#4CAF50,#FFEB3B,#FF9800,#9C27B0);
-        }
-
-        /* --- Botões de Ação no Ícone (Fixar e Editar) --- */
+        .copilot-icon { background-image: linear-gradient(to bottom right,#2196F3,#4CAF50,#FFEB3B,#FF9800,#9C27B0); }
         .icon-actions {
             position: absolute;
             top: 2px;
@@ -263,11 +222,8 @@
             color: white;
         }
         .icon-action-btn svg { width: 14px; height: 14px; }
-        /* Alterar a cor do pino fixado para refletir o novo comportamento de fixação por usuário */
         .icon-action-btn.pin-icon-btn.pinned svg { color: #00c4ff; } 
         .icon-action-btn:hover { background-color: rgba(0, 0, 0, 0.7); }
-
-        /* Estilos do Modal (mantidos, mas com cores via CSS variables) */
         #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.3s ease; }
         #generator-modal-overlay.visible { display: block; opacity: 1; }
         #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 25px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--card-shadow); border-top: 5px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
@@ -286,8 +242,6 @@
         #form-status-message { margin-top: 15px; padding: 10px; border-radius: 5px; display: none; text-align: center; }
         #form-status-message.success { background-color: #d4edda; color: #155724; display: block; }
         #form-status-message.error { background-color: #f8d7da; color: #721c24; display: block; }
-
-        /* Media Queries para responsividade */
         @media (max-width: 768px) {
             body { padding-top: 80px; }
             #page-header { padding: 10px; }
@@ -303,7 +257,6 @@
     </style>
 </head>
 <body>
-
     <header id="page-header">
         <div class="header-content">
             <input type="text" id="search-input" placeholder="Pesquisar ícones...">
@@ -313,14 +266,12 @@
             <button id="theme-toggle" class="header-button" title="Alternar Modo"><span></span></button>
         </div>
     </header>
-
     <main>
         <div id="pinned-section"></div>
         <div id="regular-section-wrapper">
             <div class="category-grid" id="all-categories-grid"></div>
         </div>
     </main>
-
     <div id="generator-modal-overlay"></div>
     <div id="generate-icon-code-section">
         <button id="close-generator-modal-btn">×</button>
@@ -347,6 +298,7 @@
                 <label for="iconCategorySelect">Categoria Onde Adicionar:</label>
                 <select id="iconCategorySelect" required>
                     <option value="" disabled selected>Selecione uma categoria</option>
+                    <option value="fixados">Fixados</option>
                     <option value="servicos-utilidades">Serviços & Utilidades</option>
                     <option value="cursos-concursos">Cursos & Concursos</option>
                     <option value="ferramentas-downloads">Ferramentas & Downloads</option>
@@ -359,13 +311,12 @@
         </form>
         <div id="form-status-message"></div>
     </div>
-
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Configuração do Firebase (será injetada pelo ambiente) ---
         const firebaseConfig = {
             apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
             authDomain: "iconesutil.firebaseapp.com",
@@ -375,14 +326,13 @@
             appId: "1:88285859566:web:e15fdb0c615b494955edff"
         };
 
-        // --- Inicialização Firebase ---
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- Mapeamento de Detalhes de Categorias ---
         const categoryDetails = {
-            'pinned-icons': { name: 'Meus Ícones Fixados', color: '#6c757d' }, // Categoria especial
+            'public-featured': { name: 'Ícones em Destaque', color: '#dc3545' }, // NOVA categoria para DESTAQUES PÚBLICOS
+            'fixados': { name: 'Fixados', color: '#ffc107' }, 
             'servicos-utilidades': { name: 'Serviços & Utilidades', color: 'rgb(111, 66, 193)' },
             'cursos-concursos': { name: 'Cursos & Concursos', color: 'rgb(40, 167, 69)' },
             'ferramentas-downloads': { name: 'Ferramentas & Downloads', color: 'rgb(0, 123, 255)' },
@@ -391,20 +341,17 @@
             'midia-entretenimento': { name: 'Mídia & Entretenimento', color: 'rgb(220, 53, 69)' }
         };
 
-        // --- Variáveis Globais e Estado da Aplicação ---
         let allIcons = [];
-        let pinnedCategoryIds = []; // Esta ainda controla categorias fixadas globalmente (para todos)
-        let currentUser = null; // Armazenará o objeto de usuário autenticado
+        let pinnedCategoryIds = [];
+        let currentUser = null; 
         let isEditMode = false;
 
-        // --- Elementos do DOM ---
         const D = {
             body: document.body,
             searchInput: document.getElementById('search-input'),
             themeToggle: document.getElementById('theme-toggle'),
             pinnedSection: document.getElementById('pinned-section'),
             allCategoriesGrid: document.getElementById('all-categories-grid'),
-            // Modal
             modalOverlay: document.getElementById('generator-modal-overlay'),
             generatorModal: document.getElementById('generate-icon-code-section'),
             openModalBtn: document.getElementById('open-generator-modal-btn'),
@@ -421,13 +368,11 @@
             submitIconButton: document.getElementById('submit-icon-button'),
         };
 
-        // --- SVG Ícones para Botões ---
         const ICONS = {
             PIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 3v2h6v5h2v-5h6v-2l-2-3z"/></svg>`,
             EDIT: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`
         };
 
-        // --- Funções de Tema ---
         const applyTheme = () => {
             const savedTheme = localStorage.getItem('theme');
             D.body.classList.toggle('dark-mode', savedTheme === 'dark');
@@ -440,66 +385,56 @@
             D.themeToggle.querySelector('span').textContent = isDark ? 'Claro' : 'Escuro';
         };
 
-        // --- Funções de Persistência de Categorias (Globais) ---
-        const loadPinnedCategories = () => {
-            pinnedCategoryIds = JSON.parse(localStorage.getItem('pinnedCategories') || '[]');
-        };
-
-        const savePinnedCategories = () => {
-            localStorage.setItem('pinnedCategories', JSON.stringify(pinnedCategoryIds));
-        };
-
-        // --- Funções de Lógica de Pin (Agora com Firebase para Ícones) ---
-        const togglePinCategory = (categoryId) => {
+        // Fixar Categoria (continua sendo uma preferência pessoal)
+        const togglePinCategory = async (categoryId) => {
+            if (!currentUser) return;
             const index = pinnedCategoryIds.indexOf(categoryId);
-            if (index > -1) pinnedCategoryIds.splice(index, 1);
-            else pinnedCategoryIds.push(categoryId);
-            
-            savePinnedCategories();
+            if (index > -1) {
+                pinnedCategoryIds.splice(index, 1);
+            } else {
+                pinnedCategoryIds.push(categoryId);
+            }
+            try {
+                const userSettingsRef = doc(db, "usuarios", currentUser.uid);
+                await setDoc(userSettingsRef, { pinnedCategories: pinnedCategoryIds }, { merge: true });
+            } catch (error) {
+                console.error("Erro ao salvar categorias fixadas:", error);
+            }
             renderPage();
         };
-
+        
+        // **LÓGICA ALTERADA: Fixar um ÍCONE agora é uma ação PÚBLICA**
         const togglePinIcon = async (iconId) => {
-            if (!currentUser) {
-                alert('Você precisa estar autenticado para fixar ícones.');
-                return;
-            }
-
             const iconRef = doc(db, "icones", iconId);
             const icon = allIcons.find(i => i.id === iconId);
-
             if (!icon) return;
 
-            const isIconPinnedByCurrentUser = icon.pinnedByUserIds && icon.pinnedByUserIds.includes(currentUser.uid);
+            // O novo valor será o inverso do valor atual. Se for undefined, se torna true.
+            const novoEstado = !icon.isPublicamenteFixado; 
 
             try {
-                if (isIconPinnedByCurrentUser) {
-                    await updateDoc(iconRef, {
-                        pinnedByUserIds: arrayRemove(currentUser.uid)
-                    });
-                } else {
-                    await updateDoc(iconRef, {
-                        pinnedByUserIds: arrayUnion(currentUser.uid)
-                    });
-                }
+                await updateDoc(iconRef, {
+                    isPublicamenteFixado: novoEstado
+                });
+                // A atualização visual ocorrerá automaticamente pelo onSnapshot
             } catch (error) {
-                console.error("Erro ao fixar/desafixar ícone:", error);
-                alert("Não foi possível atualizar o estado de fixação do ícone. Tente novamente.");
+                console.error("Erro ao destacar ícone publicamente:", error);
+                alert("Não foi possível atualizar o destaque do ícone. Tente novamente.");
             }
-            // A re-renderização será acionada pelo onSnapshot do Firestore
         };
 
-        // --- Funções de Renderização ---
+        // **LÓGICA ALTERADA: O HTML do ícone reflete o estado PÚBLICO**
         const createIconHTML = (icon) => {
             const colorClass = icon.colorClass ? ` ${icon.colorClass}` : '';
             const style = !icon.colorClass ? ` style="--icon-background-color: ${icon.customBgColor};"` : '';
-            // Verifica se o ícone está fixado pelo usuário atual
-            const isIconPinned = currentUser && icon.pinnedByUserIds && icon.pinnedByUserIds.includes(currentUser.uid);
+            
+            // Verifica se o ícone está fixado publicamente
+            const isIconPinned = icon.isPublicamenteFixado === true;
 
             return `
                 <a href="${icon.link}" class="icon-item${colorClass}" data-label="${icon.name}" data-id="${icon.id}" target="_blank">
                     <div class="icon-actions">
-                        <button class="icon-action-btn pin-icon-btn ${isIconPinned ? 'pinned' : ''}" data-id="${icon.id}" title="${isIconPinned ? 'Desafixar Ícone' : 'Fixar Ícone'}">${ICONS.PIN}</button>
+                        <button class="icon-action-btn pin-icon-btn ${isIconPinned ? 'pinned' : ''}" data-id="${icon.id}" title="${isIconPinned ? 'Remover Destaque' : 'Destacar Publicamente'}">${ICONS.PIN}</button>
                         <button class="icon-action-btn edit-icon-btn" data-id="${icon.id}" title="Editar Ícone">${ICONS.EDIT}</button>
                     </div>
                     <div class="icon-content"${style}>
@@ -507,23 +442,24 @@
                     </div>
                 </a>`;
         };
-        
+
         const createCategoryHTML = (categoryId, icons) => {
             const details = categoryDetails[categoryId];
             if (!details) return '';
+            
+            const isCategoryPinnedByUser = pinnedCategoryIds.includes(categoryId);
 
-            // A categoria de ícones fixados por usuário não tem um botão de fixar categoria
-            const isCategoryPinnedGlobally = pinnedCategoryIds.includes(categoryId);
-            const isUserPinnedCategory = categoryId === 'pinned-icons';
-
+            // O botão de fixar categoria não deve aparecer na seção de destaques públicos
+            const showPinButton = categoryId !== 'public-featured'; 
+            
             const iconsHTML = icons.map(icon => createIconHTML(icon)).join('');
-
+            
             return `
                 <div class="category-card" style="border-color: ${details.color};" data-category="${categoryId}">
                     <div class="category-header">
                         <h2>${details.name}</h2>
-                        ${!isUserPinnedCategory ? `
-                        <button class="pin-btn pin-category-btn ${isCategoryPinnedGlobally ? 'pinned' : ''}" data-id="${categoryId}" title="${isCategoryPinnedGlobally ? 'Desafixar Categoria' : 'Fixar Categoria'}">
+                        ${showPinButton ? `
+                        <button class="pin-btn pin-category-btn ${isCategoryPinnedByUser ? 'pinned' : ''}" data-id="${categoryId}" title="${isCategoryPinnedByUser ? 'Desafixar Categoria' : 'Fixar Categoria'}">
                             ${ICONS.PIN}
                         </button>
                         ` : ''}
@@ -534,6 +470,7 @@
                 </div>`;
         };
 
+        // **LÓGICA ALTERADA: Renderiza a seção de destaques PÚBLICOS primeiro**
         const renderPage = () => {
             const iconsByCategory = allIcons.reduce((acc, icon) => {
                 const category = icon.category || 'outros';
@@ -542,52 +479,47 @@
                 return acc;
             }, {});
 
-            // Renderiza Seção Fixada (Ícones Fixados pelo Usuário Atual)
             D.pinnedSection.innerHTML = '';
             let hasPinnedContent = false;
 
-            const userPinnedIcons = allIcons.filter(icon => 
-                currentUser && icon.pinnedByUserIds && icon.pinnedByUserIds.includes(currentUser.uid)
-            );
-
-            if (userPinnedIcons.length > 0) {
-                D.pinnedSection.innerHTML += createCategoryHTML('pinned-icons', userPinnedIcons);
+            // 1. Renderiza a seção de Ícones em Destaque (público)
+            const publicFeaturedIcons = allIcons.filter(icon => icon.isPublicamenteFixado === true);
+            if (publicFeaturedIcons.length > 0) {
+                D.pinnedSection.innerHTML += createCategoryHTML('public-featured', publicFeaturedIcons);
                 hasPinnedContent = true;
             }
 
-            // Renderiza Categorias Fixadas Globalmente (se houver)
+            // 2. Renderiza as Categorias Fixadas pelo usuário (pessoal)
             const pinnedCategoriesHTML = pinnedCategoryIds
                 .map(id => createCategoryHTML(id, iconsByCategory[id] || []))
                 .join('');
             
             if(pinnedCategoriesHTML) {
                 hasPinnedContent = true;
-                // Cria ou seleciona o grid de categorias fixadas na seção de pinados
-                let pinnedGrid = D.pinnedSection.querySelector('.category-grid');
+                let pinnedGrid = D.pinnedSection.querySelector('.category-grid#pinned-user-categories');
                 if(!pinnedGrid) {
                     pinnedGrid = document.createElement('div');
                     pinnedGrid.className = 'category-grid';
+                    pinnedGrid.id = 'pinned-user-categories';
                     D.pinnedSection.appendChild(pinnedGrid);
                 }
-                pinnedGrid.innerHTML += pinnedCategoriesHTML;
+                pinnedGrid.innerHTML = pinnedCategoriesHTML;
             }
-            
+                        
             D.pinnedSection.style.display = hasPinnedContent ? 'block' : 'none';
 
-            // Renderiza Categorias Regulares
+            // 3. Renderiza as categorias regulares
             const regularCategoriesHTML = Object.keys(categoryDetails)
-                .filter(id => id !== 'pinned-icons' && !pinnedCategoryIds.includes(id) && iconsByCategory[id]?.length > 0)
+                .filter(id => id !== 'public-featured' && !pinnedCategoryIds.includes(id) && iconsByCategory[id]?.length > 0)
                 .map(id => createCategoryHTML(id, iconsByCategory[id]))
                 .join('');
-            
+                        
             D.allCategoriesGrid.innerHTML = regularCategoriesHTML;
 
-            // Re-aplica filtro de pesquisa e adiciona listeners
             filterContent();
             addEventListenersToItems();
         };
 
-        // --- Filtragem e Pesquisa ---
         const filterContent = () => {
             const searchTerm = D.searchInput.value.toLowerCase().trim();
             document.querySelectorAll('.category-card').forEach(card => {
@@ -598,12 +530,10 @@
                     icon.classList.toggle('hidden', !isVisible);
                     if (isVisible) hasVisibleIcon = true;
                 });
-                // Esconde a categoria se não tiver ícones visíveis E a pesquisa estiver ativa
                 card.classList.toggle('hidden', searchTerm && !hasVisibleIcon);
             });
         };
 
-        // --- Funções do Modal ---
         const openModal = (editMode = false, iconId = null) => {
             isEditMode = editMode;
             D.iconForm.reset();
@@ -612,10 +542,7 @@
 
             if (isEditMode && iconId) {
                 const icon = allIcons.find(i => i.id === iconId);
-                if (!icon) {
-                    alert('Erro: Ícone não encontrado.');
-                    return;
-                }
+                if (!icon) return;
                 D.modalTitle.textContent = 'Editar Ícone';
                 D.submitIconButton.textContent = 'Salvar Alterações';
                 D.iconIdInput.value = icon.id;
@@ -629,25 +556,22 @@
                 D.submitIconButton.textContent = 'Adicionar ao Banco de Dados';
                 D.iconIdInput.value = '';
             }
-
             D.modalOverlay.classList.add('visible');
             D.generatorModal.classList.add('visible');
             D.body.classList.add('modal-open');
         };
-        
+
         const closeModal = () => {
             D.modalOverlay.classList.remove('visible');
             D.generatorModal.classList.remove('visible');
             D.body.classList.remove('modal-open');
         };
-        
-        // --- Processamento do Formulário (Adicionar/Editar) ---
+
         const handleSubmitIcon = async (e) => {
             e.preventDefault();
             const button = D.submitIconButton;
             button.disabled = true;
             button.textContent = isEditMode ? 'Salvando...' : 'Adicionando...';
-
             const iconData = {
                 name: D.iconNameInput.value.trim(),
                 link: D.iconLinkInput.value.trim(),
@@ -655,78 +579,86 @@
                 customBgColor: D.iconCustomBgColorInput.value,
                 category: D.iconCategorySelect.value
             };
+            if (!isEditMode) {
+                iconData.isPublicamenteFixado = false; // Garante que novos ícones não nasçam destacados
+            }
             if (iconData.colorClass) iconData.customBgColor = '';
-
             try {
                 if (isEditMode) {
-                    const id = D.iconIdInput.value;
-                    await updateDoc(doc(db, "icones", id), iconData);
+                    await updateDoc(doc(db, "icones", D.iconIdInput.value), iconData);
                     D.formStatusMessage.textContent = 'Ícone atualizado com sucesso!';
                 } else {
-                    iconData.createdAt = new Date();
-                    // Novos ícones começam sem ninguém fixando
-                    iconData.pinnedByUserIds = []; 
                     await addDoc(collection(db, "icones"), iconData);
                     D.formStatusMessage.textContent = 'Ícone adicionado com sucesso!';
                 }
                 D.formStatusMessage.className = 'success';
                 setTimeout(() => closeModal(), 1500);
             } catch (error) {
-                console.error("Erro ao processar ícone:", error);
-                D.formStatusMessage.textContent = 'Erro ao processar. Tente novamente.';
+                console.error("Erro ao salvar ícone: ", error);
+                D.formStatusMessage.textContent = `Erro: ${error.message}`;
                 D.formStatusMessage.className = 'error';
             } finally {
                 button.disabled = false;
+                button.textContent = isEditMode ? 'Salvar Alterações' : 'Adicionar ao Banco de Dados';
             }
         };
 
-        // --- Adicionar Event Listeners ---
         const addEventListenersToItems = () => {
-            document.querySelectorAll('.pin-category-btn').forEach(btn => btn.onclick = () => togglePinCategory(btn.dataset.id));
-            // Alterado para chamar togglePinIcon
-            document.querySelectorAll('.pin-icon-btn').forEach(btn => btn.onclick = (e) => { e.preventDefault(); togglePinIcon(btn.dataset.id); });
-            document.querySelectorAll('.edit-icon-btn').forEach(btn => btn.onclick = (e) => { e.preventDefault(); openModal(true, btn.dataset.id); });
+            const contentArea = document.querySelector('main');
+            contentArea.onclick = function(event) {
+                const target = event.target.closest('button');
+                if (!target) return;
+                const id = target.dataset.id;
+                if (target.classList.contains('pin-category-btn')) {
+                    togglePinCategory(id);
+                } else if (target.classList.contains('pin-icon-btn')) {
+                    event.preventDefault(); 
+                    togglePinIcon(id);
+                } else if (target.classList.contains('edit-icon-btn')) {
+                    event.preventDefault(); 
+                    openModal(true, id);
+                }
+            };
         };
 
-        const setupGlobalEventListeners = () => {
+        const initApp = () => {
+            applyTheme();
             D.themeToggle.addEventListener('click', toggleTheme);
             D.searchInput.addEventListener('input', filterContent);
-            D.openModalBtn.addEventListener('click', () => openModal(false));
+            D.openModalBtn.addEventListener('click', () => openModal());
             D.closeModalBtn.addEventListener('click', closeModal);
             D.modalOverlay.addEventListener('click', closeModal);
             D.iconForm.addEventListener('submit', handleSubmitIcon);
-        };
 
-        // --- Inicialização ---
-        const init = async () => {
-            applyTheme();
-            loadPinnedCategories(); // Carrega categorias fixadas (globais)
-            setupGlobalEventListeners();
-
-            try {
-                await signInAnonymously(auth);
-            } catch(error) {
-                console.error("Falha na autenticação anônima:", error);
-                D.allCategoriesGrid.innerHTML = '<p>Erro de autenticação. Não foi possível carregar os ícones.</p>';
-                return;
-            }
-            
-            onAuthStateChanged(auth, user => {
-                currentUser = user; // Define o usuário atual
-                if (user) {
-                    onSnapshot(collection(db, "icones"), (snapshot) => {
-                        allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        renderPage(); // Re-renderiza sempre que os ícones mudam
-                    });
-                } else {
-                    allIcons = []; // Limpa os ícones se não houver usuário (opcional, dependendo do comportamento desejado)
-                    renderPage();
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                if (!user) {
+                    try {
+                        const userCredential = await signInAnonymously(auth);
+                        currentUser = userCredential.user;
+                    } catch(error) {
+                        console.error("Erro na autenticação anônima:", error);
+                    }
                 }
+                
+                if (currentUser) {
+                    const userSettingsRef = doc(db, "usuarios", currentUser.uid);
+                    const docSnap = await getDoc(userSettingsRef);
+                    if (docSnap.exists() && docSnap.data().pinnedCategories) {
+                        pinnedCategoryIds = docSnap.data().pinnedCategories;
+                    }
+                }
+
+                onSnapshot(collection(db, 'icones'), (snapshot) => {
+                    allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderPage();
+                }, (error) => {
+                    console.error("Erro ao buscar ícones:", error);
+                });
             });
         };
 
-        document.addEventListener('DOMContentLoaded', init);
-
+        initApp();
     </script>
 </body>
 </html>
