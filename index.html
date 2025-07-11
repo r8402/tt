@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head>
+<html lang="pt-BR">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gratuitos! - Acesso Rápido</title>
@@ -242,6 +243,19 @@
         #form-status-message { margin-top: 15px; padding: 10px; border-radius: 5px; display: none; text-align: center; }
         #form-status-message.success { background-color: #d4edda; color: #155724; display: block; }
         #form-status-message.error { background-color: #f8d7da; color: #721c24; display: block; }
+
+        /* NEW: Styles for search results container */
+        #search-results-container {
+            display: none; /* Hidden by default */
+            padding: 20px 0;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); /* Same as .icons-grid */
+            gap: 15px; /* Same as .icons-grid */
+            justify-items: center; /* Same as .icons-grid */
+        }
+        #search-results-container.visible {
+            display: grid; /* Show as grid when visible */
+        }
+
         @media (max-width: 768px) {
             body { padding-top: 80px; }
             #page-header { padding: 10px; }
@@ -250,6 +264,7 @@
             .category-card { padding: 15px; }
             .category-header h2 { font-size: 1.4em; }
             .icons-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+            #search-results-container { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; } /* Adjust for mobile */
             #generate-icon-code-section { padding: 20px 15px; h2 { font-size: 1.4em; } }
             #search-input { font-size: 1em; }
             .header-button { width: 40px; height: 40px; }
@@ -271,6 +286,8 @@
         <div id="regular-section-wrapper">
             <div class="category-grid" id="all-categories-grid"></div>
         </div>
+        <!-- NEW: Container for search results -->
+        <div id="search-results-container"></div>
     </main>
     <div id="generator-modal-overlay"></div>
     <div id="generate-icon-code-section">
@@ -352,6 +369,8 @@
             themeToggle: document.getElementById('theme-toggle'),
             pinnedSection: document.getElementById('pinned-section'),
             allCategoriesGrid: document.getElementById('all-categories-grid'),
+            regularSectionWrapper: document.getElementById('regular-section-wrapper'), // Added
+            searchResultsContainer: document.getElementById('search-results-container'), // Added
             modalOverlay: document.getElementById('generator-modal-overlay'),
             generatorModal: document.getElementById('generate-icon-code-section'),
             openModalBtn: document.getElementById('open-generator-modal-btn'),
@@ -419,7 +438,17 @@
                 // A atualização visual ocorrerá automaticamente pelo onSnapshot
             } catch (error) {
                 console.error("Erro ao destacar ícone publicamente:", error);
-                alert("Não foi possível atualizar o destaque do ícone. Tente novamente.");
+                // Using a custom message box instead of alert()
+                const messageBox = document.createElement('div');
+                messageBox.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
+                    font-family: sans-serif; text-align: center;
+                `;
+                messageBox.textContent = "Não foi possível atualizar o destaque do ícone. Tente novamente.";
+                document.body.appendChild(messageBox);
+                setTimeout(() => messageBox.remove(), 3000);
             }
         };
 
@@ -505,7 +534,7 @@
                 }
                 pinnedGrid.innerHTML = pinnedCategoriesHTML;
             }
-                        
+            
             D.pinnedSection.style.display = hasPinnedContent ? 'block' : 'none';
 
             // 3. Renderiza as categorias regulares
@@ -513,26 +542,52 @@
                 .filter(id => id !== 'public-featured' && !pinnedCategoryIds.includes(id) && iconsByCategory[id]?.length > 0)
                 .map(id => createCategoryHTML(id, iconsByCategory[id]))
                 .join('');
-                        
+            
             D.allCategoriesGrid.innerHTML = regularCategoriesHTML;
 
-            filterContent();
+            // Ensure the categorized view is visible by default
+            D.regularSectionWrapper.style.display = 'block';
+            D.searchResultsContainer.classList.remove('visible'); // Hide search results by default
+            D.searchResultsContainer.innerHTML = ''; // Clear search results
+            
             addEventListenersToItems();
         };
 
+        // **MODIFIED: filterContent now handles showing/hiding sections based on search term**
         const filterContent = () => {
             const searchTerm = D.searchInput.value.toLowerCase().trim();
-            document.querySelectorAll('.category-card').forEach(card => {
-                let hasVisibleIcon = false;
-                card.querySelectorAll('.icon-item').forEach(icon => {
-                    const label = icon.dataset.label.toLowerCase();
-                    const isVisible = label.includes(searchTerm);
-                    icon.classList.toggle('hidden', !isVisible);
-                    if (isVisible) hasVisibleIcon = true;
-                });
-                card.classList.toggle('hidden', searchTerm && !hasVisibleIcon);
-            });
+
+            if (searchTerm) {
+                // Hide all category cards and the pinned section
+                D.pinnedSection.style.display = 'none';
+                D.regularSectionWrapper.style.display = 'none'; // Hide the main category wrapper
+
+                // Show search results container and populate it
+                D.searchResultsContainer.classList.add('visible');
+                D.searchResultsContainer.innerHTML = ''; // Clear previous results
+
+                const matchingIcons = allIcons.filter(icon =>
+                    icon.name.toLowerCase().includes(searchTerm)
+                );
+
+                if (matchingIcons.length > 0) {
+                    D.searchResultsContainer.innerHTML = matchingIcons.map(icon => createIconHTML(icon)).join('');
+                } else {
+                    D.searchResultsContainer.innerHTML = `<p style="text-align: center; color: var(--text-color); margin-top: 50px;">Nenhum ícone encontrado para "${searchTerm}".</p>`;
+                }
+            } else {
+                // Hide search results container
+                D.searchResultsContainer.classList.remove('visible');
+                D.searchResultsContainer.innerHTML = ''; // Clear results
+
+                // Show all category cards and the pinned section again
+                D.pinnedSection.style.display = D.pinnedSection.children.length > 0 ? 'block' : 'none';
+                D.regularSectionWrapper.style.display = 'block'; // Show the main category wrapper
+            }
+            // Always re-attach event listeners after DOM manipulation
+            addEventListenersToItems();
         };
+
 
         const openModal = (editMode = false, iconId = null) => {
             isEditMode = editMode;
@@ -604,61 +659,75 @@
         };
 
         const addEventListenersToItems = () => {
-            const contentArea = document.querySelector('main');
-            contentArea.onclick = function(event) {
-                const target = event.target.closest('button');
-                if (!target) return;
-                const id = target.dataset.id;
-                if (target.classList.contains('pin-category-btn')) {
-                    togglePinCategory(id);
-                } else if (target.classList.contains('pin-icon-btn')) {
-                    event.preventDefault(); 
-                    togglePinIcon(id);
-                } else if (target.classList.contains('edit-icon-btn')) {
-                    event.preventDefault(); 
-                    openModal(true, id);
-                }
-            };
-        };
+            // Remove existing listeners to prevent duplicates
+            document.querySelectorAll('.pin-category-btn, .pin-icon-btn, .edit-icon-btn').forEach(btn => {
+                btn.removeEventListener('click', handleDynamicButtonClick);
+            });
 
-        const initApp = () => {
-            applyTheme();
-            D.themeToggle.addEventListener('click', toggleTheme);
-            D.searchInput.addEventListener('input', filterContent);
-            D.openModalBtn.addEventListener('click', () => openModal());
-            D.closeModalBtn.addEventListener('click', closeModal);
-            D.modalOverlay.addEventListener('click', closeModal);
-            D.iconForm.addEventListener('submit', handleSubmitIcon);
-
-            onAuthStateChanged(auth, async (user) => {
-                currentUser = user;
-                if (!user) {
-                    try {
-                        const userCredential = await signInAnonymously(auth);
-                        currentUser = userCredential.user;
-                    } catch(error) {
-                        console.error("Erro na autenticação anônima:", error);
-                    }
-                }
-                
-                if (currentUser) {
-                    const userSettingsRef = doc(db, "usuarios", currentUser.uid);
-                    const docSnap = await getDoc(userSettingsRef);
-                    if (docSnap.exists() && docSnap.data().pinnedCategories) {
-                        pinnedCategoryIds = docSnap.data().pinnedCategories;
-                    }
-                }
-
-                onSnapshot(collection(db, 'icones'), (snapshot) => {
-                    allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderPage();
-                }, (error) => {
-                    console.error("Erro ao buscar ícones:", error);
-                });
+            // Add new listeners
+            document.querySelectorAll('.pin-category-btn').forEach(btn => {
+                btn.addEventListener('click', handleDynamicButtonClick);
+            });
+            document.querySelectorAll('.pin-icon-btn').forEach(btn => {
+                btn.addEventListener('click', handleDynamicButtonClick);
+            });
+            document.querySelectorAll('.edit-icon-btn').forEach(btn => {
+                btn.addEventListener('click', handleDynamicButtonClick);
             });
         };
 
-        initApp();
+        const handleDynamicButtonClick = (event) => {
+            const target = event.target.closest('button');
+            if (!target) return;
+            const id = target.dataset.id;
+            if (target.classList.contains('pin-category-btn')) {
+                togglePinCategory(id);
+            } else if (target.classList.contains('pin-icon-btn')) {
+                event.preventDefault(); 
+                togglePinIcon(id);
+            } else if (target.classList.contains('edit-icon-btn')) {
+                event.preventDefault(); // Prevent navigation if it's part of an <a> tag
+                openModal(true, id);
+            }
+        };
+
+        // Event Listeners
+        D.themeToggle.addEventListener('click', toggleTheme);
+        D.searchInput.addEventListener('input', filterContent);
+        D.openModalBtn.addEventListener('click', () => openModal(false));
+        D.closeModalBtn.addEventListener('click', closeModal);
+        D.modalOverlay.addEventListener('click', closeModal);
+        D.iconForm.addEventListener('submit', handleSubmitIcon);
+
+        // Firebase Auth and Data Listeners
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                // Listen for user-specific settings (pinned categories)
+                onSnapshot(doc(db, "usuarios", user.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        pinnedCategoryIds = docSnap.data().pinnedCategories || [];
+                    } else {
+                        pinnedCategoryIds = [];
+                    }
+                    renderPage();
+                });
+            } else {
+                // Sign in anonymously if no user is logged in
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Erro ao fazer login anônimo:", error);
+                });
+            }
+        });
+
+        // Listen for all icons changes
+        onSnapshot(collection(db, "icones"), (snapshot) => {
+            allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderPage();
+        });
+
+        // Initial theme application
+        document.addEventListener('DOMContentLoaded', applyTheme);
     </script>
 </body>
 </html>
