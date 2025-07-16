@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gratuitos! - Acesso Rápido</title>
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
+    <style>
+        /* --- GERAL & TEMA --- */
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --card-bg-color: #ffffff;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --header-bg-color: rgba(255, 255, 255, 0.8);
+            --input-bg-color: #fff;
+            --input-border-color: #ccc;
+            --button-bg-color: #e9ecef;
+            --button-text-color: #333;
+            --primary-color: #007bff;
+            --primary-color-hover: #0056b3;
+            --separator-color: rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark-mode {
+            --bg-color: #22272e;
+            --text-color: #e0e0e0;
+            --card-bg-color: #2d333b;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --header-bg-color: rgba(45, 51, 59, 0.8);
+            --input-bg-color: #3a3a3a;
+            --input-border-color: #555;
+            --button-bg-color: #555;
+            --button-text-color: #e0e0e0;
+            --primary-color: #007bff;
+            --primary-color-hover: #0062cc;
+            --separator-color: rgba(255, 255, 255, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 90px;
+            transition: background-color .3s ease, color .3s ease;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        main {
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        /* --- CABEÇALHO FIXO --- */
+        #page-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            background-color: var(--header-bg-color);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-content {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #search-input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 50px;
+            font-size: 1.1em;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            outline: none;
+            transition: all .3s ease;
+        }
+
+        #search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .header-button {
+            flex-shrink: 0;
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all .2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .header-button:hover {
+            transform: scale(1.1);
+            opacity: .9;
+        }
+
+        .header-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .header-button svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        #theme-toggle span {
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        /* --- SEÇÕES & CARDS DE CATEGORIA --- */
+        #pinned-section {
+            margin-bottom: 20px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 5px solid;
+            display: block;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--separator-color);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+        }
+
+        .category-header h2 {
+            margin: 0;
+            font-size: 1.6em;
+            color: var(--primary-color);
+        }
+
+        .pin-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.5;
+            transition: opacity 0.2s, transform 0.2s, display 0.3s;
+            display: none;
+        }
+        
+        body.master-edit-mode .pin-btn {
+            display: block;
+        }
+
+        .pin-btn:hover {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .pin-btn svg {
+            width: 22px;
+            height: 22px;
+            color: var(--text-color);
+        }
+
+        .pin-btn.pinned svg {
+            color: var(--primary-color);
+        }
+
+        .pin-btn.pinned {
+            opacity: 1;
+        }
+
+        /* --- ÍCONES & GRID DE ÍCONES --- */
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 15px;
+            justify-items: center;
+        }
+
+        .icon-item {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+            text-decoration: none;
+            color: #fff;
+            overflow: hidden;
+            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            position: relative;
+        }
+
+        body.dark-mode .icon-item {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .3);
+        }
+
+        .icon-item:hover {
+            transform: scale(1.05);
+        }
+
+        .icon-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: var(--icon-background-color, #777);
+        }
+
+        .icon-label {
+            font-size: 0.85em;
+            text-align: center;
+            padding: 5px;
+            word-break: break-word;
+            font-weight: bold;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .icon-actions {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+        }
+
+        body.master-edit-mode .icon-item:hover .icon-actions {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .icon-action-btn {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        .icon-action-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .icon-action-btn.pin-icon-btn.pinned svg {
+            color: #00c4ff;
+        }
+
+        .icon-action-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Classes de Cor para Ícones */
+        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
+        .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
+
+        /* --- MODAL --- */
+        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.3s ease; }
+        #generator-modal-overlay.visible { display: block; opacity: 1; }
+        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 25px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--card-shadow); border-top: 5px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
+        #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 25px 0; font-size: 1.8em; border-bottom: 2px solid var(--separator-color); padding-bottom: 10px; }
+        #close-generator-modal-btn { position: absolute; top: 15px; right: 15px; background: var(--button-bg-color); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem; font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
+        #close-generator-modal-btn:hover { background-color: #dc3545; color: white; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); }
+        .form-group input[type="text"], .form-group input[type="url"], .form-group select { width: 100%; padding: 12px 15px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: var(--input-bg-color); color: var(--text-color); }
+        .form-group input[type="color"] { width: 100%; padding: 5px; height: 45px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
+        #submit-icon-button { width: 100%; padding: 12px 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color .3s ease; font-weight: 500; margin-top: 10px; }
+        #submit-icon-button:hover { background-color: var(--primary-color-hover); }
+        .label-hint { font-size: 0.85em; color: #777; font-weight: 400; }
+        body.dark-mode .label-hint { color: #bbb; }
+        #form-status-message { margin-top: 15px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
+        #form-status-message.success { background-color: #d4edda; color: #155724; display: block; }
+        #form-status-message.error { background-color: #f8d7da; color: #721c24; display: block; }
+
+        /* --- CONTAINER DE RESULTADOS DA BUSCA --- */
+        #search-results-container { display: none; padding: 20px 0; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; justify-items: center; }
+        #search-results-container.visible { display: grid; }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            body { padding-top: 80px; }
+            #page-header { padding: 10px; }
+            main { padding: 10px; }
+            .category-grid { grid-template-columns: 1fr; gap: 20px; }
+            .category-card { padding: 15px; }
+            .category-header h2 { font-size: 1.4em; }
+            .icons-grid, #search-results-container { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+            #generate-icon-code-section { padding: 20px 15px; }
+            #generate-icon-code-section h2 { font-size: 1.4em; }
+            #search-input { font-size: 1em; }
+            .header-button { width: 40px; height: 40px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="page-header">
+        <div class="header-content">
+            <input type="text" id="search-input" placeholder="Pesquisar ícones..." aria-label="Pesquisar ícones">
+            <button id="master-edit-toggle" class="header-button" title="Ativar Modo de Edição" aria-label="Ativar Modo de Edição">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+            </button>
+            <button id="open-generator-modal-btn" class="header-button" title="Adicionar novo Ícone" aria-label="Adicionar novo Ícone">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </button>
+            <button id="theme-toggle" class="header-button" title="Alternar Tema" aria-label="Alternar Tema"><span></span></button>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div id="pinned-section"></div>
+        <div id="regular-section-wrapper">
+            <div class="category-grid" id="all-categories-grid"></div>
+        </div>
+        <div id="search-results-container"></div>
+    </main>
+
+    <div id="generator-modal-overlay"></div>
+    <div id="generate-icon-code-section" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button id="close-generator-modal-btn" aria-label="Fechar modal">×</button>
+        <h2 id="modal-title">Adicionar Novo Ícone</h2>
+        <form id="icon-form" novalidate>
+            <input type="hidden" id="iconIdInput">
+            <div class="form-group">
+                <label for="iconNameInput">Texto do Ícone:</label>
+                <input type="text" id="iconNameInput" required>
+            </div>
+            <div class="form-group">
+                <label for="iconLinkInput">Link do Ícone (URL):</label>
+                <input type="url" id="iconLinkInput" required>
+            </div>
+            <div class="form-group">
+                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2 ou deixe em branco)</span></label>
+                <input type="text" id="iconColorClassInput">
+            </div>
+            <div class="form-group">
+                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(ignorado se classe de cor for preenchida)</span></label>
+                <input type="color" id="iconCustomBgColorInput" value="#cccccc">
+            </div>
+            <div class="form-group">
+                <label for="iconCategorySelect">Categoria Onde Adicionar:</label>
+                <select id="iconCategorySelect" required>
+                    <option value="" disabled selected>Selecione uma categoria</option>
+                    <option value="servicos-utilidades">Serviços & Utilidades</option>
+                    <option value="cursos-concursos">Cursos & Concursos</option>
+                    <option value="ferramentas-downloads">Ferramentas & Downloads</option>
+                    <option value="compras-produtividade">Compras & Produtividade</option>
+                    <option value="design-audio">Design & Áudio</option>
+                    <option value="midia-entretenimento">Mídia & Entretenimento</option>
+                </select>
+            </div>
+            <button type="submit" id="submit-icon-button">Adicionar Ícone ao Banco de Dados</button>
+        </form>
+        <div id="form-status-message"></div>
+    </div>
+
+    <script type="module">
+        // --- MÓDULOS FIREBASE ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURAÇÃO FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
+            authDomain: "iconesutil.firebaseapp.com",
+            projectId: "iconesutil",
+            storageBucket: "iconesutil.appspot.com",
+            messagingSenderId: "88285859566",
+            appId: "1:88285859566:web:e15fdb0c615b494955edff"
+        };
+
+        // --- CONSTANTES E ESTADO ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const CATEGORY_DETAILS = {
+            'public-featured': { name: 'Ícones em Destaque', color: '#dc3545' },
+            'servicos-utilidades': { name: 'Serviços & Utilidades', color: 'rgb(111, 66, 193)' },
+            'cursos-concursos': { name: 'Cursos & Concursos', color: 'rgb(40, 167, 69)' },
+            'ferramentas-downloads': { name: 'Ferramentas & Downloads', color: 'rgb(0, 123, 255)' },
+            'compras-produtividade': { name: 'Compras & Produtividade', color: 'rgb(253, 126, 20)' },
+            'design-audio': { name: 'Design & Áudio', color: 'rgb(255, 193, 7)' },
+            'midia-entretenimento': { name: 'Mídia & Entretenimento', color: 'rgb(220, 53, 69)' }
+        };
+
+        const ICONS_SVG = {
+            PIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 3v2h6v5h2v-5h6v-2l-2-3z"/></svg>`,
+            EDIT: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`
+        };
+
+        const D = {
+            body: document.body,
+            mainContent: document.getElementById('main-content'),
+            searchInput: document.getElementById('search-input'),
+            themeToggle: document.getElementById('theme-toggle'),
+            masterEditToggle: document.getElementById('master-edit-toggle'),
+            pinnedSection: document.getElementById('pinned-section'),
+            allCategoriesGrid: document.getElementById('all-categories-grid'),
+            regularSectionWrapper: document.getElementById('regular-section-wrapper'),
+            searchResultsContainer: document.getElementById('search-results-container'),
+            modalOverlay: document.getElementById('generator-modal-overlay'),
+            generatorModal: document.getElementById('generate-icon-code-section'),
+            openModalBtn: document.getElementById('open-generator-modal-btn'),
+            closeModalBtn: document.getElementById('close-generator-modal-btn'),
+            iconForm: document.getElementById('icon-form'),
+            formStatusMessage: document.getElementById('form-status-message'),
+            modalTitle: document.getElementById('modal-title'),
+            iconIdInput: document.getElementById('iconIdInput'),
+            iconNameInput: document.getElementById('iconNameInput'),
+            iconLinkInput: document.getElementById('iconLinkInput'),
+            iconColorClassInput: document.getElementById('iconColorClassInput'),
+            iconCustomBgColorInput: document.getElementById('iconCustomBgColorInput'),
+            iconCategorySelect: document.getElementById('iconCategorySelect'),
+            submitIconButton: document.getElementById('submit-icon-button'),
+        };
+
+        let allIcons = [];
+        let pinnedCategoryIds = [];
+        let currentUser = null;
+        let isFormEditMode = false;
+        let isMasterEditModeActive = false;
+
+        // --- TEMA ---
+        const applyTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            const isDark = savedTheme === 'dark';
+            D.body.classList.toggle('dark-mode', isDark);
+            D.themeToggle.querySelector('span').textContent = isDark ? 'Claro' : 'Escuro';
+        };
+
+        const toggleTheme = () => {
+            const isDark = D.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            applyTheme();
+        };
+
+        // --- MODO DE EDIÇÃO GERAL ---
+        const toggleMasterEditMode = () => {
+            isMasterEditModeActive = !isMasterEditModeActive;
+            D.body.classList.toggle('master-edit-mode', isMasterEditModeActive);
+            D.masterEditToggle.classList.toggle('active', isMasterEditModeActive);
+            const newTitle = isMasterEditModeActive ? "Desativar Modo de Edição" : "Ativar Modo de Edição";
+            D.masterEditToggle.title = newTitle;
+            D.masterEditToggle.setAttribute('aria-label', newTitle);
+        };
+
+        // --- RENDERIZAÇÃO ---
+        const createIconHTML = (icon) => {
+            const colorClass = icon.colorClass ? ` ${icon.colorClass}` : '';
+            const style = !icon.colorClass ? ` style="--icon-background-color: ${icon.customBgColor};"` : '';
+            const isIconPinned = icon.isPublicamenteFixado === true;
+
+            return `
+                <a href="${icon.link}" class="icon-item${colorClass}" data-label="${icon.name}" data-id="${icon.id}" target="_blank" rel="noopener noreferrer">
+                    <div class="icon-actions">
+                        <button class="icon-action-btn pin-icon-btn ${isIconPinned ? 'pinned' : ''}" data-id="${icon.id}" title="${isIconPinned ? 'Remover Destaque' : 'Destacar Publicamente'}" aria-label="${isIconPinned ? 'Remover Destaque' : 'Destacar'}">${ICONS_SVG.PIN}</button>
+                        <button class="icon-action-btn edit-icon-btn" data-id="${icon.id}" title="Editar Ícone" aria-label="Editar Ícone">${ICONS_SVG.EDIT}</button>
+                    </div>
+                    <div class="icon-content"${style}>
+                        <div class="icon-label">${icon.name}</div>
+                    </div>
+                </a>`;
+        };
+
+        const createCategoryHTML = (categoryId, icons) => {
+            const details = CATEGORY_DETAILS[categoryId];
+            if (!details || icons.length === 0) return '';
+            const isCategoryPinnedByUser = pinnedCategoryIds.includes(categoryId);
+            const iconsHTML = icons.map(createIconHTML).join('');
+
+            return `
+                <div class="category-card" style="border-color: ${details.color};" data-category="${categoryId}">
+                    <div class="category-header">
+                        <h2>${details.name}</h2>
+                        <button class="pin-btn pin-category-btn ${isCategoryPinnedByUser ? 'pinned' : ''}" data-id="${categoryId}" title="${isCategoryPinnedByUser ? 'Desafixar Categoria' : 'Fixar Categoria'}" aria-label="${isCategoryPinnedByUser ? 'Desafixar' : 'Fixar'} Categoria">
+                            ${ICONS_SVG.PIN}
+                        </button>
+                    </div>
+                    <div class="icons-grid">${iconsHTML}</div>
+                </div>`;
+        };
+
+        const renderPage = () => {
+            const iconsByCategory = allIcons.reduce((acc, icon) => {
+                const category = icon.category || 'outros';
+                (acc[category] = acc[category] || []).push(icon);
+                return acc;
+            }, {});
+
+            const publicFeaturedIcons = allIcons.filter(icon => icon.isPublicamenteFixado);
+            const publicFeaturedHTML = createCategoryHTML('public-featured', publicFeaturedIcons);
+
+            const pinnedCategoriesHTML = pinnedCategoryIds
+                .map(id => createCategoryHTML(id, iconsByCategory[id] || []))
+                .join('');
+
+            const regularCategoriesHTML = Object.keys(CATEGORY_DETAILS)
+                .filter(id => id !== 'public-featured' && !pinnedCategoryIds.includes(id))
+                .map(id => createCategoryHTML(id, iconsByCategory[id] || []))
+                .join('');
+
+            D.pinnedSection.innerHTML = publicFeaturedHTML + pinnedCategoriesHTML;
+            D.allCategoriesGrid.innerHTML = regularCategoriesHTML;
+            D.pinnedSection.style.display = D.pinnedSection.innerHTML.trim() ? 'block' : 'none';
+        };
+
+        // --- BUSCA E FILTRO ---
+        const filterContent = () => {
+            const searchTerm = D.searchInput.value.toLowerCase().trim();
+
+            if (searchTerm) {
+                D.pinnedSection.style.display = 'none';
+                D.regularSectionWrapper.style.display = 'none';
+                D.searchResultsContainer.classList.add('visible');
+                const matchingIcons = allIcons.filter(icon => icon.name.toLowerCase().includes(searchTerm));
+                if (matchingIcons.length > 0) {
+                    D.searchResultsContainer.innerHTML = matchingIcons.map(createIconHTML).join('');
+                } else {
+                    D.searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1;">Nenhum ícone encontrado para "${searchTerm}".</p>`;
+                }
+            } else {
+                D.searchResultsContainer.classList.remove('visible');
+                D.searchResultsContainer.innerHTML = '';
+                D.regularSectionWrapper.style.display = 'block';
+                renderPage();
+            }
+        };
+
+        const debounce = (func, delay) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        // --- MODAL ---
+        const openModal = (editMode = false, iconId = null) => {
+            if (editMode && !isMasterEditModeActive) return;
+
+            isFormEditMode = editMode;
+            D.iconForm.reset();
+            D.formStatusMessage.className = '';
+            D.formStatusMessage.style.display = 'none';
+
+            if (isFormEditMode && iconId) {
+                const icon = allIcons.find(i => i.id === iconId);
+                if (!icon) return;
+                D.modalTitle.textContent = 'Editar Ícone';
+                D.submitIconButton.textContent = 'Salvar Alterações';
+                D.iconIdInput.value = icon.id;
+                D.iconNameInput.value = icon.name;
+                D.iconLinkInput.value = icon.link;
+                D.iconColorClassInput.value = icon.colorClass || '';
+                D.iconCustomBgColorInput.value = icon.customBgColor || '#cccccc';
+                D.iconCategorySelect.value = icon.category || '';
+            } else {
+                D.modalTitle.textContent = 'Adicionar Novo Ícone';
+                D.submitIconButton.textContent = 'Adicionar ao Banco de Dados';
+                D.iconIdInput.value = '';
+            }
+            D.modalOverlay.classList.add('visible');
+            D.generatorModal.classList.add('visible');
+            D.body.classList.add('modal-open');
+            D.iconNameInput.focus();
+        };
+
+        const closeModal = () => {
+            D.modalOverlay.classList.remove('visible');
+            D.generatorModal.classList.remove('visible');
+            D.body.classList.remove('modal-open');
+        };
+
+        const showFormStatus = (message, type = 'error') => {
+            D.formStatusMessage.textContent = message;
+            D.formStatusMessage.className = `form-status-message ${type}`;
+        };
+
+        // --- OPERAÇÕES DE DADOS (FIREBASE) ---
+        const togglePinCategory = async (categoryId) => {
+            if (!currentUser) return;
+            const index = pinnedCategoryIds.indexOf(categoryId);
+            index > -1 ? pinnedCategoryIds.splice(index, 1) : pinnedCategoryIds.push(categoryId);
+            try {
+                await setDoc(doc(db, "usuarios", currentUser.uid), { pinnedCategories: pinnedCategoryIds }, { merge: true });
+                renderPage();
+            } catch (error) { console.error("Erro ao salvar categorias fixadas:", error); }
+        };
+
+        const togglePinIcon = async (iconId) => {
+            const icon = allIcons.find(i => i.id === iconId);
+            if (!icon) return;
+            try {
+                await updateDoc(doc(db, "icones", iconId), { isPublicamenteFixado: !icon.isPublicamenteFixado });
+            } catch (error) { console.error("Erro ao destacar ícone:", error); }
+        };
+
+        const handleSubmitIcon = async (e) => {
+            e.preventDefault();
+            if (!D.iconForm.checkValidity()) {
+                showFormStatus('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+            const iconData = {
+                name: D.iconNameInput.value.trim(),
+                link: D.iconLinkInput.value.trim(),
+                colorClass: D.iconColorClassInput.value.trim(),
+                customBgColor: D.iconCustomBgColorInput.value,
+                category: D.iconCategorySelect.value
+            };
+            D.submitIconButton.disabled = true;
+            try {
+                if (isFormEditMode) {
+                    await updateDoc(doc(db, "icones", D.iconIdInput.value), iconData);
+                    showFormStatus('Ícone atualizado com sucesso!', 'success');
+                } else {
+                    await addDoc(collection(db, "icones"), iconData);
+                    showFormStatus('Ícone adicionado com sucesso!', 'success');
+                }
+                setTimeout(closeModal, 1000);
+            } catch (error) {
+                showFormStatus('Ocorreu um erro ao salvar.', 'error');
+                console.error("Erro ao salvar ícone:", error);
+            } finally {
+                D.submitIconButton.disabled = false;
+            }
+        };
+
+        // --- OUVINTES DE EVENTOS ---
+        const addEventListeners = () => {
+            D.themeToggle.addEventListener('click', toggleTheme);
+            D.masterEditToggle.addEventListener('click', toggleMasterEditMode);
+            D.searchInput.addEventListener('input', debounce(filterContent, 300));
+            D.openModalBtn.addEventListener('click', () => openModal(false));
+            D.closeModalBtn.addEventListener('click', closeModal);
+            D.modalOverlay.addEventListener('click', closeModal);
+            D.iconForm.addEventListener('submit', handleSubmitIcon);
+            document.addEventListener('keydown', (e) => e.key === "Escape" && closeModal());
+
+            D.mainContent.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-id]');
+                if (!isMasterEditModeActive || !button) return;
+
+                const id = button.dataset.id;
+                if (button.classList.contains('pin-category-btn')) togglePinCategory(id);
+                else if (button.classList.contains('pin-icon-btn')) togglePinIcon(id);
+                else if (button.classList.contains('edit-icon-btn')) openModal(true, id);
+            });
+        };
+
+        // --- INICIALIZAÇÃO ---
+        applyTheme();
+        addEventListeners();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+                    if (docSnap.exists()) pinnedCategoryIds = docSnap.data().pinnedCategories || [];
+                } catch (error) { console.error("Erro ao carregar configs do usuário:", error); }
+            } else {
+                signInAnonymously(auth).catch((error) => console.error("Login anônimo falhou:", error));
+            }
+
+            onSnapshot(collection(db, "icones"), (snapshot) => {
+                allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                D.searchInput.value ? filterContent() : renderPage();
+            }, (error) => {
+                console.error("Erro ao carregar ícones:", error);
+                D.allCategoriesGrid.innerHTML = "<p>Não foi possível carregar os ícones.</p>";
+            });
+        });
+    </script>
+</body>
+
+</html>
