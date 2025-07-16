@@ -254,7 +254,7 @@
         /* --- ÍCONES & GRID DE ÍCONES --- */
         .icons-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Min-width para ícones */
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Min-width para ícones aumentado */
             gap: 15px; /* Espaçamento ajustado */
             justify-items: center;
             margin-top: calc(var(--action-button-size) / 2); 
@@ -272,8 +272,8 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, .08); /* Sombra mais suave */
             overflow: visible;
             transition: transform .15s ease-in-out, opacity .2s ease, background-color .2s ease, border .15s ease, box-shadow .15s ease;
-            width: 100px; /* Tamanho fixo para o ícone */
-            height: 100px; /* Tamanho fixo para o ícone */
+            width: 120px; /* Tamanho fixo para o ícone aumentado */
+            height: 120px; /* Tamanho fixo para o ícone aumentado */
             border: 2px solid transparent; 
         }
 
@@ -376,7 +376,7 @@
         }
 
         .icon-label {
-            font-size: 0.85em; /* Tamanho da fonte do label ajustado */
+            font-size: 0.95em; /* Tamanho da fonte do label ajustado */
             text-align: center;
             padding: 5px 3px;
             word-break: break-word;
@@ -542,7 +542,7 @@
         #search-results-container { 
             display: none; 
             padding: 25px 0; 
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Min-width para ícones aumentado */
             gap: 15px; 
             justify-items: center; 
         } 
@@ -558,21 +558,21 @@
             .category-header h2 { font-size: 1.4em; } 
             .icons-grid, #search-results-container { 
                 grid-template-columns: repeat(4, 1fr); /* FORÇA 4 COLUNAS */
-                gap: 8px; /* Espaçamento ajustado para 4 colunas */
+                gap: 10px; /* Espaçamento ajustado para 4 colunas e ícones maiores */
                 justify-items: center; /* Centraliza os itens */
                 margin-top: calc(var(--action-button-size) / 2); 
                 margin-bottom: calc(var(--action-button-size) / 2); 
             } 
             .icon-item-wrapper { 
-                width: 90px; /* Tamanho fixo para o ícone em mobile (voltou ao original) */
-                height: 90px; /* Tamanho fixo para o ícone em mobile (voltou ao original) */
+                width: 95px; /* Tamanho fixo para o ícone em mobile aumentado */
+                height: 95px; /* Tamanho fixo para o ícone em mobile aumentado */
             }
             #generate-icon-code-section { padding: 20px; } 
             #generate-icon-code-section h2 { font-size: 1.5em; } 
             #search-input { font-size: 1em; padding: 10px 15px; } 
             .header-button { width: 40px; height: 40px; } 
             .header-button svg { width: 20px; height: 20px; } 
-            .icon-label { font-size: 0.75em; padding: 4px 2px;} /* Fonte original para mobile */
+            .icon-label { font-size: 0.8em; padding: 4px 2px;} /* Fonte ajustada para mobile */
             .icon-action-btn {
                 width: 35px; /* Botões de ação menores no mobile */
                 height: 35px;
