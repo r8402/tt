@@ -6,43 +6,45 @@
     <title>Gratuitos! - Acesso Rápido</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
     <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- GERAL & TEMA --- */
         :root {
-            --bg-color: #f0f2f5;
-            --text-color: #333;
-            --card-bg-color: #ffffff;
-            --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); /* Sombra um pouco maior */
-            --header-bg-color: rgba(255, 255, 255, 0.8);
-            --input-bg-color: #fff;
-            --input-border-color: #ccc;
-            --button-bg-color: #e9ecef;
-            --button-text-color: #333;
-            --primary-color: #007bff;
+            --bg-color: #F8F9FA; /* Fundo mais claro */
+            --text-color: #343A40; /* Texto escuro quase preto */
+            --card-bg-color: #FFFFFF;
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* Sombra mais suave e espalhada */
+            --header-bg-color: rgba(255, 255, 255, 0.9);
+            --input-bg-color: #F8F9FA; /* Fundo do input mais claro */
+            --input-border-color: #DEE2E6; /* Borda suave */
+            --button-bg-color: #E9ECEF;
+            --button-text-color: #495057;
+            --primary-color: #007BFF;
             --primary-color-rgb: 0, 123, 255;
-            --primary-color-hover: #0056b3;
-            --separator-color: rgba(0, 0, 0, 0.08); /* Separador mais visível */
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --action-button-size: 50.7px; /* 39px * 1.3 = 50.7px */
+            --primary-color-hover: #0069D9;
+            --separator-color: #E9ECEF; /* Separador mais leve */
+            --danger-color: #DC3545;
+            --warning-color: #FFC107;
+            --action-button-size: 40px; /* Tamanho ajustado para os botões de ação */
+            --action-button-icon-size: 20px; /* Tamanho do SVG dos botões de ação */
         }
 
         body.dark-mode {
-            --bg-color: #22272e;
-            --text-color: #e0e0e0;
-            --card-bg-color: #2d333b;
-            --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-            --header-bg-color: rgba(45, 51, 59, 0.8);
-            --input-bg-color: #3a3a3a;
-            --input-border-color: #555;
-            --button-bg-color: #555;
-            --button-text-color: #e0e0e0;
-            --primary-color: #007bff;
+            --bg-color: #1A1D20; /* Fundo escuro */
+            --text-color: #E0E0E0;
+            --card-bg-color: #2D3035;
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            --header-bg-color: rgba(45, 48, 53, 0.9);
+            --input-bg-color: #3A3D42;
+            --input-border-color: #5B6068;
+            --button-bg-color: #4A4D52;
+            --button-text-color: #E0E0E0;
+            --primary-color: #007BFF;
             --primary-color-rgb: 0, 123, 255;
-            --primary-color-hover: #0062cc;
-            --separator-color: rgba(255, 255, 255, 0.15);
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
+            --primary-color-hover: #0056B3;
+            --separator-color: #4A4D52;
+            --danger-color: #E74C3C;
+            --warning-color: #F39C12;
         }
 
         html {
@@ -50,13 +52,14 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif; /* Nova fonte */
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-top: 100px; /* Aumentado para acomodar o cabeçalho maior */
+            padding-top: 80px; /* Ajustado para um cabeçalho mais compacto */
             transition: background-color .3s ease, color .3s ease;
-            font-size: 1.05em; /* Aumentado o tamanho da fonte base */
+            font-size: 1em; 
+            line-height: 1.6;
         }
 
         body.modal-open {
@@ -64,13 +67,13 @@
         }
 
         main {
-            padding: 30px; /* Aumentado o padding geral */
+            padding: 25px; /* Padding geral ajustado */
             width: 100%;
-            max-width: 1400px; /* Aumentado a largura máxima */
+            max-width: 1300px; /* Largura máxima ligeiramente reduzida */
             margin: 0 auto;
             box-sizing: border-box;
-            position: relative; /* Para posicionar o overlay de edição */
-            z-index: 1; /* Para estar abaixo do cabeçalho */
+            position: relative;
+            z-index: 1;
         }
 
         /* --- CABEÇALHO FIXO --- */
@@ -79,12 +82,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 20px 30px; /* Aumentado o padding */
+            padding: 15px 25px; /* Padding ajustado */
             background-color: var(--header-bg-color);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px); /* Blur mais pronunciado */
+            -webkit-backdrop-filter: blur(10px);
             z-index: 1000;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Sombra mais sutil */
             box-sizing: border-box;
             display: flex;
             justify-content: center;
@@ -93,27 +96,27 @@
 
         .header-content {
             width: 100%;
-            max-width: 900px; /* Aumentado a largura máxima */
+            max-width: 800px; /* Largura máxima ajustada */
             display: flex;
-            gap: 15px; /* Aumentado o espaçamento */
+            gap: 10px; /* Espaçamento ajustado */
             align-items: center;
         }
 
         #search-input {
             flex-grow: 1;
-            padding: 14px 20px; /* Aumentado o padding */
+            padding: 12px 18px; /* Padding ajustado */
             border: 1px solid var(--input-border-color);
-            border-radius: 50px;
-            font-size: 1.2em; /* Aumentado o tamanho da fonte */
+            border-radius: 25px; /* Mais arredondado */
+            font-size: 1.05em;
             background-color: var(--input-bg-color);
             color: var(--text-color);
             outline: none;
-            transition: all .3s ease;
+            transition: all .2s ease;
         }
 
         #search-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3); /* Sombra maior no foco */
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2); /* Sombra mais sutil no foco */
         }
 
         .header-button {
@@ -122,103 +125,110 @@
             color: var(--button-text-color);
             border: none;
             border-radius: 50%;
-            width: 50px; /* Aumentado o tamanho do botão */
-            height: 50px; /* Aumentado o tamanho do botão */
+            width: 45px; /* Tamanho do botão ajustado */
+            height: 45px; /* Tamanho do botão ajustado */
             cursor: pointer;
-            font-size: 1.1rem; /* Aumentado o tamanho da fonte */
+            font-size: 1rem;
             transition: all .2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra para botões */
         }
 
         .header-button:hover {
-            transform: scale(1.1);
-            opacity: .9;
+            transform: translateY(-2px); /* Efeito de levantamento */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .header-button.active {
             background-color: var(--primary-color);
             color: white;
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
         }
 
         .header-button svg {
-            width: 26px; /* Aumentado o tamanho do SVG */
-            height: 26px; /* Aumentado o tamanho do SVG */
+            width: 22px; /* Tamanho do SVG ajustado */
+            height: 22px; /* Tamanho do SVG ajustado */
         }
 
         #theme-toggle span {
-            font-size: 0.8em; /* Aumentado o tamanho da fonte */
-            font-weight: bold;
+            font-size: 0.75em;
+            font-weight: 600;
         }
 
         /* --- OVERLAY DO MODO DE EDIÇÃO --- */
         #master-edit-overlay {
-            position: absolute; /* Não fixed, para rolar com o conteúdo */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.1); /* Um leve escurecimento */
-            z-index: 500; /* Abaixo do cabeçalho e modal, mas acima do conteúdo */
-            display: none; /* Escondido por padrão */
+            background-color: rgba(0, 0, 0, 0.05); /* Mais sutil */
+            z-index: 500;
+            display: none;
         }
 
         body.master-edit-mode #master-edit-overlay {
-            display: block; /* Visível no modo de edição */
+            display: block;
         }
-
 
         /* --- SEÇÕES & CARDS DE CATEGORIA --- */
         #pinned-section {
-            margin-bottom: 30px; /* Aumentado o espaçamento */
-            position: relative; /* Para que os ícones fiquem acima do overlay */
+            margin-bottom: 25px; /* Espaçamento ajustado */
+            position: relative;
             z-index: 501;
         }
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Min-width maior */
-            gap: 40px; /* Aumentado o espaçamento entre as categorias */
-            position: relative; /* Para que os ícones fiquem acima do overlay */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Min-width ajustado */
+            gap: 30px; /* Espaçamento entre categorias ajustado */
+            position: relative;
             z-index: 501;
         }
 
         .category-card {
             background-color: var(--card-bg-color);
-            border-radius: 16px; /* Bordas mais arredondadas */
+            border-radius: 12px; /* Bordas mais arredondadas */
             box-shadow: var(--card-shadow);
-            padding: 30px; /* Aumentado o padding */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-top: 6px solid; /* Borda superior mais grossa */
+            padding: 25px; /* Padding ajustado */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-top: 5px solid; /* Borda superior ajustada */
             display: block;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px); /* Efeito de levantamento no hover */
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12); /* Sombra mais pronunciada */
         }
 
         .category-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--separator-color);
-            margin-bottom: 30px; /* Aumentado o espaçamento */
-            padding-bottom: 12px; /* Aumentado o padding */
+            border-bottom: 1px solid var(--separator-color); /* Borda mais fina */
+            margin-bottom: 25px; /* Espaçamento ajustado */
+            padding-bottom: 10px; /* Padding ajustado */
         }
 
         .category-header h2 {
             margin: 0;
-            font-size: 1.8em; /* Aumentado o tamanho da fonte */
+            font-size: 1.5em; /* Tamanho da fonte ajustado */
             color: var(--primary-color);
+            font-weight: 600; /* Mais negrito */
         }
 
-        /* Botão de fixar categoria - APENAS EM MASTER-EDIT-MODE */
+        /* Botão de fixar categoria */
         .pin-category-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 8px; /* Aumentado o padding */
-            opacity: 0.6;
-            transition: opacity 0.2s, transform 0.2s, display 0.3s;
-            display: none; /* Ocultar por padrão, só mostra no master-edit-mode */
+            padding: 6px;
+            opacity: 0.5;
+            transition: opacity 0.2s, transform 0.2s;
+            display: none; /* Ocultar por padrão */
         }
 
         body.master-edit-mode .pin-category-btn {
@@ -227,65 +237,61 @@
 
         .pin-category-btn:hover {
             opacity: 1;
-            transform: scale(1.15);
+            transform: scale(1.1);
         }
 
         .pin-category-btn svg {
-            width: 24px; /* Aumentado o tamanho do SVG */
-            height: 24px; /* Aumentado o tamanho do SVG */
+            width: 20px;
+            height: 20px;
             color: var(--text-color);
         }
 
         .pin-category-btn.pinned svg {
             color: var(--primary-color);
-        }
-
-        .pin-category-btn.pinned {
             opacity: 1;
         }
 
         /* --- ÍCONES & GRID DE ÍCONES --- */
         .icons-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Min-width maior para ícones */
-            gap: 20px; /* Aumentado o espaçamento */
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Min-width para ícones */
+            gap: 15px; /* Espaçamento ajustado */
             justify-items: center;
-            /* Adiciona um margin-top para compensar os botões que sobem */
             margin-top: calc(var(--action-button-size) / 2); 
-            margin-bottom: calc(var(--action-button-size) / 2); /* Ajuste para espaçamento inferior */
+            margin-bottom: calc(var(--action-button-size) / 2); 
         }
 
-        .icon-item-wrapper { /* Novo wrapper para o item do ícone */
+        .icon-item-wrapper {
             position: relative;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 14px; /* Bordas mais arredondadas */
-            box-shadow: 0 3px 8px rgba(0, 0, 0, .15); /* Sombra mais suave */
-            overflow: visible; /* Permite que os botões apareçam fora dos limites */
-            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease, border .2s ease, box-shadow .2s ease;
-            width: 100px; /* Definido o tamanho fixo para o ícone */
-            height: 100px; /* Definido o tamanho fixo para o ícone */
-            border: 2px solid transparent; /* Adicionado borda transparente padrão */
+            border-radius: 10px; /* Bordas mais arredondadas */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08); /* Sombra mais suave */
+            overflow: visible;
+            transition: transform .15s ease-in-out, opacity .2s ease, background-color .2s ease, border .15s ease, box-shadow .15s ease;
+            width: 100px; /* Tamanho fixo para o ícone */
+            height: 100px; /* Tamanho fixo para o ícone */
+            border: 2px solid transparent; 
         }
 
         body.dark-mode .icon-item-wrapper {
-            box-shadow: 0 3px 8px rgba(0, 0, 0, .4);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
         }
 
         .icon-item-wrapper:hover {
-            transform: scale(1.08); /* Aumento maior no hover */
+            transform: scale(1.05); /* Aumento no hover mais sutil */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Estilo para ícone fixado publicamente - APARECE APENAS EM MASTER-EDIT-MODE */
+        /* Estilo para ícone fixado publicamente */
         body.master-edit-mode .icon-item-wrapper.publicly-pinned {
-            border: 3px solid var(--primary-color); /* Borda mais grossa */
-            box-shadow: 0 0 20px rgba(0, 123, 255, 0.5); /* Sombra mais pronunciada */
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.4); /* Sombra mais suave */
         }
         
-        /* O link real que encapsula o conteúdo do ícone */
         .icon-link {
             text-decoration: none;
             color: #fff;
@@ -297,35 +303,37 @@
             align-items: center;
         }
 
-        /* Desabilita o clique no link quando em modo de edição */
         body.master-edit-mode .icon-link {
-            pointer-events: none; /* Desabilita todos os eventos de ponteiro no link */
+            pointer-events: none;
         }
         
-        /* Permite o clique nos botões de ação dentro do link no modo de edição */
         body.master-edit-mode .icon-item-wrapper .icon-action-btn {
-            pointer-events: auto; /* Reabilita eventos de ponteiro para os botões */
+            pointer-events: auto;
         }
 
-
-        /* Esconde as ações do ícone por padrão */
         .icon-actions {
             display: none;
             position: absolute;
-            top: calc(-1 * var(--action-button-size) / 2); /* Ajusta para o centro do botão estar na linha superior do wrapper */
-            left: 50%; /* Centraliza horizontalmente */
-            transform: translateX(-50%); /* Ajusta para centralizar de fato */
+            top: calc(-1 * var(--action-button-size) / 2); 
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
-            gap: 5px;
+            gap: 3px; /* Espaçamento entre os botões de ação */
+            opacity: 0; /* Escondido por padrão, aparece no hover */
+            transition: opacity 0.2s ease;
+        }
+        
+        .icon-item-wrapper:hover .icon-actions {
+             opacity: 1; /* Aparece no hover do wrapper */
         }
 
-        /* Mostra as ações do ícone APENAS em master-edit-mode */
         body.master-edit-mode .icon-actions {
             display: flex;
+            opacity: 1; /* Sempre visível no modo de edição */
         }
 
         .icon-action-btn {
-            background-color: rgba(0, 0, 0, 0.4); /* Mais transparente */
+            background-color: rgba(0, 0, 0, 0.5); /* Mais opaco */
             border: none;
             border-radius: 50%;
             width: var(--action-button-size);
@@ -337,10 +345,11 @@
             transition: background-color 0.2s, transform 0.2s;
             color: white;
             padding: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .icon-action-btn:hover {
-            background-color: rgba(0, 0, 0, 0.7); /* Mais transparente no hover */
+            background-color: rgba(0, 0, 0, 0.8);
             transform: scale(1.1);
         }
         .icon-action-btn.edit-btn:hover { background-color: var(--warning-color); }
@@ -348,8 +357,8 @@
         .icon-action-btn.unpin-btn:hover { background-color: var(--danger-color); }
 
         .icon-action-btn svg {
-            width: 30.42px; /* 23.4px * 1.3 = 30.42px */
-            height: 30.42px; /* 23.4px * 1.3 = 30.42px */
+            width: var(--action-button-icon-size);
+            height: var(--action-button-icon-size);
             color: white;
         }
 
@@ -361,79 +370,215 @@
             width: 100%;
             height: 100%;
             background-color: var(--icon-background-color, #777);
-            border-radius: 12px; 
-            padding: 5px; /* Aumentado o padding interno */
+            border-radius: 8px; /* Bordas mais suaves */
+            padding: 8px; /* Padding interno do ícone */
+            box-sizing: border-box;
         }
 
         .icon-label {
-            font-size: 0.95em; /* Aumentado o tamanho da fonte do label */
+            font-size: 0.85em; /* Tamanho da fonte do label ajustado */
             text-align: center;
-            padding: 8px 3px; /* Mais padding */
+            padding: 5px 3px;
             word-break: break-word;
-            font-weight: bold;
-            line-height: 1.3; /* Mais espaço entre as linhas */
+            font-weight: 500; /* Peso da fonte ajustado */
+            line-height: 1.2;
             text-transform: uppercase;
+            color: white; /* Cor do texto padrão para ícones */
         }
 
         /* Classes de Cor para Ícones */
-        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }        .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
+        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; } .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
 
         /* --- MODAL --- */
-        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.3s ease; } /* Backgound mais escuro */
+        #generator-modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.6); /* Mais suave */
+            backdrop-filter: blur(5px); /* Menos blur */
+            z-index: 1040; 
+            display: none; 
+            opacity: 0; 
+            transition: opacity 0.2s ease; 
+        } 
         #generator-modal-overlay.visible { display: block; opacity: 1; }
-        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); /* Escala inicial menor */ width: 95%; max-width: 700px; /* Modal mais largo */ max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 35px; /* Aumentado */ background-color: var(--card-bg-color); border-radius: 16px; /* Mais arredondado */ box-shadow: var(--card-shadow); border-top: 6px solid var(--primary-color); /* Borda mais grossa */ display: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
+
+        #generate-icon-code-section { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%) scale(0.95); /* Escala inicial mais próxima */
+            width: 90%; 
+            max-width: 600px; /* Modal ligeiramente mais estreito */
+            max-height: 90vh; 
+            overflow-y: auto; 
+            z-index: 1050; 
+            padding: 30px; 
+            background-color: var(--card-bg-color); 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra mais pronunciada para o modal */
+            border-top: 4px solid var(--primary-color); 
+            display: none; 
+            opacity: 0; 
+            transition: opacity 0.2s ease, transform 0.2s ease; 
+        }
         #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 30px 0; /* Mais espaçamento */ font-size: 2em; /* Título maior */ border-bottom: 2px solid var(--separator-color); padding-bottom: 15px; } /* Mais padding */
-        #close-generator-modal-btn { position: absolute; top: 20px; right: 20px; /* Mais afastado */ background: var(--button-bg-color); border: none; border-radius: 50%; width: 35px; height: 35px; /* Botão maior */ font-size: 1.4rem; /* Icone maior */ font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
+
+        #generate-icon-code-section h2 { 
+            text-align: center; 
+            color: var(--primary-color); 
+            margin: 0 0 25px 0; 
+            font-size: 1.8em; 
+            border-bottom: 1px solid var(--separator-color); 
+            padding-bottom: 12px; 
+            font-weight: 600;
+        }
+
+        #close-generator-modal-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background: var(--button-bg-color); 
+            border: none; 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            color: var(--button-text-color); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1; 
+            padding: 0; 
+            transition: background-color .2s, color .2s; 
+        }
         #close-generator-modal-btn:hover { background-color: var(--danger-color); color: white; }
-        .form-group { margin-bottom: 22px; } /* Mais espaçamento */
-        .form-group label { display: block; margin-bottom: 8px; /* Mais espaçamento */ font-weight: 500; color: var(--text-color); font-size: 1.1em; /* Fonte maior */ }
-        .form-group input[type="text"], .form-group input[type="url"], .form-group select { width: 100%; padding: 14px 18px; /* Mais padding */ border: 1px solid var(--input-border-color); border-radius: 10px; /* Mais arredondado */ box-sizing: border-box; font-size: 1.1em; /* Fonte maior */ background-color: var(--input-bg-color); color: var(--text-color); }
-        .form-group input[type="color"] { width: 100%; padding: 8px; height: 50px; /* Altura maior */ border: 1px solid var(--input-border-color); border-radius: 100px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
-        #submit-icon-button { width: 100%; padding: 15px 20px; /* Mais padding */ background-color: var(--primary-color); color: white; border: none; border-radius: 10px; /* Mais arredondado */ font-size: 1.2em; /* Fonte maior */ cursor: pointer; transition: background-color .3s ease; font-weight: 500; margin-top: 15px; } /* Mais espaçamento */
-        #submit-icon-button:hover { background-color: var(--primary-color-hover); }
-        .label-hint { font-size: 0.9em; /* Fonte ligeiramente maior */ color: #777; font-weight: 400; }
-        body.dark-mode .label-hint { color: #bbb; }
-        #form-status-message { margin-top: 20px; padding: 12px; border-radius: 8px; text-align: center; display: none; font-size: 1.05em;} /* Aumentado */
-        #form-status-message.success { background-color: #d4edda; color: #155724; display: block; }
-        #form-status-message.error { background-color: #f8d7da; color: #721c24; display: block; }
+
+        .form-group { margin-bottom: 18px; } 
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 500; 
+            color: var(--text-color); 
+            font-size: 0.95em; 
+        }
+
+        .form-group input[type="text"], 
+        .form-group input[type="url"], 
+        .form-group select { 
+            width: 100%; 
+            padding: 10px 14px; 
+            border: 1px solid var(--input-border-color); 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 1em; 
+            background-color: var(--input-bg-color); 
+            color: var(--text-color); 
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="url"]:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
+            outline: none;
+        }
+
+        .form-group input[type="color"] { 
+            width: 100%; 
+            padding: 6px; 
+            height: 40px; 
+            border: 1px solid var(--input-border-color); 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            cursor: pointer; 
+            background-color: var(--input-bg-color); 
+        }
+
+        #submit-icon-button { 
+            width: 100%; 
+            padding: 12px 18px; 
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            transition: background-color .2s ease, transform .1s ease; 
+            font-weight: 500; 
+            margin-top: 15px; 
+        } 
+
+        #submit-icon-button:hover { 
+            background-color: var(--primary-color-hover); 
+            transform: translateY(-1px);
+        }
+
+        .label-hint { 
+            font-size: 0.8em; 
+            color: #6C757D; 
+            font-weight: 400; 
+        }
+        body.dark-mode .label-hint { color: #A0A0A0; }
+
+        #form-status-message { 
+            margin-top: 15px; 
+            padding: 10px; 
+            border-radius: 6px; 
+            text-align: center; 
+            display: none; 
+            font-size: 0.95em;
+        } 
+        #form-status-message.success { background-color: #D4EDDA; color: #155724; display: block; }
+        #form-status-message.error { background-color: #F8D7DA; color: #721C24; display: block; }
 
         /* --- CONTAINER DE RESULTADOS DA BUSCA --- */
-        #search-results-container { display: none; padding: 30px 0; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; justify-items: center; } /* Valores maiores */
+        #search-results-container { 
+            display: none; 
+            padding: 25px 0; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 15px; 
+            justify-items: center; 
+        } 
         #search-results-container.visible { display: grid; }
 
         /* --- RESPONSIVIDADE --- */
         @media (max-width: 768px) {
-            body { padding-top: 90px; font-size: 1em;} /* Ajuste de padding para celular */
-            #page-header { padding: 15px; } /* Ajuste de padding */
-            main { padding: 15px; } /* Ajuste de padding */
-            .category-grid { grid-template-columns: 1fr; gap: 25px; } /* Gap ajustado */
-            .category-card { padding: 20px; } /* Ajuste de padding */
-            .category-header h2 { font-size: 1.6em; } /* Ajuste de fonte */
+            body { padding-top: 70px; font-size: 0.95em;} 
+            #page-header { padding: 10px 15px; } 
+            main { padding: 15px; } 
+            .category-grid { grid-template-columns: 1fr; gap: 20px; } 
+            .category-card { padding: 20px; } 
+            .category-header h2 { font-size: 1.4em; } 
             .icons-grid, #search-results-container { 
-                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
-                gap: 15px; 
-                margin-top: calc(var(--action-button-size) / 2); /* Ajuste para celular */
-                margin-bottom: calc(var(--action-button-size) / 2); /* Ajuste para celular */
-            } /* Min-width ajustado para ícones */
-            .icon-item-wrapper { /* Ajuste para celular */
-                width: 90px;
-                height: 90px;
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Ícones menores no mobile */
+                gap: 12px; 
+                margin-top: calc(var(--action-button-size) / 2); 
+                margin-bottom: calc(var(--action-button-size) / 2); 
+            } 
+            .icon-item-wrapper { 
+                width: 80px;
+                height: 80px;
             }
-            #generate-icon-code-section { padding: 25px 20px; } /* Ajuste de padding */
-            #generate-icon-code-section h2 { font-size: 1.6em; } /* Ajuste de fonte */
-            #search-input { font-size: 1.05em; padding: 12px 18px; } /* Ajuste de fonte e padding */
-            .header-button { width: 45px; height: 45px; } /* Ajuste de tamanho */
-            .header-button svg { width: 24px; height: 24px; } /* Ajuste de tamanho */
-            .icon-label { font-size: 0.85em; padding: 6px 3px;} /* Ajuste de fonte e padding */
-            /* Botões de ação do ícone em telas menores */
+            #generate-icon-code-section { padding: 20px; } 
+            #generate-icon-code-section h2 { font-size: 1.5em; } 
+            #search-input { font-size: 1em; padding: 10px 15px; } 
+            .header-button { width: 40px; height: 40px; } 
+            .header-button svg { width: 20px; height: 20px; } 
+            .icon-label { font-size: 0.75em; padding: 4px 2px;} 
             .icon-action-btn {
-                width: 43.94px; /* 33.8px * 1.3 = 43.94px */
-                height: 43.94px; /* 33.8px * 1.3 = 43.94px */
+                width: 35px; /* Botões de ação menores no mobile */
+                height: 35px;
             }
             .icon-action-btn svg {
-                width: 27.04px; /* 20.8px * 1.3 = 27.04px */
-                height: 27.04px; /* 20.8px * 1.3 = 27.04px */
+                width: 18px; /* SVG dos botões de ação menor no mobile */
+                height: 18px;
             }
         }
     </style>
@@ -543,7 +688,7 @@
             searchInput: document.getElementById('search-input'),
             themeToggle: document.getElementById('theme-toggle'),
             masterEditToggle: document.getElementById('master-edit-toggle'),
-            masterEditOverlay: document.getElementById('master-edit-overlay'), // Novo elemento
+            masterEditOverlay: document.getElementById('master-edit-overlay'),
             pinnedSection: document.getElementById('pinned-section'),
             allCategoriesGrid: document.getElementById('all-categories-grid'),
             regularSectionWrapper: document.getElementById('regular-section-wrapper'),
@@ -592,7 +737,7 @@
             const newTitle = isMasterEditModeActive ? "Desativar Modo de Edição" : "Ativar Modo de Edição";
             D.masterEditToggle.title = newTitle;
             D.masterEditToggle.setAttribute('aria-label', newTitle);
-            renderPage(); // Re-renderiza para mostrar/esconder botões de edição nos ícones
+            renderPage();
         };
 
         // --- RENDERIZAÇÃO ---
@@ -601,7 +746,6 @@
             const style = !icon.colorClass ? ` style="--icon-background-color: ${icon.customBgColor};"` : '';
             const isIconPubliclyPinned = icon.isPublicamenteFixado === true;
 
-            // Adiciona botões de ação (editar e fixar/desafixar)
             const actionButtons = `
                 <div class="icon-actions">
                     <button class="icon-action-btn edit-btn" data-id="${icon.id}" title="Editar Ícone" aria-label="Editar Ícone">
@@ -649,7 +793,6 @@
                 return acc;
             }, {});
 
-            // Sort public featured icons by pinnedDate in descending order (most recent first)
             const publicFeaturedIcons = allIcons
                 .filter(icon => icon.isPublicamenteFixado)
                 .sort((a, b) => (b.pinnedDate?.toDate() || 0) - (a.pinnedDate?.toDate() || 0));
@@ -682,7 +825,7 @@
                 if (matchingIcons.length > 0) {
                     D.searchResultsContainer.innerHTML = matchingIcons.map(createIconHTML).join('');
                 } else {
-                    D.searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center;">Nenhum ícone encontrado para "${searchTerm}".</p>`;
+                    D.searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--text-color);">Nenhum ícone encontrado para "${searchTerm}".</p>`;
                 }
             } else {
                 D.searchResultsContainer.classList.remove('visible');
@@ -702,7 +845,7 @@
 
         // --- MODAL ---
         const openModal = (editMode = false, iconId = null) => {
-            if (editMode && !isMasterEditModeActive) return; // Só permite edição se Master Edit Mode estiver ativo
+            if (editMode && !isMasterEditModeActive) return;
 
             isFormEditMode = editMode;
             D.iconForm.reset();
@@ -749,7 +892,11 @@
         const togglePinCategory = async (categoryId) => {
             if (!currentUser) return;
             const index = pinnedCategoryIds.indexOf(categoryId);
-            index > -1 ? pinnedCategoryIds.splice(index, 1) : pinnedCategoryIds.h(categoryId);
+            if (index > -1) {
+                pinnedCategoryIds.splice(index, 1);
+            } else {
+                pinnedCategoryIds.push(categoryId);
+            }
             try {
                 await setDoc(doc(db, "usuarios", currentUser.uid), { pinnedCategories: pinnedCategoryIds }, { merge: true });
                 renderPage();
@@ -764,10 +911,9 @@
                 const newPinnedState = !icon.isPublicamenteFixado;
                 const updateData = {
                     isPublicamenteFixado: newPinnedState,
-                    pinnedDate: newPinnedState ? serverTimestamp() : null // Update timestamp on pin, remove on unpin
+                    pinnedDate: newPinnedState ? serverTimestamp() : null
                 };
                 await updateDoc(doc(db, "icones", iconId), updateData);
-                // renderPage() será chamado pelo onSnapshot do Firebase
             } catch (error) {
                 console.error("Erro ao destacar/desdestacar ícone:", error);
             }
@@ -817,17 +963,14 @@
         D.searchInput.addEventListener('input', debounce(filterContent, 300));
 
         D.mainContent.addEventListener('click', (e) => {
-            // Lógica para fixar/desafixar categoria
             if (e.target.closest('.pin-category-btn')) {
                 const categoryId = e.target.closest('.pin-category-btn').dataset.id;
                 togglePinCategory(categoryId);
             }
-            // Lógica para editar ícone
             if (e.target.closest('.icon-action-btn.edit-btn')) {
                 const iconId = e.target.closest('.icon-action-btn.edit-btn').dataset.id;
                 openModal(true, iconId);
             }
-            // Lógica para fixar/desafixar ícone publicamente
             if (e.target.closest('.icon-action-btn.pin-btn') || e.target.closest('.icon-action-btn.unpin-btn')) {
                 const iconId = e.target.closest('.icon-action-btn').dataset.id;
                 togglePinIcon(iconId);
@@ -846,13 +989,11 @@
                     pinnedCategoryIds = userDocSnap.data().pinnedCategories || [];
                 }
             } else {
-                // Autentica anonimamente se não houver usuário logado
                 signInAnonymously(auth).catch((error) => console.error("Erro ao autenticar anonimamente:", error));
             }
-            // Observador de ícones: atualiza a interface sempre que há mudança no banco de dados
             onSnapshot(collection(db, "icones"), (snapshot) => {
                 allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderPage(); // Renderiza a página com os dados mais recentes
+                renderPage();
             });
         });
     </script>
