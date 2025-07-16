@@ -24,7 +24,7 @@
             --separator-color: rgba(0, 0, 0, 0.08); /* Separador mais visível */
             --danger-color: #dc3545;
             --warning-color: #ffc107;
-            --action-button-size: 30px; /* Tamanho dos novos botões de ação */
+            --action-button-size: 50.7px; /* 39px * 1.3 = 50.7px */
         }
 
         body.dark-mode {
@@ -310,7 +310,8 @@
             display: none;
             position: absolute;
             top: 5px;
-            right: 5px;
+            left: 50%; /* Centraliza horizontalmente */
+            transform: translateX(-50%); /* Ajusta para centralizar de fato */
             z-index: 10;
             gap: 5px;
         }
@@ -344,8 +345,8 @@
         .icon-action-btn.unpin-btn:hover { background-color: var(--danger-color); }
 
         .icon-action-btn svg {
-            width: 18px;
-            height: 18px;
+            width: 30.42px; /* 23.4px * 1.3 = 30.42px */
+            height: 30.42px; /* 23.4px * 1.3 = 30.42px */
             color: white;
         }
 
@@ -415,12 +416,12 @@
             .icon-label { font-size: 0.85em; padding: 6px 3px;} /* Ajuste de fonte e padding */
             /* Botões de ação do ícone em telas menores */
             .icon-action-btn {
-                width: 26px;
-                height: 26px;
+                width: 43.94px; /* 33.8px * 1.3 = 43.94px */
+                height: 43.94px; /* 33.8px * 1.3 = 43.94px */
             }
             .icon-action-btn svg {
-                width: 16px;
-                height: 16px;
+                width: 27.04px; /* 20.8px * 1.3 = 27.04px */
+                height: 27.04px; /* 20.8px * 1.3 = 27.04px */
             }
         }
     </style>
@@ -440,7 +441,8 @@
     </header>
 
     <main id="main-content">
-        <div id="master-edit-overlay"></div> <div id="pinned-section"></div>
+        <div id="master-edit-overlay"></div> 
+        <div id="pinned-section"></div>
         <div id="regular-section-wrapper">
             <div class="category-grid" id="all-categories-grid"></div>
         </div>
