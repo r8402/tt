@@ -12,7 +12,7 @@
             --bg-color: #f0f2f5;
             --text-color: #333;
             --card-bg-color: #ffffff;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.1); /* Sombra um pouco maior */
             --header-bg-color: rgba(255, 255, 255, 0.8);
             --input-bg-color: #fff;
             --input-border-color: #ccc;
@@ -21,16 +21,17 @@
             --primary-color: #007bff;
             --primary-color-rgb: 0, 123, 255;
             --primary-color-hover: #0056b3;
-            --separator-color: rgba(0, 0, 0, 0.05);
+            --separator-color: rgba(0, 0, 0, 0.08); /* Separador mais visível */
             --danger-color: #dc3545;
             --warning-color: #ffc107;
+            --action-button-size: 30px; /* Tamanho dos novos botões de ação */
         }
 
         body.dark-mode {
             --bg-color: #22272e;
             --text-color: #e0e0e0;
             --card-bg-color: #2d333b;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
             --header-bg-color: rgba(45, 51, 59, 0.8);
             --input-bg-color: #3a3a3a;
             --input-border-color: #555;
@@ -39,7 +40,7 @@
             --primary-color: #007bff;
             --primary-color-rgb: 0, 123, 255;
             --primary-color-hover: #0062cc;
-            --separator-color: rgba(255, 255, 255, 0.1);
+            --separator-color: rgba(255, 255, 255, 0.15);
             --danger-color: #dc3545;
             --warning-color: #ffc107;
         }
@@ -53,8 +54,9 @@
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding-top: 90px;
+            padding-top: 100px; /* Aumentado para acomodar o cabeçalho maior */
             transition: background-color .3s ease, color .3s ease;
+            font-size: 1.05em; /* Aumentado o tamanho da fonte base */
         }
 
         body.modal-open {
@@ -62,11 +64,13 @@
         }
 
         main {
-            padding: 20px;
+            padding: 30px; /* Aumentado o padding geral */
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px; /* Aumentado a largura máxima */
             margin: 0 auto;
             box-sizing: border-box;
+            position: relative; /* Para posicionar o overlay de edição */
+            z-index: 1; /* Para estar abaixo do cabeçalho */
         }
 
         /* --- CABEÇALHO FIXO --- */
@@ -75,12 +79,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 15px 20px;
+            padding: 20px 30px; /* Aumentado o padding */
             background-color: var(--header-bg-color);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
             box-sizing: border-box;
             display: flex;
             justify-content: center;
@@ -89,18 +93,18 @@
 
         .header-content {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px; /* Aumentado a largura máxima */
             display: flex;
-            gap: 10px;
+            gap: 15px; /* Aumentado o espaçamento */
             align-items: center;
         }
 
         #search-input {
             flex-grow: 1;
-            padding: 12px 15px;
+            padding: 14px 20px; /* Aumentado o padding */
             border: 1px solid var(--input-border-color);
             border-radius: 50px;
-            font-size: 1.1em;
+            font-size: 1.2em; /* Aumentado o tamanho da fonte */
             background-color: var(--input-bg-color);
             color: var(--text-color);
             outline: none;
@@ -109,7 +113,7 @@
 
         #search-input:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3); /* Sombra maior no foco */
         }
 
         .header-button {
@@ -118,10 +122,10 @@
             color: var(--button-text-color);
             border: none;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 50px; /* Aumentado o tamanho do botão */
+            height: 50px; /* Aumentado o tamanho do botão */
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem; /* Aumentado o tamanho da fonte */
             transition: all .2s ease;
             display: flex;
             justify-content: center;
@@ -140,33 +144,54 @@
         }
 
         .header-button svg {
-            width: 22px;
-            height: 22px;
+            width: 26px; /* Aumentado o tamanho do SVG */
+            height: 26px; /* Aumentado o tamanho do SVG */
         }
 
         #theme-toggle span {
-            font-size: 0.7em;
+            font-size: 0.8em; /* Aumentado o tamanho da fonte */
             font-weight: bold;
         }
 
+        /* --- OVERLAY DO MODO DE EDIÇÃO --- */
+        #master-edit-overlay {
+            position: absolute; /* Não fixed, para rolar com o conteúdo */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1); /* Um leve escurecimento */
+            z-index: 500; /* Abaixo do cabeçalho e modal, mas acima do conteúdo */
+            display: none; /* Escondido por padrão */
+        }
+
+        body.master-edit-mode #master-edit-overlay {
+            display: block; /* Visível no modo de edição */
+        }
+
+
         /* --- SEÇÕES & CARDS DE CATEGORIA --- */
         #pinned-section {
-            margin-bottom: 20px;
+            margin-bottom: 30px; /* Aumentado o espaçamento */
+            position: relative; /* Para que os ícones fiquem acima do overlay */
+            z-index: 501;
         }
 
         .category-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Min-width maior */
+            gap: 40px; /* Aumentado o espaçamento entre as categorias */
+            position: relative; /* Para que os ícones fiquem acima do overlay */
+            z-index: 501;
         }
 
         .category-card {
             background-color: var(--card-bg-color);
-            border-radius: 12px;
+            border-radius: 16px; /* Bordas mais arredondadas */
             box-shadow: var(--card-shadow);
-            padding: 25px;
+            padding: 30px; /* Aumentado o padding */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-top: 5px solid;
+            border-top: 6px solid; /* Borda superior mais grossa */
             display: block;
         }
 
@@ -175,94 +200,153 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--separator-color);
-            margin-bottom: 25px;
-            padding-bottom: 10px;
+            margin-bottom: 30px; /* Aumentado o espaçamento */
+            padding-bottom: 12px; /* Aumentado o padding */
         }
 
         .category-header h2 {
             margin: 0;
-            font-size: 1.6em;
+            font-size: 1.8em; /* Aumentado o tamanho da fonte */
             color: var(--primary-color);
         }
 
-        .pin-btn {
+        /* Botão de fixar categoria - APENAS EM MASTER-EDIT-MODE */
+        .pin-category-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 5px;
-            opacity: 0.5;
+            padding: 8px; /* Aumentado o padding */
+            opacity: 0.6;
             transition: opacity 0.2s, transform 0.2s, display 0.3s;
             display: none; /* Ocultar por padrão, só mostra no master-edit-mode */
         }
 
-        body.master-edit-mode .pin-btn {
+        body.master-edit-mode .pin-category-btn {
             display: block;
         }
 
-        .pin-btn:hover {
+        .pin-category-btn:hover {
             opacity: 1;
             transform: scale(1.15);
         }
 
-        .pin-btn svg {
-            width: 22px;
-            height: 22px;
+        .pin-category-btn svg {
+            width: 24px; /* Aumentado o tamanho do SVG */
+            height: 24px; /* Aumentado o tamanho do SVG */
             color: var(--text-color);
         }
 
-        .pin-btn.pinned svg {
+        .pin-category-btn.pinned svg {
             color: var(--primary-color);
         }
 
-        .pin-btn.pinned {
+        .pin-category-btn.pinned {
             opacity: 1;
         }
 
         /* --- ÍCONES & GRID DE ÍCONES --- */
         .icons-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Min-width maior para ícones */
+            gap: 20px; /* Aumentado o espaçamento */
             justify-items: center;
         }
 
-        .icon-item {
+        .icon-item-wrapper { /* Novo wrapper para o item do ícone */
+            position: relative;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
-            text-decoration: none;
-            color: #fff;
+            border-radius: 14px; /* Bordas mais arredondadas */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .15); /* Sombra mais suave */
             overflow: hidden;
-            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease, border .2s ease;
+            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease, border .2s ease, box-shadow .2s ease;
             width: 100%;
             aspect-ratio: 1 / 1;
-            position: relative;
-        }
-        
-        body.dark-mode .icon-item {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, .3);
+            border: 2px solid transparent; /* Adicionado borda transparente padrão */
         }
 
-        .icon-item:hover {
-            transform: scale(1.05);
-        }
-        
-        /* Estilo para ícone fixado publicamente - MODIFICADO AQUI */
-        body.master-edit-mode .icon-item.publicly-pinned {
-            border: 2px solid var(--primary-color);
-            box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+        body.dark-mode .icon-item-wrapper {
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .4);
         }
 
-        /* Habilitar arrastar apenas no modo de edição mestre */
-        body.master-edit-mode .icon-item {
-            cursor: grab;
+        .icon-item-wrapper:hover {
+            transform: scale(1.08); /* Aumento maior no hover */
         }
-        body.master-edit-mode .icon-item:active {
-            cursor: grabbing;
+
+        /* Estilo para ícone fixado publicamente - APARECE APENAS EM MASTER-EDIT-MODE */
+        body.master-edit-mode .icon-item-wrapper.publicly-pinned {
+            border: 3px solid var(--primary-color); /* Borda mais grossa */
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.5); /* Sombra mais pronunciada */
+        }
+        
+        /* O link real que encapsula o conteúdo do ícone */
+        .icon-link {
+            text-decoration: none;
+            color: #fff;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Desabilita o clique no link quando em modo de edição */
+        body.master-edit-mode .icon-link {
+            pointer-events: none; /* Desabilita todos os eventos de ponteiro no link */
+        }
+        
+        /* Permite o clique nos botões de ação dentro do link no modo de edição */
+        body.master-edit-mode .icon-item-wrapper .icon-action-btn {
+            pointer-events: auto; /* Reabilita eventos de ponteiro para os botões */
+        }
+
+
+        /* Esconde as ações do ícone por padrão */
+        .icon-actions {
+            display: none;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 10;
+            gap: 5px;
+        }
+
+        /* Mostra as ações do ícone APENAS em master-edit-mode */
+        body.master-edit-mode .icon-actions {
+            display: flex;
+        }
+
+        .icon-action-btn {
+            background-color: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: var(--action-button-size);
+            height: var(--action-button-size);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            color: white;
+            padding: 0;
+        }
+
+        .icon-action-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        .icon-action-btn.edit-btn:hover { background-color: var(--warning-color); }
+        .icon-action-btn.pin-btn:hover { background-color: var(--primary-color); }
+        .icon-action-btn.unpin-btn:hover { background-color: var(--danger-color); }
+
+        .icon-action-btn svg {
+            width: 18px;
+            height: 18px;
+            color: white;
         }
 
         .icon-content {
@@ -273,170 +357,70 @@
             width: 100%;
             height: 100%;
             background-color: var(--icon-background-color, #777);
+            border-radius: 12px; 
+            padding: 5px; /* Aumentado o padding interno */
         }
 
         .icon-label {
-            font-size: 0.85em;
+            font-size: 0.95em; /* Aumentado o tamanho da fonte do label */
             text-align: center;
-            padding: 5px;
+            padding: 8px 3px; /* Mais padding */
             word-break: break-word;
             font-weight: bold;
-            line-height: 1.2;
+            line-height: 1.3; /* Mais espaço entre as linhas */
             text-transform: uppercase;
-        }
-
-        /* Esconder actions antigas dos ícones */
-        .icon-actions {
-            display: none !important;
         }
 
         /* Classes de Cor para Ícones */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }        .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
 
         /* --- MODAL --- */
-        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.3s ease; }
+        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.3s ease; } /* Backgound mais escuro */
         #generator-modal-overlay.visible { display: block; opacity: 1; }
-        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 25px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--card-shadow); border-top: 5px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
+        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); /* Escala inicial menor */ width: 95%; max-width: 700px; /* Modal mais largo */ max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 35px; /* Aumentado */ background-color: var(--card-bg-color); border-radius: 16px; /* Mais arredondado */ box-shadow: var(--card-shadow); border-top: 6px solid var(--primary-color); /* Borda mais grossa */ display: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; }
         #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 25px 0; font-size: 1.8em; border-bottom: 2px solid var(--separator-color); padding-bottom: 10px; }
-        #close-generator-modal-btn { position: absolute; top: 15px; right: 15px; background: var(--button-bg-color); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem; font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
+        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 30px 0; /* Mais espaçamento */ font-size: 2em; /* Título maior */ border-bottom: 2px solid var(--separator-color); padding-bottom: 15px; } /* Mais padding */
+        #close-generator-modal-btn { position: absolute; top: 20px; right: 20px; /* Mais afastado */ background: var(--button-bg-color); border: none; border-radius: 50%; width: 35px; height: 35px; /* Botão maior */ font-size: 1.4rem; /* Icone maior */ font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
         #close-generator-modal-btn:hover { background-color: var(--danger-color); color: white; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); }
-        .form-group input[type="text"], .form-group input[type="url"], .form-group select { width: 100%; padding: 12px 15px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: var(--input-bg-color); color: var(--text-color); }
-        .form-group input[type="color"] { width: 100%; padding: 5px; height: 45px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
-        #submit-icon-button { width: 100%; padding: 12px 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color .3s ease; font-weight: 500; margin-top: 10px; }
+        .form-group { margin-bottom: 22px; } /* Mais espaçamento */
+        .form-group label { display: block; margin-bottom: 8px; /* Mais espaçamento */ font-weight: 500; color: var(--text-color); font-size: 1.1em; /* Fonte maior */ }
+        .form-group input[type="text"], .form-group input[type="url"], .form-group select { width: 100%; padding: 14px 18px; /* Mais padding */ border: 1px solid var(--input-border-color); border-radius: 10px; /* Mais arredondado */ box-sizing: border-box; font-size: 1.1em; /* Fonte maior */ background-color: var(--input-bg-color); color: var(--text-color); }
+        .form-group input[type="color"] { width: 100%; padding: 8px; height: 50px; /* Altura maior */ border: 1px solid var(--input-border-color); border-radius: 100px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
+        #submit-icon-button { width: 100%; padding: 15px 20px; /* Mais padding */ background-color: var(--primary-color); color: white; border: none; border-radius: 10px; /* Mais arredondado */ font-size: 1.2em; /* Fonte maior */ cursor: pointer; transition: background-color .3s ease; font-weight: 500; margin-top: 15px; } /* Mais espaçamento */
         #submit-icon-button:hover { background-color: var(--primary-color-hover); }
-        .label-hint { font-size: 0.85em; color: #777; font-weight: 400; }
+        .label-hint { font-size: 0.9em; /* Fonte ligeiramente maior */ color: #777; font-weight: 400; }
         body.dark-mode .label-hint { color: #bbb; }
-        #form-status-message { margin-top: 15px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
+        #form-status-message { margin-top: 20px; padding: 12px; border-radius: 8px; text-align: center; display: none; font-size: 1.05em;} /* Aumentado */
         #form-status-message.success { background-color: #d4edda; color: #155724; display: block; }
         #form-status-message.error { background-color: #f8d7da; color: #721c24; display: block; }
 
         /* --- CONTAINER DE RESULTADOS DA BUSCA --- */
-        #search-results-container { display: none; padding: 20px 0; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; justify-items: center; }
+        #search-results-container { display: none; padding: 30px 0; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; justify-items: center; } /* Valores maiores */
         #search-results-container.visible { display: grid; }
-
-        /* --- ZONA DE AÇÕES (ARRASTAR E SOLTAR) --- */
-        #action-zone {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--card-bg-color);
-            border: 2px dashed var(--input-border-color);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            box-shadow: var(--card-shadow);
-            color: var(--text-color);
-            font-weight: bold;
-            font-size: 0.9em;
-            opacity: 0;
-            pointer-events: none; /* Desabilitado por padrão */
-            transition: opacity 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
-            z-index: 999;
-            width: 150px; /* Tamanho fixo */
-            height: 150px; /* Tamanho fixo */
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        #action-zone.visible {
-            opacity: 1;
-            pointer-events: auto; /* Habilitado quando visível */
-        }
-
-        #action-zone.drag-over {
-            border-color: var(--primary-color);
-            background-color: rgba(var(--primary-color-rgb), 0.1);
-        }
-
-        #action-zone.edit-mode {
-            border-color: var(--warning-color);
-            background-color: rgba(255, 193, 7, 0.1);
-        }
-
-        #action-zone.pin-mode {
-            border-color: var(--primary-color);
-            background-color: rgba(var(--primary-color-rgb), 0.1);
-        }
-
-        #action-zone svg {
-            width: 30px;
-            height: 30px;
-            color: var(--text-color);
-            margin-bottom: 5px;
-        }
-        body.dark-mode #action-zone svg {
-            color: var(--text-color);
-        }
-        #action-zone .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-            width: 100%;
-        }
-        
-        #action-zone .action-buttons button {
-            background-color: var(--button-bg-color);
-            color: var(--button-text-color);
-            border: none;
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 0.8em;
-            font-weight: bold;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        #action-zone .action-buttons button.edit-btn {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
-        #action-zone .action-buttons button.pin-toggle-btn.fix-btn {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        #action-zone .action-buttons button.pin-toggle-btn.unfix-btn {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        #action-zone .action-buttons button:hover {
-            opacity: 0.9;
-        }
 
         /* --- RESPONSIVIDADE --- */
         @media (max-width: 768px) {
-            body { padding-top: 80px; }
-            #page-header { padding: 10px; }
-            main { padding: 10px; }
-            .category-grid { grid-template-columns: 1fr; gap: 20px; }
-            .category-card { padding: 15px; }
-            .category-header h2 { font-size: 1.4em; }
-            .icons-grid, #search-results-container { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
-            #generate-icon-code-section { padding: 20px 15px; }
-            #generate-icon-code-section h2 { font-size: 1.4em; }
-            #search-input { font-size: 1em; }
-            .header-button { width: 40px; height: 40px; }
-            #action-zone {
-                width: 120px;
-                height: 120px;
-                padding: 10px;
-                font-size: 0.7em;
-                bottom: 10px;
-                right: 10px;
+            body { padding-top: 90px; font-size: 1em;} /* Ajuste de padding para celular */
+            #page-header { padding: 15px; } /* Ajuste de padding */
+            main { padding: 15px; } /* Ajuste de padding */
+            .category-grid { grid-template-columns: 1fr; gap: 25px; } /* Gap ajustado */
+            .category-card { padding: 20px; } /* Ajuste de padding */
+            .category-header h2 { font-size: 1.6em; } /* Ajuste de fonte */
+            .icons-grid, #search-results-container { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; } /* Min-width ajustado para ícones */
+            #generate-icon-code-section { padding: 25px 20px; } /* Ajuste de padding */
+            #generate-icon-code-section h2 { font-size: 1.6em; } /* Ajuste de fonte */
+            #search-input { font-size: 1.05em; padding: 12px 18px; } /* Ajuste de fonte e padding */
+            .header-button { width: 45px; height: 45px; } /* Ajuste de tamanho */
+            .header-button svg { width: 24px; height: 24px; } /* Ajuste de tamanho */
+            .icon-label { font-size: 0.85em; padding: 6px 3px;} /* Ajuste de fonte e padding */
+            /* Botões de ação do ícone em telas menores */
+            .icon-action-btn {
+                width: 26px;
+                height: 26px;
             }
-            #action-zone svg {
-                width: 25px;
-                height: 25px;
+            .icon-action-btn svg {
+                width: 16px;
+                height: 16px;
             }
         }
     </style>
@@ -456,7 +440,7 @@
     </header>
 
     <main id="main-content">
-        <div id="pinned-section"></div>
+        <div id="master-edit-overlay"></div> <div id="pinned-section"></div>
         <div id="regular-section-wrapper">
             <div class="category-grid" id="all-categories-grid"></div>
         </div>
@@ -502,20 +486,11 @@
         <div id="form-status-message"></div>
     </div>
 
-    <div id="action-zone" aria-label="Arraste ícones aqui para ações">
-        <svg id="action-zone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-        <span id="action-zone-text">Arraste um ícone aqui</span>
-        <div class="action-buttons" style="display: none;">
-            <button id="edit-dropped-icon-btn" class="edit-btn">Editar</button>
-            <button id="toggle-pin-dropped-icon-btn" class="pin-toggle-btn">Fixar/Desafixar</button>
-        </div>
-    </div>
-
     <script type="module">
         // --- MÓDULOS FIREBASE ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURAÇÃO FIREBASE ---
         const firebaseConfig = {
@@ -545,7 +520,7 @@
         const ICONS_SVG = {
             PIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 3v2h6v5h2v-5h6v-2l-2-3z"/></svg>`,
             EDIT: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`,
-            DRAG_PROMPT: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>`
+            UNPIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-10V4h-1v3l-2 3v2h6v-2l-2-3zM7 2v2h1v8l-2 3v2h6v-2l-2-3V4h1V2z"/></svg>`
         };
 
         const D = {
@@ -554,6 +529,7 @@
             searchInput: document.getElementById('search-input'),
             themeToggle: document.getElementById('theme-toggle'),
             masterEditToggle: document.getElementById('master-edit-toggle'),
+            masterEditOverlay: document.getElementById('master-edit-overlay'), // Novo elemento
             pinnedSection: document.getElementById('pinned-section'),
             allCategoriesGrid: document.getElementById('all-categories-grid'),
             regularSectionWrapper: document.getElementById('regular-section-wrapper'),
@@ -572,13 +548,6 @@
             iconCustomBgColorInput: document.getElementById('iconCustomBgColorInput'),
             iconCategorySelect: document.getElementById('iconCategorySelect'),
             submitIconButton: document.getElementById('submit-icon-button'),
-            // Novas referências para a zona de ações
-            actionZone: document.getElementById('action-zone'),
-            actionZoneIcon: document.getElementById('action-zone-icon'),
-            actionZoneText: document.getElementById('action-zone-text'),
-            actionZoneButtons: document.querySelector('#action-zone .action-buttons'),
-            editDroppedIconBtn: document.getElementById('edit-dropped-icon-btn'),
-            togglePinDroppedIconBtn: document.getElementById('toggle-pin-dropped-icon-btn'),
         };
 
         let allIcons = [];
@@ -586,7 +555,6 @@
         let currentUser = null;
         let isFormEditMode = false;
         let isMasterEditModeActive = false;
-        let draggedIconId = null;
 
         // --- TEMA ---
         const applyTheme = () => {
@@ -610,11 +578,7 @@
             const newTitle = isMasterEditModeActive ? "Desativar Modo de Edição" : "Ativar Modo de Edição";
             D.masterEditToggle.title = newTitle;
             D.masterEditToggle.setAttribute('aria-label', newTitle);
-
-            D.actionZone.classList.toggle('visible', isMasterEditModeActive);
-            if (!isMasterEditModeActive) {
-                resetActionZone();
-            }
+            renderPage(); // Re-renderiza para mostrar/esconder botões de edição nos ícones
         };
 
         // --- RENDERIZAÇÃO ---
@@ -623,12 +587,27 @@
             const style = !icon.colorClass ? ` style="--icon-background-color: ${icon.customBgColor};"` : '';
             const isIconPubliclyPinned = icon.isPublicamenteFixado === true;
 
+            // Adiciona botões de ação (editar e fixar/desafixar)
+            const actionButtons = `
+                <div class="icon-actions">
+                    <button class="icon-action-btn edit-btn" data-id="${icon.id}" title="Editar Ícone" aria-label="Editar Ícone">
+                        ${ICONS_SVG.EDIT}
+                    </button>
+                    <button class="icon-action-btn ${isIconPubliclyPinned ? 'unpin-btn' : 'pin-btn'}" data-id="${icon.id}" title="${isIconPubliclyPinned ? 'Desafixar Publicamente' : 'Fixar Publicamente'}" aria-label="${isIconPubliclyPinned ? 'Desafixar Publicamente' : 'Fixar Publicamente'}">
+                        ${isIconPubliclyPinned ? ICONS_SVG.UNPIN : ICONS_SVG.PIN}
+                    </button>
+                </div>
+            `;
+
             return `
-                <a href="${icon.link}" class="icon-item${colorClass} ${isIconPubliclyPinned ? 'publicly-pinned' : ''}" data-label="${icon.name}" data-id="${icon.id}" target="_blank" rel="noopener noreferrer" draggable="true">
-                    <div class="icon-content"${style}>
-                        <div class="icon-label">${icon.name}</div>
-                    </div>
-                </a>`;
+                <div class="icon-item-wrapper${colorClass} ${isIconPubliclyPinned ? 'publicly-pinned' : ''}" data-label="${icon.name}" data-id="${icon.id}">
+                    <a href="${icon.link}" class="icon-link" target="_blank" rel="noopener noreferrer">
+                        <div class="icon-content"${style}>
+                            <div class="icon-label">${icon.name}</div>
+                        </div>
+                    </a>
+                    ${actionButtons}
+                </div>`;
         };
 
         const createCategoryHTML = (categoryId, icons) => {
@@ -641,7 +620,7 @@
                 <div class="category-card" style="border-color: ${details.color};" data-category="${categoryId}">
                     <div class="category-header">
                         <h2>${details.name}</h2>
-                        <button class="pin-btn pin-category-btn ${isCategoryPinnedByUser ? 'pinned' : ''}" data-id="${categoryId}" title="${isCategoryPinnedByUser ? 'Desafixar Categoria' : 'Fixar Categoria'}" aria-label="${isCategoryPinnedByUser ? 'Desafixar' : 'Fixar'} Categoria">
+                        <button class="pin-category-btn ${isCategoryPinnedByUser ? 'pinned' : ''}" data-id="${categoryId}" title="${isCategoryPinnedByUser ? 'Desafixar Categoria' : 'Fixar Categoria'}" aria-label="${isCategoryPinnedByUser ? 'Desafixar' : 'Fixar'} Categoria">
                             ${ICONS_SVG.PIN}
                         </button>
                     </div>
@@ -656,8 +635,12 @@
                 return acc;
             }, {});
 
-            const publicFeaturedIcons = allIcons.filter(icon => icon.isPublicamenteFixado);
-            const publicFeaturedHTML = createCategoryHTML('public-featured', publicFeaturedIcons);
+            // Sort public featured icons by pinnedDate in descending order (most recent first)
+            const publicFeaturedIcons = allIcons
+                .filter(icon => icon.isPublicamenteFixado)
+                .sort((a, b) => (b.pinnedDate?.toDate() || 0) - (a.pinnedDate?.toDate() || 0));
+
+            const publicFeaturedHTML = publicFeaturedIcons.length > 0 ? createCategoryHTML('public-featured', publicFeaturedIcons) : '';
 
             const pinnedCategoriesHTML = pinnedCategoryIds
                 .map(id => createCategoryHTML(id, iconsByCategory[id] || []))
@@ -685,7 +668,7 @@
                 if (matchingIcons.length > 0) {
                     D.searchResultsContainer.innerHTML = matchingIcons.map(createIconHTML).join('');
                 } else {
-                    D.searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1;">Nenhum ícone encontrado para "${searchTerm}".</p>`;
+                    D.searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center;">Nenhum ícone encontrado para "${searchTerm}".</p>`;
                 }
             } else {
                 D.searchResultsContainer.classList.remove('visible');
@@ -705,7 +688,7 @@
 
         // --- MODAL ---
         const openModal = (editMode = false, iconId = null) => {
-            if (editMode && !isMasterEditModeActive) return;
+            if (editMode && !isMasterEditModeActive) return; // Só permite edição se Master Edit Mode estiver ativo
 
             isFormEditMode = editMode;
             D.iconForm.reset();
@@ -741,7 +724,6 @@
             D.modalOverlay.classList.remove('visible');
             D.generatorModal.classList.remove('visible');
             D.body.classList.remove('modal-open');
-            resetActionZone();
         };
 
         const showFormStatus = (message, type = 'error') => {
@@ -764,28 +746,17 @@
             const icon = allIcons.find(i => i.id === iconId);
             if (!icon) return;
             
-            // Aplica/remove a classe visualmente no HTML imediatamente
-            const iconElement = document.querySelector(`.icon-item[data-id="${iconId}"]`);
-            if (iconElement) {
-                iconElement.classList.toggle('publicly-pinned', !icon.isPublicamenteFixado);
-            }
-            
             try {
-                // Atualiza o status no Firebase
-                await updateDoc(doc(db, "icones", iconId), { isPublicamenteFixado: !icon.isPublicamenteFixado });
+                const newPinnedState = !icon.isPublicamenteFixado;
+                const updateData = {
+                    isPublicamenteFixado: newPinnedState,
+                    pinnedDate: newPinnedState ? serverTimestamp() : null // Update timestamp on pin, remove on unpin
+                };
+                await updateDoc(doc(db, "icones", iconId), updateData);
                 // renderPage() será chamado pelo onSnapshot do Firebase
             } catch (error) {
                 console.error("Erro ao destacar/desdestacar ícone:", error);
-                // Reverte a mudança visual se houver erro no Firebase
-                if (iconElement) {
-                    iconElement.classList.toggle('publicly-pinned', icon.isPublicamenteFixado);
-                }
             }
-            // Não reseta a actionZone aqui para permitir feedback visual imediato após o clique,
-            // a menos que você queira que ela desapareça logo após a ação.
-            // Se esta função for chamada pelo drag-and-drop, o resetActionZone() já está no handler do drop.
-            // Se for pelo clique, pode manter visível ou resetar dependendo da UX desejada.
-            resetActionZone(); // Adicionado aqui para garantir que a zona resete após o clique ou arrastar.
         };
 
         const handleSubmitIcon = async (e) => {
@@ -807,7 +778,7 @@
                     await updateDoc(doc(db, "icones", D.iconIdInput.value), iconData);
                     showFormStatus('Ícone atualizado com sucesso!', 'success');
                 } else {
-                    await addDoc(collection(db, "icones"), iconData);
+                    await addDoc(collection(db, "icones"), { ...iconData, createdAt: serverTimestamp() });
                     showFormStatus('Ícone adicionado com sucesso!', 'success');
                 }
                 setTimeout(() => {
@@ -820,15 +791,6 @@
             } finally {
                 D.submitIconButton.disabled = false;
             }
-        };
-
-        // --- LÓGICA DA ZONA DE AÇÕES (ARRASTAR E SOLTAR) ---
-        const resetActionZone = () => {
-            D.actionZone.classList.remove('drag-over', 'edit-mode', 'pin-mode');
-            D.actionZoneIcon.innerHTML = ICONS_SVG.DRAG_PROMPT;
-            D.actionZoneText.textContent = 'Arraste um ícone aqui';
-            D.actionZoneButtons.style.display = 'none';
-            draggedIconId = null;
         };
 
         // --- EVENT LISTENERS ---
@@ -846,92 +808,15 @@
                 const categoryId = e.target.closest('.pin-category-btn').dataset.id;
                 togglePinCategory(categoryId);
             }
-            // Lógica para fixar/desafixar ícone ao CLICAR, APENAS se o modo de edição estiver ATIVO
-            if (isMasterEditModeActive) {
-                const iconItem = e.target.closest('.icon-item');
-                // Garante que o clique não foi originado de dentro da zona de ação
-                if (iconItem && !e.target.closest('#action-zone')) {
-                    const iconId = iconItem.dataset.id;
-                    togglePinIcon(iconId);
-                }
+            // Lógica para editar ícone
+            if (e.target.closest('.icon-action-btn.edit-btn')) {
+                const iconId = e.target.closest('.icon-action-btn.edit-btn').dataset.id;
+                openModal(true, iconId);
             }
-        });
-
-        // Eventos de Drag and Drop para ícones
-        D.mainContent.addEventListener('dragstart', (e) => {
-            if (!isMasterEditModeActive) {
-                e.preventDefault();
-                return;
-            }
-            const iconItem = e.target.closest('.icon-item');
-            if (iconItem) {
-                draggedIconId = iconItem.dataset.id;
-                e.dataTransfer.setData('text/plain', draggedIconId);
-                D.actionZoneIcon.innerHTML = ICONS_SVG.DRAG_PROMPT;
-                D.actionZoneText.textContent = 'Solte aqui para Ações';
-                D.actionZoneButtons.style.display = 'none';
-            }
-        });
-
-        D.mainContent.addEventListener('dragend', () => {
-            // Limpa as classes de arrasto da actionZone ao finalizar o arrasto
-            D.actionZone.classList.remove('drag-over', 'edit-mode', 'pin-mode');
-            // Se nenhum ícone foi solto na zona (draggedIconId ainda é o mesmo que no dragstart ou não foi resetado pelo drop)
-            // e estamos no modo de edição, reseta a zona para seu estado inicial
-            if (isMasterEditModeActive && draggedIconId === null) {
-                resetActionZone();
-            }
-        });
-
-        D.actionZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            D.actionZone.classList.add('drag-over');
-            D.actionZoneText.textContent = 'Solte aqui';
-            D.actionZoneIcon.innerHTML = ICONS_SVG.DRAG_PROMPT;
-        });
-
-        D.actionZone.addEventListener('dragleave', () => {
-            D.actionZone.classList.remove('drag-over');
-            D.actionZoneText.textContent = 'Arraste um ícone aqui';
-            D.actionZoneIcon.innerHTML = ICONS_SVG.DRAG_PROMPT;
-        });
-
-        D.actionZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            D.actionZone.classList.remove('drag-over');
-            const droppedIconId = e.dataTransfer.getData('text/plain');
-
-            if (droppedIconId) {
-                draggedIconId = droppedIconId; // Garante que o ID do ícone arrastado está salvo
-                const iconBeingDropped = allIcons.find(i => i.id === draggedIconId);
-
-                D.actionZoneText.textContent = 'O que deseja fazer?';
-                D.actionZoneButtons.style.display = 'flex';
-                D.actionZone.classList.add('pin-mode'); // Adiciona classe para estilizar a zona em modo de fixação
-                
-                // Atualiza o texto e estilo do botão de fixar/desafixar baseado no estado atual do ícone
-                if (iconBeingDropped && iconBeingDropped.isPublicamenteFixado) {
-                    D.togglePinDroppedIconBtn.textContent = 'Desafixar';
-                    D.togglePinDroppedIconBtn.classList.remove('fix-btn');
-                    D.togglePinDroppedIconBtn.classList.add('unfix-btn');
-                    D.actionZoneIcon.innerHTML = ICONS_SVG.PIN; // Ícone de pino cheio
-                } else {
-                    D.togglePinDroppedIconBtn.textContent = 'Fixar';
-                    D.togglePinDroppedIconBtn.classList.remove('unfix-btn');
-                    D.togglePinDroppedIconBtn.classList.add('fix-btn');
-                    D.actionZoneIcon.innerHTML = ICONS_SVG.PIN; // Ícone de pino cheio/vazio, use o que preferir
-                }
-
-                // Configura os botões de ação
-                D.editDroppedIconBtn.onclick = () => {
-                    openModal(true, draggedIconId);
-                    // Não reseta a actionZone aqui, pois o modal será aberto
-                    // A zona será resetada quando o modal for fechado
-                };
-
-                D.togglePinDroppedIconBtn.onclick = () => {
-                    togglePinIcon(draggedIconId); // Chama a função que já reseta a actionZone
-                };
+            // Lógica para fixar/desafixar ícone publicamente
+            if (e.target.closest('.icon-action-btn.pin-btn') || e.target.closest('.icon-action-btn.unpin-btn')) {
+                const iconId = e.target.closest('.icon-action-btn').dataset.id;
+                togglePinIcon(iconId);
             }
         });
 
