@@ -250,6 +250,9 @@
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Min-width maior para ícones */
             gap: 20px; /* Aumentado o espaçamento */
             justify-items: center;
+            /* Adiciona um margin-top para compensar os botões que sobem */
+            margin-top: calc(var(--action-button-size) / 2); 
+            margin-bottom: calc(var(--action-button-size) / 2); /* Ajuste para espaçamento inferior */
         }
 
         .icon-item-wrapper { /* Novo wrapper para o item do ícone */
@@ -261,10 +264,10 @@
             align-items: center;
             border-radius: 14px; /* Bordas mais arredondadas */
             box-shadow: 0 3px 8px rgba(0, 0, 0, .15); /* Sombra mais suave */
-            overflow: hidden;
+            overflow: visible; /* Permite que os botões apareçam fora dos limites */
             transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease, border .2s ease, box-shadow .2s ease;
-            width: 100%;
-            aspect-ratio: 1 / 1;
+            width: 100px; /* Definido o tamanho fixo para o ícone */
+            height: 100px; /* Definido o tamanho fixo para o ícone */
             border: 2px solid transparent; /* Adicionado borda transparente padrão */
         }
 
@@ -309,7 +312,7 @@
         .icon-actions {
             display: none;
             position: absolute;
-            top: 5px;
+            top: calc(-1 * var(--action-button-size) / 2); /* Ajusta para o centro do botão estar na linha superior do wrapper */
             left: 50%; /* Centraliza horizontalmente */
             transform: translateX(-50%); /* Ajusta para centralizar de fato */
             z-index: 10;
@@ -407,7 +410,16 @@
             .category-grid { grid-template-columns: 1fr; gap: 25px; } /* Gap ajustado */
             .category-card { padding: 20px; } /* Ajuste de padding */
             .category-header h2 { font-size: 1.6em; } /* Ajuste de fonte */
-            .icons-grid, #search-results-container { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 15px; } /* Min-width ajustado para ícones */
+            .icons-grid, #search-results-container { 
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+                gap: 15px; 
+                margin-top: calc(var(--action-button-size) / 2); /* Ajuste para celular */
+                margin-bottom: calc(var(--action-button-size) / 2); /* Ajuste para celular */
+            } /* Min-width ajustado para ícones */
+            .icon-item-wrapper { /* Ajuste para celular */
+                width: 90px;
+                height: 90px;
+            }
             #generate-icon-code-section { padding: 25px 20px; } /* Ajuste de padding */
             #generate-icon-code-section h2 { font-size: 1.6em; } /* Ajuste de fonte */
             #search-input { font-size: 1.05em; padding: 12px 18px; } /* Ajuste de fonte e padding */
@@ -737,7 +749,7 @@
         const togglePinCategory = async (categoryId) => {
             if (!currentUser) return;
             const index = pinnedCategoryIds.indexOf(categoryId);
-            index > -1 ? pinnedCategoryIds.splice(index, 1) : pinnedCategoryIds.push(categoryId);
+            index > -1 ? pinnedCategoryIds.splice(index, 1) : pinnedCategoryIds.h(categoryId);
             try {
                 await setDoc(doc(db, "usuarios", currentUser.uid), { pinnedCategories: pinnedCategoryIds }, { merge: true });
                 renderPage();
