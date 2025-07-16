@@ -355,6 +355,8 @@
         .icon-action-btn.edit-btn:hover { background-color: var(--warning-color); }
         .icon-action-btn.pin-btn:hover { background-color: var(--primary-color); }
         .icon-action-btn.unpin-btn:hover { background-color: var(--danger-color); }
+        .icon-action-btn.delete-btn:hover { background-color: var(--danger-color); } /* Estilo para o botão de deletar */
+
 
         .icon-action-btn svg {
             width: var(--action-button-icon-size);
@@ -680,7 +682,8 @@
         const ICONS_SVG = {
             PIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 3v2h6v5h2v-5h6v-2l-2-3z"/></svg>`,
             EDIT: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`,
-            UNPIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-10V4h-1v3l-2 3v2h6v-2l-2-3zM7 2v2h1v8l-2 3v2h6v-2l-2-3V4h1V2z"/></svg>`
+            UNPIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-10V4h-1v3l-2 3v2h6v-2l-2-3zM7 2v2h1v8l-2 3v2h6v-2l-2-3V4h1V2z"/></svg>`,
+            DELETE: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>` // SVG para o ícone de lixeira
         };
 
         const D = {
@@ -754,6 +757,9 @@
                     </button>
                     <button class="icon-action-btn ${isIconPubliclyPinned ? 'unpin-btn' : 'pin-btn'}" data-id="${icon.id}" title="${isIconPubliclyPinned ? 'Desafixar Publicamente' : 'Fixar Publicamente'}" aria-label="${isIconPubliclyPinned ? 'Desafixar Publicamente' : 'Fixar Publicamente'}">
                         ${isIconPubliclyPinned ? ICONS_SVG.UNPIN : ICONS_SVG.PIN}
+                    </button>
+                    <button class="icon-action-btn delete-btn" data-id="${icon.id}" title="Remover Ícone" aria-label="Remover Ícone">
+                        ${ICONS_SVG.DELETE}
                     </button>
                 </div>
             `;
@@ -920,6 +926,20 @@
             }
         };
 
+        const deleteIcon = async (iconId, iconName) => {
+            if (!isMasterEditModeActive) return;
+
+            if (confirm(`Tem certeza que deseja remover o ícone "${iconName}"?`)) {
+                try {
+                    await deleteDoc(doc(db, "icones", iconId));
+                    alert(`Ícone "${iconName}" removido com sucesso!`);
+                } catch (error) {
+                    console.error("Erro ao remover ícone:", error);
+                    alert("Ocorreu um erro ao remover o ícone.");
+                }
+            }
+        };
+
         const handleSubmitIcon = async (e) => {
             e.preventDefault();
             if (!D.iconForm.checkValidity()) {
@@ -975,6 +995,13 @@
             if (e.target.closest('.icon-action-btn.pin-btn') || e.target.closest('.icon-action-btn.unpin-btn')) {
                 const iconId = e.target.closest('.icon-action-btn').dataset.id;
                 togglePinIcon(iconId);
+            }
+            if (e.target.closest('.icon-action-btn.delete-btn')) {
+                const iconId = e.target.closest('.icon-action-btn.delete-btn').dataset.id;
+                const icon = allIcons.find(i => i.id === iconId);
+                if (icon) {
+                    deleteIcon(icon.id, icon.name);
+                }
             }
         });
 
