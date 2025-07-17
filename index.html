@@ -344,7 +344,7 @@
             },
             async addIcon(data) {
                 await addDoc(collection(this.db, "icones"), { ...data, createdAt: serverTimestamp() });
-            },
+            } ,
             async deleteIcon(id) {
                 await deleteDoc(doc(this.db, "icones", id));
             }
@@ -510,7 +510,18 @@
                     }, {});
 
                     // 1. Renderizar Ícones em Destaque (Publicamente Fixados)
-                    const publicFeaturedIcons = state.allIcons.filter(icon => icon.isPublicamenteFixado);
+                    let publicFeaturedIcons = state.allIcons.filter(icon => icon.isPublicamenteFixado);
+                    
+                    // --- ORDENAÇÃO DOS ÍCONES DE DESTAQUE MAIS RECENTES EM PRIMEIRO ---
+                    publicFeaturedIcons.sort((a, b) => {
+                        // Garante que `createdAt` é um objeto Timestamp do Firebase ou um valor compatível.
+                        // Se for um objeto Timestamp, use `toDate()`. Caso contrário, tente converter para Date.
+                        const dateA = a.createdAt && typeof a.createdAt.toDate === 'function' ? a.createdAt.toDate() : (a.createdAt ? new Date(a.createdAt) : new Date(0));
+                        const dateB = b.createdAt && typeof b.createdAt.toDate === 'function' ? b.createdAt.toDate() : (b.createdAt ? new Date(b.createdAt) : new Date(0));
+                        return dateB.getTime() - dateA.getTime(); // Ordena do mais recente para o mais antigo
+                    });
+                    // ------------------------------------------------------------------
+
                     if (publicFeaturedIcons.length > 0) {
                         const featuredCategoryCard = this.createCategoryCard(
                             'public-featured',
@@ -723,6 +734,9 @@
                     const existingIcon = state.allIcons.find(i => i.id === id);
                     iconData.isAnimated = existingIcon ? existingIcon.isAnimated : false;
                     iconData.isPublicamenteFixado = existingIcon ? existingIcon.isPublicamenteFixado : false;
+                    // Mantenha o `createdAt` original ao editar
+                    iconData.createdAt = existingIcon ? existingIcon.createdAt : serverTimestamp();
+
 
                     FirebaseService.updateIcon(id, iconData)
                         .then(() => {
@@ -735,9 +749,10 @@
                             UIManager.showFormStatus('Erro ao atualizar ícone.', 'error');
                         });
                 } else {
-                    // Para novos ícones, defina como false por padrão
+                    // Para novos ícones, defina como false por padrão e adicione o timestamp
                     iconData.isAnimated = false;
                     iconData.isPublicamenteFixado = false;
+                    iconData.createdAt = serverTimestamp(); // Adiciona o timestamp para novos ícones
 
                     FirebaseService.addIcon(iconData)
                         .then(() => {
@@ -777,7 +792,8 @@
                             }
                         }
                         else if (actionBtn.classList.contains('pin-btn')) {
-                            FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado });
+                            // Ao fixar, atualiza o timestamp `createdAt` para que apareça em primeiro
+                            FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado, createdAt: serverTimestamp() });
                         }
                         else if (actionBtn.classList.contains('animate-btn')) {
                             FirebaseService.updateIcon(id, { isAnimated: !icon.isAnimated });
