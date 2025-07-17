@@ -88,11 +88,12 @@
             height: 90px; box-sizing: border-box; overflow: hidden;
         }
         .icon-link:hover { transform: translateY(-5px); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12); }
+        /* AÇÕES DO ÍCONE SÓ APARECEM NO MODO DE EDIÇÃO */
         body.master-edit-mode .icon-link { pointer-events: none; }
         .icon-visual {
             display: flex; align-items: center; justify-content: center; flex-grow: 1; padding: 10px;
             background-color: #cccccc; transition: transform 0.2s ease;
-            position: relative; /* Adicionado para posicionamento do texto sobre a imagem */
+            position: relative; /* Adicionado para posicionamento do texto do ícone */
         }
         .icon-visual img {
             max-width: 60px; /* Limita o tamanho da imagem, se houver */
@@ -136,7 +137,8 @@
             transform: translateX(-50%); z-index: 10; gap: 8px; opacity: 0;
             transition: all 0.2s ease; pointer-events: none;
         }
-        .icon-card-wrapper:hover .icon-actions, body.master-edit-mode .icon-card-wrapper .icon-actions { opacity: 1; top: -18px; pointer-events: auto; }
+        /* Somente mostra os botões de ação se o body tiver a classe master-edit-mode */
+        body.master-edit-mode .icon-card-wrapper .icon-actions { opacity: 1; top: -18px; pointer-events: auto; }
         .icon-action-btn {
             background-color: var(--card-bg-color); color: var(--text-color); border: 1px solid var(--separator-color);
             border-radius: 50%; width: var(--action-button-size); height: var(--action-button-size);
@@ -758,6 +760,12 @@
 
                     const actionBtn = e.target.closest('.icon-action-btn');
                     if (actionBtn) {
+                        // Estas ações só podem ser feitas se o modo de edição estiver ATIVO
+                        if (!state.isMasterEditMode) {
+                            alert('Por favor, ative o Modo de Edição (botão de cadeado) para realizar esta ação.');
+                            return;
+                        }
+
                         if (actionBtn.classList.contains('edit-btn')) {
                             UIManager.openModal(icon);
                         }
@@ -768,14 +776,11 @@
                                     .catch(err => console.error('Erro ao remover ícone:', err));
                             }
                         }
-                        // Funções que alteram uma propriedade booleana (apenas em modo de edição mestre)
-                        else if (state.isMasterEditMode) { // Permite ações de edição de conteúdo público apenas no modo mestre
-                            if (actionBtn.classList.contains('pin-btn')) {
-                                FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado });
-                            }
-                            else if (actionBtn.classList.contains('animate-btn')) {
-                                FirebaseService.updateIcon(id, { isAnimated: !icon.isAnimated });
-                            }
+                        else if (actionBtn.classList.contains('pin-btn')) {
+                            FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado });
+                        }
+                        else if (actionBtn.classList.contains('animate-btn')) {
+                            FirebaseService.updateIcon(id, { isAnimated: !icon.isAnimated });
                         }
                     }
                 }
