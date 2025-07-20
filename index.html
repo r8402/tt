@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gratuitos! - Acesso Rápido</title>
+    <title>Gratuitos! - Acesso Rápido (Refatorado)</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
     <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Variáveis CSS */
+        /* O CSS permanece o mesmo da versão anterior, pois a estrutura de classes foi mantida. */
         :root {
             --bg-color: #F8F9FA; --text-color: #343A40; --text-color-light: #FFFFFF;
             --card-bg-color: #FFFFFF; --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -26,22 +26,17 @@
             --input-border-color: #5B6068; --button-bg-color: #4A4D52;
             --button-text-color: #E0E0E0; --separator-color: #4A4D52;
         }
-
-        /* Base e Layout */
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color);
             color: var(--text-color); padding-top: 90px;
             transition: background-color .3s ease, color .3s ease; font-size: 1em; line-height: 1.6;
-            overflow-x: hidden; /* Evita scroll horizontal */
         }
-        body.modal-open { overflow: hidden; } /* Previne scroll do body quando modal está aberto */
+        body.modal-open { overflow: hidden; }
         main {
             padding: 25px; width: 100%; max-width: 1300px; margin: 0 auto;
             box-sizing: border-box; position: relative; z-index: 1;
         }
-
-        /* Header Fixo */
         #page-header {
             position: fixed; top: 0; left: 0; width: 100%; padding: 18px 25px;
             background-color: var(--header-bg-color); backdrop-filter: blur(10px);
@@ -66,91 +61,83 @@
         .header-button.active { background-color: var(--primary-color); color: white; box-shadow: 0 2px 5px rgba(var(--primary-color-rgb), 0.3); }
         .header-button svg { width: 24px; height: 24px; }
         #theme-toggle span { font-size: 0.75em; font-weight: 600; }
-
-        /* Modo de Edição Mestre */
-        #master-edit-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.05); z-index: 500; display: none;
-        }
+        #master-edit-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.05); z-index: 500; display: none; }
         body.master-edit-mode #master-edit-overlay { display: block; }
-
-        /* Seção de Ícones Fixados e Categorias */
         #pinned-section { margin-bottom: 25px; position: relative; z-index: 501; }
-        .category-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px; position: relative; z-index: 501;
-        }
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; position: relative; z-index: 501; }
         .category-card {
             background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--card-shadow);
             padding: 25px; transition: transform 0.2s ease, box-shadow 0.2s ease;
             border-top: 5px solid; display: block;
         }
         .category-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12); }
-        .category-header {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--separator-color); margin-bottom: 25px; padding-bottom: 10px;
-        }
+        .category-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--separator-color); margin-bottom: 25px; padding-bottom: 10px; }
         .category-header h2 { margin: 0; font-size: 1.5em; color: var(--primary-color); font-weight: 600; }
-        .pin-category-btn {
-            background: none; border: none; cursor: pointer; padding: 6px;
-            opacity: 0.5; transition: opacity 0.2s, transform 0.2s; display: none;
-        }
-        body.master-edit-mode .pin-category-btn { display: block; } /* Só mostra no modo edição */
+        .pin-category-btn { background: none; border: none; cursor: pointer; padding: 6px; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; display: none; }
+        body.master-edit-mode .pin-category-btn { display: block; }
         .pin-category-btn:hover { opacity: 1; transform: scale(1.1); }
         .pin-category-btn svg { width: 20px; height: 20px; color: var(--text-color); }
         .pin-category-btn.pinned svg { color: var(--primary-color); opacity: 1; }
-
-        /* Ícones Individuais */
         @keyframes pulse-jump { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.08); } }
         .animated-icon { animation: pulse-jump 2.5s ease-in-out infinite; }
-        .icons-grid, #search-results-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px; padding-top: 20px;
-        }
+        .icons-grid, #search-results-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding-top: 20px; }
         .icon-card-wrapper { position: relative; }
         .icon-link {
-            display: flex; text-decoration: none; border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transition: transform 0.2s ease, box-shadow 0.2s ease; border: 1px solid transparent;
             height: 90px; box-sizing: border-box; overflow: hidden;
         }
         .icon-link:hover { transform: translateY(-5px); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12); }
-        body.master-edit-mode .icon-link { pointer-events: none; } /* Desativa cliques no modo edição */
-
+        /* AÇÕES DO ÍCONE SÓ APARECEM NO MODO DE EDIÇÃO */
+        body.master-edit-mode .icon-link { pointer-events: none; }
         .icon-visual {
             display: flex; align-items: center; justify-content: center; flex-grow: 1; padding: 10px;
             background-color: #cccccc; transition: transform 0.2s ease;
-            position: relative;
+            position: relative; /* Adicionado para posicionamento do texto do ícone */
         }
         .icon-visual img {
-            max-width: 60px; max-height: 60px; object-fit: contain;
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            max-width: 60px; /* Limita o tamanho da imagem, se houver */
+            max-height: 60px; /* Limita o tamanho da imagem, se houver */
+            object-fit: contain; /* Garante que a imagem se ajuste sem distorção */
+            position: absolute; /* Permite que o texto se sobreponha */
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
         }
         .icon-link:hover .icon-visual { transform: scale(1.05); }
-
         .icon-text-content {
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 1; padding: 0 5px;
-            color: var(--text-color-light); text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-            text-align: center; /* Centraliza o texto */
-            overflow: hidden; /* Garante que o texto não saia do container */
+            position: absolute; /* Alterado de relative para absolute */
+            top: 0; left: 0; right: 0; bottom: 0; /* Ocupa todo o espaço do pai */
+            z-index: 1; /* Para garantir que o texto fique por cima da imagem */
+            padding: 0 5px; /* Adiciona um pequeno padding horizontal */
+            /* Garante que o texto tenha cor e contraste adequados sobre a imagem */
+            color: var(--text-color-light); /* Garante cor do texto branca */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7); /* Adiciona sombra para melhorar legibilidade */
         }
         .icon-title {
-            font-size: 1em; font-weight: 700; line-height: 1.2;
-            word-break: break-word; /* Permite quebrar palavras longas */
-            width: 100%; display: block;
+            font-size: 1em; font-weight: 700; text-align: center;
+            line-height: 1.2; word-break: break-word;
+            white-space: nowrap; /* Impede que o texto quebre linha */
+            overflow: hidden;    /* Esconde o texto que transborda */
+            text-overflow: ellipsis; /* Adiciona "..." ao texto cortado */
+            max-width: 100%; /* Garante que o texto não saia do container */
+            display: block; /* Garante que as propriedades de overflow funcionem */
         }
         .icon-description {
-            font-size: 0.75em; font-weight: 400; line-height: 1.1; margin-top: 4px; opacity: 0.9;
-            word-break: break-word; /* Permite quebrar palavras longas */
-            width: 100%; display: block;
+            font-size: 0.75em; font-weight: 400; text-align: center;
+            line-height: 1.1; margin-top: 4px; opacity: 0.9;
+            white-space: nowrap; /* Impede que o texto quebre linha */
+            overflow: hidden;    /* Esconde o texto que transborda */
+            text-overflow: ellipsis; /* Adiciona "..." ao texto cortado */
+            max-width: 100%; /* Garante que o texto não saia do container */
+            display: block; /* Garante que as propriedades de overflow funcionem */
         }
         .icon-actions {
             display: flex; flex-direction: row; position: absolute; top: -20px; left: 50%;
             transform: translateX(-50%); z-index: 10; gap: 8px; opacity: 0;
             transition: all 0.2s ease; pointer-events: none;
         }
+        /* Somente mostra os botões de ação se o body tiver a classe master-edit-mode */
         body.master-edit-mode .icon-card-wrapper .icon-actions { opacity: 1; top: -18px; pointer-events: auto; }
         .icon-action-btn {
             background-color: var(--card-bg-color); color: var(--text-color); border: 1px solid var(--separator-color);
@@ -168,71 +155,27 @@
         .icon-action-btn.animate-btn.active { background-color: var(--animate-color); color: white; }
         .icon-action-btn svg { width: var(--action-button-icon-size); height: var(--action-button-icon-size); }
         .icon-card-wrapper.publicly-pinned .icon-link { border: 2px solid var(--primary-color); box-shadow: 0 0 12px rgba(var(--primary-color-rgb), 0.3); }
-
-        /* Classes de Cor - Exemplo (Mantenha as suas originais) */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; } .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
         .icon-visual[class*=" "] .icon-text-content { color: inherit; }
-
-        /* Modal de Geração/Edição de Ícone */
-        #generator-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
-            z-index: 1040; display: none; opacity: 0; transition: opacity 0.2s ease;
-        }
+        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.2s ease; }
         #generator-modal-overlay.visible { display: block; opacity: 1; }
-        #generate-icon-code-section {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
-            width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
-            z-index: 1050; padding: 30px; background-color: var(--card-bg-color);
-            border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border-top: 4px solid var(--primary-color); display: none; opacity: 0;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
+        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 30px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-top: 4px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; }
         #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #generate-icon-code-section h2 {
-            text-align: center; color: var(--primary-color); margin: 0 0 25px 0;
-            font-size: 1.8em; border-bottom: 1px solid var(--separator-color);
-            padding-bottom: 12px; font-weight: 600;
-        }
-        #close-generator-modal-btn {
-            position: absolute; top: 15px; right: 15px; background: var(--button-bg-color);
-            border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem;
-            font-weight: bold; color: var(--button-text-color); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; line-height: 1;
-            padding: 0; transition: background-color .2s, color .2s;
-        }
+        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 25px 0; font-size: 1.8em; border-bottom: 1px solid var(--separator-color); padding-bottom: 12px; font-weight: 600; }
+        #close-generator-modal-btn { position: absolute; top: 15px; right: 15px; background: var(--button-bg-color); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem; font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
         #close-generator-modal-btn:hover { background-color: var(--danger-color); color: white; }
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); font-size: 0.95em; }
-        .form-group input[type="text"], .form-group input[type="url"], .form-group select, .form-group textarea {
-            width: 100%; padding: 10px 14px; border: 1px solid var(--input-border-color);
-            border-radius: 8px; box-sizing: border-box; font-size: 1em; font-family: 'Inter', sans-serif;
-            background-color: var(--input-bg-color); color: var(--text-color);
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .form-group input[type="text"]:focus, .form-group input[type="url"]:focus, .form-group select:focus, .form-group textarea:focus {
-            border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); outline: none;
-        }
-        .form-group input[type="color"] {
-            width: 100%; padding: 6px; height: 40px; border: 1px solid var(--input-border-color);
-            border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color);
-        }
-        #submit-icon-button {
-            width: 100%; padding: 12px 18px; background-color: var(--primary-color); color: white;
-            border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer;
-            transition: background-color .2s ease, transform .1s ease; font-weight: 500; margin-top: 15px;
-        }
+        .form-group input[type="text"], .form-group input[type="url"], .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; font-size: 1em; font-family: 'Inter', sans-serif; background-color: var(--input-bg-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input[type="text"]:focus, .form-group input[type="url"]:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); outline: none; }
+        .form-group input[type="color"] { width: 100%; padding: 6px; height: 40px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
+        #submit-icon-button { width: 100%; padding: 12px 18px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color .2s ease, transform .1s ease; font-weight: 500; margin-top: 15px; }
         #submit-icon-button:hover { background-color: var(--primary-color-hover); transform: translateY(-1px); }
         .label-hint { font-size: 0.8em; color: #6C757D; font-weight: 400; }
         body.dark-mode .label-hint { color: #A0A0A0; }
-        #form-status-message {
-            margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center;
-            display: none; font-size: 0.95em;
-        }
+        #form-status-message { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; display: none; font-size: 0.95em; }
         #form-status-message.success { background-color: #D4EDDA; color: #155724; display: block; }
         #form-status-message.error { background-color: #F8D7DA; color: #721C24; display: block; }
-
-        /* Media Queries para Responsividade */
         @media (max-width: 768px) {
             body { padding-top: 80px; font-size: 0.95em;} main { padding: 15px; }
             #page-header { padding: 12px 15px; } .category-grid { grid-template-columns: 1fr; gap: 20px; }
@@ -303,7 +246,7 @@
                 <label for="iconCategorySelect">Categoria:</label>
                 <select id="iconCategorySelect" required>
                     <option value="" disabled selected>Selecione uma categoria</option>
-                </select>
+                    </select>
             </div>
             <button type="submit" id="submit-icon-button">Salvar Ícone</button>
         </form>
@@ -316,11 +259,12 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Configurações da Aplicação ---
-        const APP_CONFIG = {
+        /**
+         * MÓDULO DE CONFIGURAÇÃO
+         * Centraliza todas as constantes e configurações da aplicação.
+         */
+        const config = {
             firebase: {
-                // ATENÇÃO: É ALTAMENTE RECOMENDADO RESTRINGIR ESTA CHAVE NO CONSOLE DO FIREBASE PARA SEU DOMÍNIO.
-                // PARA MAIOR SEGURANÇA, CONSIDERE UM BACKEND OU FIREBASE CLOUD FUNCTIONS.
                 apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
                 authDomain: "iconesutil.firebaseapp.com",
                 projectId: "iconesutil",
@@ -329,7 +273,7 @@
                 appId: "1:88285859566:web:e15fdb0c615b494955edff"
             },
             categories: {
-                'public-featured': { name: 'Destaques', color: '#dc3545' },
+                'public-featured': { name: 'Destaques', color: '#dc3545' }, // Ícones fixados publicamente
                 'servicos-utilidades': { name: 'Serviços & Utilidades', color: 'rgb(111, 66, 193)' },
                 'cursos-concursos': { name: 'Cursos & Concursos', color: 'rgb(40, 167, 69)' },
                 'ferramentas-downloads': { name: 'Ferramentas & Downloads', color: 'rgb(0, 123, 255)' },
@@ -346,123 +290,81 @@
             }
         };
 
-        // --- Estado Global da Aplicação ---
-        const appState = {
+        /**
+         * MÓDULO DE ESTADO
+         * Armazena o estado atual da aplicação.
+         */
+        const state = {
             allIcons: [],
-            pinnedCategoryIds: [],
+            pinnedCategoryIds: [], // Categorias fixadas pelo usuário para destaque na tela inicial
             currentUser: null,
             isMasterEditMode: false,
             isFormEditMode: false,
             searchTerm: ''
         };
 
-        // --- Módulo FirebaseService: Interage com o Firebase ---
-        const FirebaseService = (function() {
-            let db;
-            let auth;
-
-            const init = () => {
-                const app = initializeApp(APP_CONFIG.firebase);
-                db = getFirestore(app);
-                auth = getAuth(app);
-            };
-
-            const authenticate = (onAuthStateChangedCallback) => {
-                onAuthStateChanged(auth, async (user) => {
+        /**
+         * SERVIÇO DO FIREBASE
+         * Lida com toda a comunicação com o banco de dados.
+         */
+        const FirebaseService = {
+            db: null,
+            auth: null,
+            init() {
+                const app = initializeApp(config.firebase);
+                this.db = getFirestore(app);
+                this.auth = getAuth(app);
+            },
+            authenticate(onAuthStateChangedCallback) {
+                onAuthStateChanged(this.auth, async (user) => {
                     if (user) {
-                        appState.currentUser = user;
-                        try {
-                            const userDocSnap = await getDoc(doc(db, "usuarios", user.uid));
-                            appState.pinnedCategoryIds = userDocSnap.exists() ? userDocSnap.data().pinnedCategories || [] : [];
-                        } catch (error) {
-                            console.error("Erro ao carregar categorias fixadas do usuário:", error);
-                        }
+                        state.currentUser = user;
+                        // Carrega as categorias fixadas para este usuário
+                        const userDocSnap = await getDoc(doc(this.db, "usuarios", user.uid));
+                        state.pinnedCategoryIds = userDocSnap.exists() ? userDocSnap.data().pinnedCategories || [] : [];
                     } else {
-                        // Tenta login anônimo se não houver usuário logado
-                        try {
-                            await signInAnonymously(auth);
-                        } catch (error) {
-                            console.error("Erro ao fazer login anônimo:", error);
-                        }
+                        // Faz login anônimo se não houver usuário logado
+                        await signInAnonymously(this.auth);
                     }
-                    onAuthStateChangedCallback();
+                    onAuthStateChangedCallback(); // Garante que a renderização ocorra após carregar o estado do usuário
                 });
-            };
-
-            const onIconsUpdate = (callback) => {
-                onSnapshot(collection(db, "icones"), (snapshot) => {
+            },
+            onIconsUpdate(callback) {
+                onSnapshot(collection(this.db, "icones"), (snapshot) => {
                     const icons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     callback(icons);
-                }, (error) => {
-                    console.error("Erro ao receber atualização dos ícones:", error);
-                    // Poderia exibir uma mensagem de erro na UI
                 });
-            };
+            },
+            async saveUserPinnedCategories(categories) {
+                if (!state.currentUser) return; // Não salva se não houver usuário
+                await setDoc(doc(this.db, "usuarios", state.currentUser.uid), { pinnedCategories: categories }, { merge: true });
+            },
+            async updateIcon(id, data) {
+                await updateDoc(doc(this.db, "icones", id), data);
+            },
+            async addIcon(data) {
+                await addDoc(collection(this.db, "icones"), { ...data, createdAt: serverTimestamp() });
+            } ,
+            async deleteIcon(id) {
+                await deleteDoc(doc(this.db, "icones", id));
+            }
+        };
 
-            const saveUserPinnedCategories = async (categories) => {
-                if (!appState.currentUser) {
-                    console.warn("Usuário não autenticado. Não é possível salvar categorias fixadas.");
-                    return;
-                }
-                try {
-                    await setDoc(doc(db, "usuarios", appState.currentUser.uid), { pinnedCategories: categories }, { merge: true });
-                } catch (error) {
-                    console.error("Erro ao salvar categorias fixadas:", error);
-                    throw error; // Propagar erro para UI
-                }
-            };
-
-            const updateIcon = async (id, data) => {
-                try {
-                    await updateDoc(doc(db, "icones", id), data);
-                } catch (error) {
-                    console.error("Erro ao atualizar ícone:", error);
-                    throw error;
-                }
-            };
-
-            const addIcon = async (data) => {
-                try {
-                    await addDoc(collection(db, "icones"), { ...data, createdAt: serverTimestamp() });
-                } catch (error) {
-                    console.error("Erro ao adicionar ícone:", error);
-                    throw error;
-                }
-            };
-
-            const deleteIcon = async (id) => {
-                try {
-                    await deleteDoc(doc(db, "icones", id));
-                } catch (error) {
-                    console.error("Erro ao remover ícone:", error);
-                    throw error;
-                }
-            };
-
-            return {
-                init,
-                authenticate,
-                onIconsUpdate,
-                saveUserPinnedCategories,
-                updateIcon,
-                addIcon,
-                deleteIcon
-            };
-        })();
-
-        // --- Módulo UIManager: Manipula a Interface do Usuário ---
-        const UIManager = (function() {
-            const elements = {};
-
-            const getDOMElements = () => {
-                return {
+        /**
+         * GERENCIADOR DA INTERFACE (UI)
+         * Responsável por toda a manipulação do DOM.
+         */
+        const UIManager = {
+            elements: {},
+            init() {
+                const DOMElements = {
                     body: document.body,
                     mainContent: document.getElementById('main-content'),
                     searchInput: document.getElementById('search-input'),
                     themeToggle: document.getElementById('theme-toggle'),
                     masterEditToggle: document.getElementById('master-edit-toggle'),
                     pinnedSection: document.getElementById('pinned-section'),
-                    allCategoriesGrid: document.getElementById('all-categories-grid'),
+                    allCategoriesGrid: document.getElementById('all-categories-grid'), // Container para as categorias
                     searchResultsContainer: document.getElementById('search-results-container'),
                     modalOverlay: document.getElementById('generator-modal-overlay'),
                     generatorModal: document.getElementById('generate-icon-code-section'),
@@ -471,42 +373,39 @@
                     formStatusMessage: document.getElementById('form-status-message'),
                     modalTitle: document.getElementById('modal-title'),
                     openModalBtn: document.getElementById('open-generator-modal-btn'),
+                    // Adicionado para acesso mais fácil ao botão de submit
                     submitIconBtn: document.getElementById('submit-icon-button'),
-                    iconIdInput: document.getElementById('iconIdInput'),
-                    iconNameInput: document.getElementById('iconNameInput'),
-                    iconDescriptionInput: document.getElementById('iconDescriptionInput'),
-                    iconLinkInput: document.getElementById('iconLinkInput'),
-                    iconImageUrlInput: document.getElementById('iconImageUrlInput'),
-                    iconColorClassInput: document.getElementById('iconColorClassInput'),
-                    iconCustomBgColorInput: document.getElementById('iconCustomBgColorInput'),
-                    iconCategorySelect: document.getElementById('iconCategorySelect')
                 };
-            };
+                this.elements = DOMElements;
+                this.populateCategorySelect(); // Popula o select de categorias no formulário
+            },
 
-            const init = () => {
-                Object.assign(elements, getDOMElements()); // Atribui os elementos ao objeto 'elements'
-                populateCategorySelect();
-            };
-
-            const populateCategorySelect = () => {
-                const selectElement = elements.iconCategorySelect;
-                selectElement.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
-                for (const categoryId in APP_CONFIG.categories) {
+            // Método para popular o select de categorias no formulário de adicionar/editar
+            populateCategorySelect() {
+                const selectElement = this.elements.iconForm.elements.iconCategorySelect;
+                // Limpa opções existentes, exceto a primeira (disabled selected)
+                while (selectElement.options.length > 1) {
+                    selectElement.remove(1);
+                }
+                for (const categoryId in config.categories) {
+                    // Ignora a categoria 'public-featured' para seleção manual no formulário
                     if (categoryId === 'public-featured') continue;
+
                     const option = document.createElement('option');
                     option.value = categoryId;
-                    option.textContent = APP_CONFIG.categories[categoryId].name;
+                    option.textContent = config.categories[categoryId].name;
                     selectElement.appendChild(option);
                 }
-            };
+            },
 
-            const createIconElement = (icon) => {
+            createIconElement(icon) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'icon-card-wrapper';
                 wrapper.dataset.id = icon.id;
                 wrapper.dataset.label = icon.name;
 
                 if (icon.isAnimated) wrapper.classList.add('animated-icon');
+                // A classe 'publicly-pinned' é adicionada ao wrapper apenas quando o ícone é renderizado na seção de fixados
                 
                 const link = document.createElement('a');
                 link.href = icon.link;
@@ -522,6 +421,7 @@
                     visual.style.backgroundColor = icon.customBgColor || '#cccccc';
                 }
 
+                // Verifica se há uma imagem de ícone para usar
                 if (icon.imageUrl) {
                     const img = document.createElement('img');
                     img.src = icon.imageUrl;
@@ -537,7 +437,6 @@
                 title.textContent = icon.name;
                 textContent.appendChild(title);
 
-                // Adiciona a descrição se existir
                 if (icon.description) {
                     const description = document.createElement('span');
                     description.className = 'icon-description';
@@ -545,17 +444,19 @@
                     textContent.appendChild(description);
                 }
                 
+                // O textContent é sempre adicionado ao visual para manter o layout, mesmo com imagem
+                // Garante que o texto fique por cima da imagem.
                 visual.appendChild(textContent);
+                
                 link.appendChild(visual);
 
-                const actions = createActionsElement(icon);
+                const actions = this.createActionsElement(icon);
                 wrapper.appendChild(link);
                 wrapper.appendChild(actions);
 
                 return wrapper;
-            };
-
-            const createActionsElement = (icon) => {
+            },
+            createActionsElement(icon) {
                 const actionsContainer = document.createElement('div');
                 actionsContainer.className = 'icon-actions';
                 
@@ -568,99 +469,118 @@
                     return btn;
                 };
 
-                actionsContainer.appendChild(createBtn('edit-btn', 'Editar Ícone', APP_CONFIG.svgs.EDIT));
-                actionsContainer.appendChild(createBtn('pin-btn', icon.isPublicamenteFixado ? 'Desafixar Publicamente' : 'Fixar Publicamente', icon.isPublicamenteFixado ? APP_CONFIG.svgs.UNPIN : APP_CONFIG.svgs.PIN, icon.isPublicamenteFixado));
-                actionsContainer.appendChild(createBtn('animate-btn', icon.isAnimated ? 'Desativar Animação' : 'Ativar Animação', APP_CONFIG.svgs.ANIMATE, icon.isAnimated));
-                actionsContainer.appendChild(createBtn('delete-btn', 'Remover Ícone', APP_CONFIG.svgs.DELETE));
+                actionsContainer.appendChild(createBtn('edit-btn', 'Editar Ícone', config.svgs.EDIT));
+                // O botão de fixar agora indica fixação pública
+                actionsContainer.appendChild(createBtn('pin-btn', icon.isPublicamenteFixado ? 'Desafixar Publicamente' : 'Fixar Publicamente', icon.isPublicamenteFixado ? config.svgs.UNPIN : config.svgs.PIN, icon.isPublicamenteFixado));
+                actionsContainer.appendChild(createBtn('animate-btn', icon.isAnimated ? 'Desativar Animação' : 'Ativar Animação', config.svgs.ANIMATE, icon.isAnimated));
+                actionsContainer.appendChild(createBtn('delete-btn', 'Remover Ícone', config.svgs.DELETE));
 
                 return actionsContainer;
-            };
+            },
 
-            const render = () => {
-                const { pinnedSection, allCategoriesGrid, searchResultsContainer } = elements;
+            render() {
+                const { pinnedSection, allCategoriesGrid, searchResultsContainer } = this.elements;
                 [pinnedSection, allCategoriesGrid, searchResultsContainer].forEach(el => el.innerHTML = '');
 
-                if (appState.searchTerm) {
+                // Lógica de pesquisa
+                if (state.searchTerm) {
                     searchResultsContainer.style.display = 'grid';
-                    allCategoriesGrid.style.display = 'none';
-                    pinnedSection.style.display = 'none';
+                    allCategoriesGrid.style.display = 'none'; // Esconde as categorias
+                    pinnedSection.style.display = 'none'; // Esconde a seção de fixados
 
-                    const matchingIcons = appState.allIcons.filter(icon =>
-                        icon.name.toLowerCase().includes(appState.searchTerm) ||
-                        (icon.description && icon.description.toLowerCase().includes(appState.searchTerm))
+                    const matchingIcons = state.allIcons.filter(icon =>
+                        icon.name.toLowerCase().includes(state.searchTerm) ||
+                        (icon.description && icon.description.toLowerCase().includes(state.searchTerm))
                     );
 
                     if (matchingIcons.length > 0) {
-                        matchingIcons.forEach(icon => searchResultsContainer.appendChild(createIconElement(icon)));
+                        matchingIcons.forEach(icon => searchResultsContainer.appendChild(this.createIconElement(icon)));
                     } else {
-                        searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; margin-top: 30px;">Nenhum ícone encontrado para "${appState.searchTerm}".</p>`;
+                        searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; margin-top: 30px;">Nenhum ícone encontrado para "${state.searchTerm}".</p>`;
                     }
                 } else {
+                    // Lógica de renderização por categorias (tela inicial)
                     searchResultsContainer.style.display = 'none';
-                    allCategoriesGrid.style.display = 'grid';
-                    pinnedSection.style.display = 'block';
+                    allCategoriesGrid.style.display = 'grid'; // Mostra o grid de categorias (container para os cards)
+                    pinnedSection.style.display = 'block'; // Mostra a seção de fixados
 
-                    const iconsByCategory = appState.allIcons.reduce((acc, icon) => {
+                    const iconsByCategory = state.allIcons.reduce((acc, icon) => {
                         (acc[icon.category] = acc[icon.category] || []).push(icon);
                         return acc;
                     }, {});
 
-                    // Renderizar Ícones em Destaque (Publicamente Fixados)
-                    let publicFeaturedIcons = appState.allIcons.filter(icon => icon.isPublicamenteFixado);
+                    // 1. Renderizar Ícones em Destaque (Publicamente Fixados)
+                    let publicFeaturedIcons = state.allIcons.filter(icon => icon.isPublicamenteFixado);
+                    
+                    // --- ORDENAÇÃO DOS ÍCONES DE DESTAQUE MAIS RECENTES EM PRIMEIRO ---
                     publicFeaturedIcons.sort((a, b) => {
+                        // Garante que `createdAt` é um objeto Timestamp do Firebase ou um valor compatível.
+                        // Se for um objeto Timestamp, use `toDate()`. Caso contrário, tente converter para Date.
                         const dateA = a.createdAt && typeof a.createdAt.toDate === 'function' ? a.createdAt.toDate() : (a.createdAt ? new Date(a.createdAt) : new Date(0));
                         const dateB = b.createdAt && typeof b.createdAt.toDate === 'function' ? b.createdAt.toDate() : (b.createdAt ? new Date(b.createdAt) : new Date(0));
-                        return dateB.getTime() - dateA.getTime();
+                        return dateB.getTime() - dateA.getTime(); // Ordena do mais recente para o mais antigo
                     });
+                    // ------------------------------------------------------------------
 
                     if (publicFeaturedIcons.length > 0) {
-                        const featuredCategoryCard = createCategoryCard(
+                        const featuredCategoryCard = this.createCategoryCard(
                             'public-featured',
-                            APP_CONFIG.categories['public-featured'].name,
-                            APP_CONFIG.categories['public-featured'].color
+                            config.categories['public-featured'].name,
+                            config.categories['public-featured'].color
                         );
+                        // Remove o botão de fixar categoria para a seção de destaques públicos
                         const pinBtn = featuredCategoryCard.querySelector('.pin-category-btn');
-                        if (pinBtn) pinBtn.remove(); // Remove o botão de fixar categoria para a seção de destaques
-
+                        if (pinBtn) pinBtn.remove();
+                        
                         const featuredIconsGrid = featuredCategoryCard.querySelector('.icons-grid');
                         publicFeaturedIcons.forEach(icon => {
-                            const iconEl = createIconElement(icon);
-                            iconEl.classList.add('publicly-pinned');
+                            const iconEl = this.createIconElement(icon);
+                            iconEl.classList.add('publicly-pinned'); // Adiciona a classe para destaque visual
                             featuredIconsGrid.appendChild(iconEl);
                         });
                         pinnedSection.appendChild(featuredCategoryCard);
                     } else {
-                        pinnedSection.innerHTML = appState.isMasterEditMode
-                            ? `<p style="text-align: center; margin-bottom: 25px; opacity: 0.7;">Nenhum ícone em destaque. Use o modo de edição para fixar alguns!</p>`
-                            : `<p style="text-align: center; margin-bottom: 25px;">Nenhum ícone em destaque no momento.</p>`;
+                        // Se não houver ícones fixados, ainda podemos mostrar um placeholder ou ocultar a seção
+                        if (!state.isMasterEditMode) { // Oculta a mensagem se não estiver em modo de edição
+                            pinnedSection.innerHTML = `<p style="text-align: center; margin-bottom: 25px;">Nenhum ícone em destaque no momento.</p>`;
+                        } else {
+                             pinnedSection.innerHTML = `<p style="text-align: center; margin-bottom: 25px; opacity: 0.7;">Nenhum ícone em destaque. Use o modo de edição para fixar alguns!</p>`;
+                        }
                     }
 
-                    // Renderizar Outras Categorias
-                    for (const categoryId in APP_CONFIG.categories) {
-                        if (categoryId === 'public-featured') continue;
+                    // 2. Renderizar Outras Categorias
+                    // Garante a ordem das categorias definida no config.categories
+                    for (const categoryId in config.categories) {
+                        if (categoryId === 'public-featured') continue; // Já tratado acima
 
-                        const categoryName = APP_CONFIG.categories[categoryId].name;
-                        const categoryColor = APP_CONFIG.categories[categoryId].color;
+                        const categoryName = config.categories[categoryId].name;
+                        const categoryColor = config.categories[categoryId].color;
                         const iconsInThisCategory = iconsByCategory[categoryId] || [];
 
-                        if (iconsInThisCategory.length > 0 || appState.isMasterEditMode) {
-                            const categoryCard = createCategoryCard(categoryId, categoryName, categoryColor);
+                        // Só cria a seção se houver ícones nela ou se estiver em modo de edição
+                        if (iconsInThisCategory.length > 0 || state.isMasterEditMode) {
+                            const categoryCard = this.createCategoryCard(categoryId, categoryName, categoryColor);
                             const iconsGrid = categoryCard.querySelector('.icons-grid');
+
+                            // Ordenar ícones alfabeticamente dentro da categoria (opcional)
                             iconsInThisCategory.sort((a, b) => a.name.localeCompare(b.name));
+
                             iconsInThisCategory.forEach(icon => {
-                                iconsGrid.appendChild(createIconElement(icon));
+                                iconsGrid.appendChild(this.createIconElement(icon));
                             });
                             allCategoriesGrid.appendChild(categoryCard);
                         }
                     }
 
-                    if (allCategoriesGrid.children.length === 0 && !appState.isMasterEditMode && !publicFeaturedIcons.length) {
+                    // Se não houver nenhuma categoria com ícones e não estiver em modo de edição
+                    if (allCategoriesGrid.children.length === 0 && !state.isMasterEditMode) {
                          allCategoriesGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; margin-top: 30px;">Não há categorias com ícones para exibir no momento.</p>`;
                     }
                 }
-            };
+            },
 
-            const createCategoryCard = (categoryId, name, color) => {
+            // Método para criar a estrutura do card de categoria
+            createCategoryCard(categoryId, name, color) {
                 const card = document.createElement('section');
                 card.className = 'category-card';
                 card.style.borderColor = color;
@@ -673,14 +593,15 @@
                 title.textContent = name;
                 header.appendChild(title);
 
+                // Botão de fixar/desafixar categoria (só aparece no modo de edição)
                 const pinBtn = document.createElement('button');
                 pinBtn.className = 'pin-category-btn';
-                pinBtn.title = appState.pinnedCategoryIds.includes(categoryId) ? 'Desafixar Categoria' : 'Fixar Categoria';
-                pinBtn.innerHTML = appState.pinnedCategoryIds.includes(categoryId) ? APP_CONFIG.svgs.UNPIN : APP_CONFIG.svgs.PIN;
-                if (appState.pinnedCategoryIds.includes(categoryId)) {
+                pinBtn.title = state.pinnedCategoryIds.includes(categoryId) ? 'Desafixar Categoria' : 'Fixar Categoria';
+                pinBtn.innerHTML = state.pinnedCategoryIds.includes(categoryId) ? config.svgs.UNPIN : config.svgs.PIN;
+                if (state.pinnedCategoryIds.includes(categoryId)) {
                     pinBtn.classList.add('pinned');
                 }
-                pinBtn.dataset.categoryId = categoryId;
+                pinBtn.dataset.categoryId = categoryId; // Armazena o ID da categoria para manipulação
                 header.appendChild(pinBtn);
 
                 card.appendChild(header);
@@ -690,245 +611,220 @@
                 card.appendChild(iconsGrid);
 
                 return card;
-            };
+            },
 
-            const toggleMasterEditMode = (isActive) => {
-                elements.body.classList.toggle('master-edit-mode', isActive);
-                elements.masterEditToggle.classList.toggle('active', isActive);
-                render();
-            };
+            toggleMasterEditMode(isActive) {
+                this.elements.body.classList.toggle('master-edit-mode', isActive);
+                this.elements.masterEditToggle.classList.toggle('active', isActive);
+                this.render(); // Re-renderizar para mostrar/ocultar botões e categorias vazias
+            },
+            toggleTheme(isDark) {
+                this.elements.body.classList.toggle('dark-mode', isDark);
+                this.elements.themeToggle.querySelector('span').textContent = isDark ? 'Claro' : 'Escuro';
+                this.elements.themeToggle.title = `Alternar para Tema ${isDark ? 'Claro' : 'Escuro'}`;
+            },
+            openModal(iconData = null) {
+                state.isFormEditMode = !!iconData;
+                const { iconForm, modalTitle, generatorModal, modalOverlay, submitIconBtn } = this.elements;
+                iconForm.reset();
+                this.clearFormStatus(); // Limpa mensagens de status anteriores
 
-            const toggleTheme = (isDark) => {
-                elements.body.classList.toggle('dark-mode', isDark);
-                elements.themeToggle.querySelector('span').textContent = isDark ? 'Claro' : 'Escuro';
-                elements.themeToggle.title = `Alternar para Tema ${isDark ? 'Claro' : 'Escuro'}`;
-            };
+                modalTitle.textContent = state.isFormEditMode ? 'Editar Ícone' : 'Adicionar Novo Ícone';
+                submitIconBtn.textContent = state.isFormEditMode ? 'Atualizar Ícone' : 'Salvar Ícone';
 
-            const openModal = (iconData = null) => {
-                appState.isFormEditMode = !!iconData;
-                elements.iconForm.reset(); // Limpa o formulário
+                iconForm.elements.iconIdInput.value = iconData?.id || '';
+                iconForm.elements.iconNameInput.value = iconData?.name || '';
+                iconForm.elements.iconDescriptionInput.value = iconData?.description || '';
+                iconForm.elements.iconLinkInput.value = iconData?.link || '';
+                iconForm.elements.iconImageUrlInput.value = iconData?.imageUrl || ''; // Preenche o campo de URL da imagem
+                iconForm.elements.iconColorClassInput.value = iconData?.colorClass || '';
+                iconForm.elements.iconCustomBgColorInput.value = iconData?.customBgColor || '#cccccc';
+                iconForm.elements.iconCategorySelect.value = iconData?.category || ''; // Assegura que a categoria correta esteja selecionada
 
-                // Garante que o campo de descrição seja limpo ou preenchido
-                elements.iconDescriptionInput.value = iconData?.description || '';
-
-                clearFormStatus();
-
-                elements.modalTitle.textContent = appState.isFormEditMode ? 'Editar Ícone' : 'Adicionar Novo Ícone';
-                elements.submitIconBtn.textContent = appState.isFormEditMode ? 'Atualizar Ícone' : 'Salvar Ícone';
-
-                elements.iconIdInput.value = iconData?.id || '';
-                elements.iconNameInput.value = iconData?.name || '';
-                elements.iconLinkInput.value = iconData?.link || '';
-                elements.iconImageUrlInput.value = iconData?.imageUrl || '';
-                elements.iconColorClassInput.value = iconData?.colorClass || '';
-                elements.iconCustomBgColorInput.value = iconData?.customBgColor || '#cccccc';
-                elements.iconCategorySelect.value = iconData?.category || '';
-
-                elements.generatorModal.classList.add('visible');
-                elements.modalOverlay.classList.add('visible');
-                elements.body.classList.add('modal-open');
-            };
-
-            const closeModal = () => {
-                elements.generatorModal.classList.remove('visible');
-                elements.modalOverlay.classList.remove('visible');
-                elements.body.classList.remove('modal-open');
-            };
-
-            const showFormStatus = (message, type) => {
-                const statusEl = elements.formStatusMessage;
+                generatorModal.classList.add('visible');
+                modalOverlay.classList.add('visible');
+                this.elements.body.classList.add('modal-open'); // Previne scroll do body
+            },
+            closeModal() {
+                this.elements.generatorModal.classList.remove('visible');
+                this.elements.modalOverlay.classList.remove('visible');
+                this.elements.body.classList.remove('modal-open'); // Permite scroll do body
+            },
+            showFormStatus(message, type) {
+                const statusEl = this.elements.formStatusMessage;
                 statusEl.textContent = message;
                 statusEl.className = `form-status-message ${type}`;
-            };
+            },
+            clearFormStatus() {
+                this.elements.formStatusMessage.className = 'form-status-message';
+                this.elements.formStatusMessage.textContent = '';
+            }
+        };
 
-            const clearFormStatus = () => {
-                elements.formStatusMessage.className = 'form-status-message';
-                elements.formStatusMessage.textContent = '';
-            };
+        /**
+         * CONTROLADOR DA APLICAÇÃO (APP)
+         * Orquestra os módulos e lida com os eventos do usuário.
+         */
+        const App = {
+            init() {
+                FirebaseService.init();
+                UIManager.init();
+                this.setupEventListeners();
+                
+                // Carrega o tema salvo do localStorage
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                UIManager.toggleTheme(savedTheme === 'dark');
 
-            return {
-                init,
-                render,
-                toggleMasterEditMode,
-                toggleTheme,
-                openModal,
-                closeModal,
-                showFormStatus,
-                clearFormStatus,
-                elements // Expor elementos para facilitar acesso nos event listeners
-            };
-        })();
-
-        // --- Módulo AppController: Gerencia a Lógica Principal da Aplicação ---
-        const AppController = (function() {
-
-            const setupEventListeners = () => {
-                UIManager.elements.themeToggle.addEventListener('click', () => {
+                // Autentica e inicia o monitoramento dos ícones e do estado do usuário
+                FirebaseService.authenticate(() => {
+                    FirebaseService.onIconsUpdate(newIcons => {
+                        state.allIcons = newIcons;
+                        UIManager.render(); // Renderiza após carregar os ícones e o estado do usuário
+                    });
+                });
+            },
+            setupEventListeners() {
+                const { themeToggle, masterEditToggle, searchInput, mainContent, openModalBtn, closeModalBtn, iconForm, submitIconBtn } = UIManager.elements;
+                
+                themeToggle.addEventListener('click', () => {
                     const isDark = document.body.classList.toggle('dark-mode');
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                     UIManager.toggleTheme(isDark);
                 });
 
-                UIManager.elements.masterEditToggle.addEventListener('click', () => {
-                    appState.isMasterEditMode = !appState.isMasterEditMode;
-                    UIManager.toggleMasterEditMode(appState.isMasterEditMode);
+                masterEditToggle.addEventListener('click', () => {
+                    state.isMasterEditMode = !state.isMasterEditMode;
+                    UIManager.toggleMasterEditMode(state.isMasterEditMode);
                 });
 
-                UIManager.elements.searchInput.addEventListener('input', () => {
-                    appState.searchTerm = UIManager.elements.searchInput.value.toLowerCase().trim();
+                searchInput.addEventListener('input', () => {
+                    state.searchTerm = searchInput.value.toLowerCase().trim();
                     UIManager.render();
                 });
 
-                UIManager.elements.openModalBtn.addEventListener('click', () => UIManager.openModal());
-                UIManager.elements.closeModalBtn.addEventListener('click', () => UIManager.closeModal());
-                UIManager.elements.iconForm.addEventListener('submit', handleFormSubmit);
-                UIManager.elements.mainContent.addEventListener('click', handleMainContentClick);
-            };
+                openModalBtn.addEventListener('click', () => UIManager.openModal());
+                closeModalBtn.addEventListener('click', () => UIManager.closeModal());
 
-            const handleFormSubmit = async (e) => {
+                iconForm.addEventListener('submit', this.handleFormSubmit);
+
+                mainContent.addEventListener('click', this.handleMainContentClick);
+            },
+            handleFormSubmit(e) {
                 e.preventDefault();
                 const form = e.target;
                 const iconData = {
-                    name: UIManager.elements.iconNameInput.value.trim(),
-                    // Garante que a descrição seja sempre capturada, mesmo que vazia
-                    description: UIManager.elements.iconDescriptionInput.value.trim(),
-                    link: UIManager.elements.iconLinkInput.value.trim(),
-                    imageUrl: UIManager.elements.iconImageUrlInput.value.trim(),
-                    colorClass: UIManager.elements.iconColorClassInput.value.trim(),
-                    customBgColor: UIManager.elements.iconCustomBgColorInput.value,
-                    category: UIManager.elements.iconCategorySelect.value,
+                    name: form.elements.iconNameInput.value.trim(),
+                    description: form.elements.iconDescriptionInput.value.trim(),
+                    link: form.elements.iconLinkInput.value.trim(),
+                    imageUrl: form.elements.iconImageUrlInput.value.trim(), // Novo campo
+                    colorClass: form.elements.iconColorClassInput.value.trim(),
+                    customBgColor: form.elements.iconCustomBgColorInput.value,
+                    category: form.elements.iconCategorySelect.value,
                 };
-                const id = UIManager.elements.iconIdInput.value;
+                const id = form.elements.iconIdInput.value;
 
-                UIManager.clearFormStatus();
+                UIManager.clearFormStatus(); // Limpa status anterior
                 if (!iconData.name || !iconData.link || !iconData.category) {
                     UIManager.showFormStatus('Por favor, preencha o Título, Link e Categoria do ícone.', 'error');
                     return;
                 }
 
-                try {
-                    if (id) {
-                        const existingIcon = appState.allIcons.find(i => i.id === id);
-                        // Ao editar, preserva isAnimated e isPublicamenteFixado.
-                        // O createdAt só é atualizado se a fixação pública mudar, ou para novos ícones.
-                        // Para edição normal, queremos manter o createdAt original.
-                        const dataToUpdate = { ...iconData };
-                        if (existingIcon) {
-                            dataToUpdate.isAnimated = existingIcon.isAnimated || false;
-                            // Se a fixação pública não for alterada, mantenha o createdAt original
-                            dataToUpdate.isPublicamenteFixado = existingIcon.isPublicamenteFixado || false;
-                            if (dataToUpdate.isPublicamenteFixado !== existingIcon.isPublicamenteFixado) {
-                                // Se a fixação pública for alterada, atualize o timestamp
-                                dataToUpdate.createdAt = serverTimestamp();
-                            } else {
-                                // Caso contrário, mantenha o timestamp original
-                                dataToUpdate.createdAt = existingIcon.createdAt;
-                            }
+                if (id) {
+                    // Mantenha o estado atual de isAnimated e isPublicamenteFixado ao editar
+                    const existingIcon = state.allIcons.find(i => i.id === id);
+                    iconData.isAnimated = existingIcon ? existingIcon.isAnimated : false;
+                    iconData.isPublicamenteFixado = existingIcon ? existingIcon.isPublicamenteFixado : false;
+                    // Mantenha o `createdAt` original ao editar
+                    iconData.createdAt = existingIcon ? existingIcon.createdAt : serverTimestamp();
+
+
+                    FirebaseService.updateIcon(id, iconData)
+                        .then(() => {
+                            UIManager.closeModal();
+                            UIManager.showFormStatus('Ícone atualizado com sucesso!', 'success');
+                            setTimeout(() => UIManager.clearFormStatus(), 3000);
+                        })
+                        .catch(error => {
+                            console.error("Erro ao atualizar ícone:", error);
+                            UIManager.showFormStatus('Erro ao atualizar ícone.', 'error');
+                        });
+                } else {
+                    // Para novos ícones, defina como false por padrão e adicione o timestamp
+                    iconData.isAnimated = false;
+                    iconData.isPublicamenteFixado = false;
+                    iconData.createdAt = serverTimestamp(); // Adiciona o timestamp para novos ícones
+
+                    FirebaseService.addIcon(iconData)
+                        .then(() => {
+                            UIManager.closeModal();
+                            UIManager.showFormStatus('Ícone adicionado com sucesso!', 'success');
+                            setTimeout(() => UIManager.clearFormStatus(), 3000);
+                        })
+                        .catch(error => {
+                            console.error("Erro ao adicionar ícone:", error);
+                            UIManager.showFormStatus('Erro ao adicionar ícone.', 'error');
+                        });
+                }
+            },
+            handleMainContentClick(e) {
+                // Manipula cliques nos botões de ação do ícone
+                const wrapper = e.target.closest('.icon-card-wrapper');
+                if (wrapper) {
+                    const id = wrapper.dataset.id;
+                    const icon = state.allIcons.find(i => i.id === id);
+
+                    const actionBtn = e.target.closest('.icon-action-btn');
+                    if (actionBtn) {
+                        // Estas ações só podem ser feitas se o modo de edição estiver ATIVO
+                        if (!state.isMasterEditMode) {
+                            alert('Por favor, ative o Modo de Edição (botão de cadeado) para realizar esta ação.');
+                            return;
                         }
 
-                        await FirebaseService.updateIcon(id, dataToUpdate);
-                        UIManager.showFormStatus('Ícone atualizado com sucesso!', 'success');
-                    } else {
-                        // Para novos ícones
-                        iconData.isAnimated = false;
-                        iconData.isPublicamenteFixado = false;
-                        iconData.createdAt = serverTimestamp(); // Define timestamp para novos ícones
-                        await FirebaseService.addIcon(iconData);
-                        UIManager.showFormStatus('Ícone adicionado com sucesso!', 'success');
-                    }
-                    UIManager.closeModal();
-                    setTimeout(() => UIManager.clearFormStatus(), 3000);
-                } catch (error) {
-                    console.error("Erro na operação do ícone:", error);
-                    UIManager.showFormStatus(`Erro: ${error.message || 'Ocorreu um erro.'}`, 'error');
-                }
-            };
-
-            const handleMainContentClick = async (e) => {
-                const wrapper = e.target.closest('.icon-card-wrapper');
-                const actionBtn = e.target.closest('.icon-action-btn');
-                const pinCategoryBtn = e.target.closest('.pin-category-btn');
-
-                if (actionBtn && wrapper) {
-                    if (!appState.isMasterEditMode) {
-                        alert('Por favor, ative o Modo de Edição (botão de cadeado) para realizar esta ação.');
-                        return;
-                    }
-                    const id = wrapper.dataset.id;
-                    const icon = appState.allIcons.find(i => i.id === id);
-
-                    if (!icon) {
-                        console.warn("Ícone não encontrado para a ação.");
-                        UIManager.showFormStatus('Erro: Ícone não encontrado.', 'error');
-                        return;
-                    }
-
-                    try {
                         if (actionBtn.classList.contains('edit-btn')) {
                             UIManager.openModal(icon);
-                        } else if (actionBtn.classList.contains('delete-btn')) {
-                            if (confirm(`Tem certeza que deseja remover o ícone "${icon.name}"?`)) {
-                                await FirebaseService.deleteIcon(id);
-                                UIManager.showFormStatus('Ícone removido com sucesso!', 'success');
-                                setTimeout(() => UIManager.clearFormStatus(), 3000);
-                            }
-                        } else if (actionBtn.classList.contains('pin-btn')) {
-                            // Ao fixar/desafixar publicamente, atualiza o timestamp 'createdAt'
-                            await FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado, createdAt: serverTimestamp() });
-                            UIManager.showFormStatus('Estado de fixação atualizado!', 'success');
-                            setTimeout(() => UIManager.clearFormStatus(), 2000);
-                        } else if (actionBtn.classList.contains('animate-btn')) {
-                            await FirebaseService.updateIcon(id, { isAnimated: !icon.isAnimated });
-                            UIManager.showFormStatus('Animação atualizada!', 'success');
-                            setTimeout(() => UIManager.clearFormStatus(), 2000);
                         }
-                    } catch (error) {
-                        console.error("Erro na ação do ícone:", error);
-                        UIManager.showFormStatus(`Erro: ${error.message || 'Não foi possível realizar a ação.'}`, 'error');
-                    }
-                } else if (pinCategoryBtn && appState.isMasterEditMode) {
-                    const categoryId = pinCategoryBtn.dataset.categoryId;
-                    let newPinnedCategories = [...appState.pinnedCategoryIds];
-
-                    if (newPinnedCategories.includes(categoryId)) {
-                        newPinnedCategories = newPinnedCategories.filter(id => id !== categoryId);
-                    } else {
-                        newPinnedCategories.push(categoryId);
-                    }
-                    appState.pinnedCategoryIds = newPinnedCategories;
-                    try {
-                        await FirebaseService.saveUserPinnedCategories(newPinnedCategories);
-                        UIManager.render();
-                        UIManager.showFormStatus('Categorias fixadas atualizadas!', 'success');
-                        setTimeout(() => UIManager.clearFormStatus(), 2000);
-                    } catch (error) {
-                        console.error("Erro ao fixar/desafixar categoria:", error);
-                        UIManager.showFormStatus(`Erro ao fixar/desafixar categoria: ${error.message || 'Ocorreu um erro.'}`, 'error');
+                        else if (actionBtn.classList.contains('delete-btn')) {
+                            if (confirm(`Tem certeza que deseja remover o ícone "${icon.name}"?`)) {
+                                FirebaseService.deleteIcon(id)
+                                    .then(() => console.log('Ícone removido com sucesso!'))
+                                    .catch(err => console.error('Erro ao remover ícone:', err));
+                            }
+                        }
+                        else if (actionBtn.classList.contains('pin-btn')) {
+                            // Ao fixar, atualiza o timestamp `createdAt` para que apareça em primeiro
+                            FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado, createdAt: serverTimestamp() });
+                        }
+                        else if (actionBtn.classList.contains('animate-btn')) {
+                            FirebaseService.updateIcon(id, { isAnimated: !icon.isAnimated });
+                        }
                     }
                 }
-            };
 
-            const init = () => {
-                FirebaseService.init();
-                UIManager.init();
-                setupEventListeners();
-                
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                UIManager.toggleTheme(savedTheme === 'dark');
+                // Manipula cliques nos botões de fixar/desafixar categoria (apenas no modo de edição mestre)
+                const pinCategoryBtn = e.target.closest('.pin-category-btn');
+                if (pinCategoryBtn && state.isMasterEditMode) {
+                    const categoryId = pinCategoryBtn.dataset.categoryId;
+                    let newPinnedCategories = [...state.pinnedCategoryIds];
 
-                FirebaseService.authenticate(() => {
-                    FirebaseService.onIconsUpdate(newIcons => {
-                        appState.allIcons = newIcons;
-                        UIManager.render();
-                    });
-                });
-            };
+                    if (newPinnedCategories.includes(categoryId)) {
+                        // Desafixa a categoria
+                        newPinnedCategories = newPinnedCategories.filter(id => id !== categoryId);
+                    } else {
+                        // Fixa a categoria
+                        newPinnedCategories.push(categoryId);
+                    }
+                    state.pinnedCategoryIds = newPinnedCategories; // Atualiza o estado local
+                    FirebaseService.saveUserPinnedCategories(newPinnedCategories) // Salva no Firebase
+                        .then(() => UIManager.render()) // Re-renderiza para atualizar o estado visual dos botões
+                        .catch(err => console.error("Erro ao salvar categorias fixadas:", err));
+                }
+            }
+        };
 
-            return { init };
-        })();
+        // Inicia a aplicação quando o DOM estiver pronto.
+        document.addEventListener('DOMContentLoaded', () => App.init());
 
-        // Inicializa a aplicação quando o DOM estiver completamente carregado.
-        document.addEventListener('DOMContentLoaded', () => AppController.init());
     </script>
 </body>
 </html>
