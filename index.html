@@ -1,830 +1,1256 @@
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gratuitos! - Acesso Rápido (Refatorado)</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
-    <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Gratuitos!</title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        /* O CSS permanece o mesmo da versão anterior, pois a estrutura de classes foi mantida. */
-        :root {
-            --bg-color: #F8F9FA; --text-color: #343A40; --text-color-light: #FFFFFF;
-            --card-bg-color: #FFFFFF; --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-            --header-bg-color: rgba(255, 255, 255, 0.9); --input-bg-color: #F8F9FA;
-            --input-border-color: #DEE2E6; --button-bg-color: #E9ECEF;
-            --button-text-color: #495057; --primary-color: #007BFF;
-            --primary-color-rgb: 0, 123, 255; --primary-color-hover: #0069D9;
-            --separator-color: #E9ECEF; --danger-color: #DC3545; --warning-color: #FFC107;
-            --animate-color: #9C27B0; --action-button-size: 32px; --action-button-icon-size: 16px;
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 20px 120px 20px;
+            transition: background-color .3s ease, color .3s ease;
+            position: relative;
+        }
+        body.no-scroll, body.modal-open {
+            overflow: hidden;
         }
         body.dark-mode {
-            --bg-color: #1A1D20; --text-color: #E0E0E0; --text-color-light: #FFFFFF;
-            --card-bg-color: #2D3035; --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-            --header-bg-color: rgba(45, 48, 53, 0.9); --input-bg-color: #3A3D42;
-            --input-border-color: #5B6068; --button-bg-color: #4A4D52;
-            --button-text-color: #E0E0E0; --separator-color: #4A4D52;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
         }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color);
-            color: var(--text-color); padding-top: 90px;
-            transition: background-color .3s ease, color .3s ease; font-size: 1em; line-height: 1.6;
+
+        /* SOBREPOSIÇÃO PARA O MODO DE PESQUISA */
+        body.search-active::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            backdrop-filter: blur(3px);
+            transition: opacity 0.3s ease;
+            opacity: 1;
         }
-        body.modal-open { overflow: hidden; }
-        main {
-            padding: 25px; width: 100%; max-width: 1300px; margin: 0 auto;
-            box-sizing: border-box; position: relative; z-index: 1;
+        body:not(.search-active)::before {
+            opacity: 0;
+            pointer-events: none;
         }
-        #page-header {
-            position: fixed; top: 0; left: 0; width: 100%; padding: 18px 25px;
-            background-color: var(--header-bg-color); backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); box-sizing: border-box;
-            display: flex; justify-content: center; align-items: center;
+
+        /* Oculta e desabilita interações no conteúdo principal quando a pesquisa está ativa */
+        .category-container {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-        .header-content { width: 100%; max-width: 800px; display: flex; gap: 10px; align-items: center; }
+        body.search-active .category-container {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        body.search-active #top-fixed-bar {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* --- Container para a barra flutuante e resultados --- */
+        #floating-bar-wrapper {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Container para os resultados rápidos */
+        #quick-results-container {
+            display: none;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body.dark-mode #quick-results-container {
+             background-color: rgba(58, 58, 58, 0.95);
+             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #quick-results-content {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Estilo para os ícones dentro da barra de resultados rápidos */
+        .quick-result-item {
+            box-sizing: border-box;
+            width: 160px;
+            height: 45px;
+            min-width: 160px;
+            border-radius: 50px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            flex-basis: auto;
+        }
+        .quick-result-item .icon-label {
+            font-size: 0.9em !important;
+        }
+        
+        .no-results-message {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            color: #777;
+        }
+        body.dark-mode .no-results-message {
+            color: #bbb;
+        }
+
+        /* Barra de pesquisa em si */
+        #search-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #ffffff;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: background-color .3s ease, box-shadow .3s ease;
+        }
+        body.dark-mode #search-container {
+            background-color: #3a3a3a;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
         #search-input {
-            flex-grow: 1; padding: 12px 18px; border: 1px solid var(--input-border-color);
-            border-radius: 25px; font-size: 1.05em; background-color: var(--input-bg-color);
-            color: var(--text-color); outline: none; transition: all .2s ease;
+            flex-grow: 1;
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            background-color: transparent;
+            color: #333;
+            box-shadow: none;
+            outline: none;
+            transition: color .3s ease;
         }
-        #search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
-        .header-button {
-            flex-shrink: 0; background-color: var(--button-bg-color); color: var(--button-text-color);
-            border: none; border-radius: 50%; width: 48px; height: 48px; cursor: pointer;
-            font-size: 1rem; transition: all .2s ease; display: flex; justify-content: center;
-            align-items: center; padding: 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+        body.dark-mode #search-input {
+            color: #e0e0e0;
         }
-        .header-button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        .header-button.active { background-color: var(--primary-color); color: white; box-shadow: 0 2px 5px rgba(var(--primary-color-rgb), 0.3); }
-        .header-button svg { width: 24px; height: 24px; }
-        #theme-toggle span { font-size: 0.75em; font-weight: 600; }
-        #master-edit-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.05); z-index: 500; display: none; }
-        body.master-edit-mode #master-edit-overlay { display: block; }
-        #pinned-section { margin-bottom: 25px; position: relative; z-index: 501; }
-        .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; position: relative; z-index: 501; }
-        .category-card {
-            background-color: var(--card-bg-color); border-radius: 12px; box-shadow: var(--card-shadow);
-            padding: 25px; transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border-top: 5px solid; display: block;
+
+        #theme-toggle, #open-generator-modal-btn {
+            flex-shrink: 0;
+            margin-left: 8px;
+            background-color: #e9ecef;
+            color: #333;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color .3s ease, color .3s ease, transform .2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
         }
-        .category-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12); }
-        .category-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--separator-color); margin-bottom: 25px; padding-bottom: 10px; }
-        .category-header h2 { margin: 0; font-size: 1.5em; color: var(--primary-color); font-weight: 600; }
-        .pin-category-btn { background: none; border: none; cursor: pointer; padding: 6px; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; display: none; }
-        body.master-edit-mode .pin-category-btn { display: block; }
-        .pin-category-btn:hover { opacity: 1; transform: scale(1.1); }
-        .pin-category-btn svg { width: 20px; height: 20px; color: var(--text-color); }
-        .pin-category-btn.pinned svg { color: var(--primary-color); opacity: 1; }
-        @keyframes pulse-jump { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.08); } }
-        .animated-icon { animation: pulse-jump 2.5s ease-in-out infinite; }
-        .icons-grid, #search-results-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; padding-top: 20px; }
-        .icon-card-wrapper { position: relative; }
-        .icon-link {
-            display: flex; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease; border: 1px solid transparent;
-            height: 90px; box-sizing: border-box; overflow: hidden;
+        
+        body.dark-mode #theme-toggle, body.dark-mode #open-generator-modal-btn {
+            background-color: #555;
+            color: #e0e0e0;
         }
-        .icon-link:hover { transform: translateY(-5px); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12); }
-        /* AÇÕES DO ÍCONE SÓ APARECEM NO MODO DE EDIÇÃO */
-        body.master-edit-mode .icon-link { pointer-events: none; }
-        .icon-visual {
-            display: flex; align-items: center; justify-content: center; flex-grow: 1; padding: 10px;
-            background-color: #cccccc; transition: transform 0.2s ease;
-            position: relative; /* Adicionado para posicionamento do texto do ícone */
+        #theme-toggle:hover, #open-generator-modal-btn:hover {
+            transform: scale(1.1);
+            opacity: .9;
         }
-        .icon-visual img {
-            max-width: 60px; /* Limita o tamanho da imagem, se houver */
-            max-height: 60px; /* Limita o tamanho da imagem, se houver */
-            object-fit: contain; /* Garante que a imagem se ajuste sem distorção */
-            position: absolute; /* Permite que o texto se sobreponha */
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+        
+        #theme-toggle span {
+             font-size: 0.7em;
+             font-weight: bold;
         }
-        .icon-link:hover .icon-visual { transform: scale(1.05); }
-        .icon-text-content {
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            position: absolute; /* Alterado de relative para absolute */
-            top: 0; left: 0; right: 0; bottom: 0; /* Ocupa todo o espaço do pai */
-            z-index: 1; /* Para garantir que o texto fique por cima da imagem */
-            padding: 0 5px; /* Adiciona um pequeno padding horizontal */
-            /* Garante que o texto tenha cor e contraste adequados sobre a imagem */
-            color: var(--text-color-light); /* Garante cor do texto branca */
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.7); /* Adiciona sombra para melhorar legibilidade */
+        #open-generator-modal-btn svg {
+            width: 22px;
+            height: 22px;
         }
-        .icon-title {
-            font-size: 1em; font-weight: 700; text-align: center;
-            line-height: 1.2; word-break: break-word;
-            white-space: nowrap; /* Impede que o texto quebre linha */
-            overflow: hidden;    /* Esconde o texto que transborda */
-            text-overflow: ellipsis; /* Adiciona "..." ao texto cortado */
-            max-width: 100%; /* Garante que o texto não saia do container */
-            display: block; /* Garante que as propriedades de overflow funcionem */
+
+        .category-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            width: 100%;
         }
-        .icon-description {
-            font-size: 0.75em; font-weight: 400; text-align: center;
-            line-height: 1.1; margin-top: 4px; opacity: 0.9;
-            white-space: nowrap; /* Impede que o texto quebre linha */
-            overflow: hidden;    /* Esconde o texto que transborda */
-            text-overflow: ellipsis; /* Adiciona "..." ao texto cortado */
-            max-width: 100%; /* Garante que o texto não saia do container */
-            display: block; /* Garante que as propriedades de overflow funcionem */
+        .color-category {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s, display 0.3s;
+            border-top: 5px solid;
         }
-        .icon-actions {
-            display: flex; flex-direction: row; position: absolute; top: -20px; left: 50%;
-            transform: translateX(-50%); z-index: 10; gap: 8px; opacity: 0;
-            transition: all 0.2s ease; pointer-events: none;
+        body.dark-mode .color-category {
+            background-color: #3a3a3a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
-        /* Somente mostra os botões de ação se o body tiver a classe master-edit-mode */
-        body.master-edit-mode .icon-card-wrapper .icon-actions { opacity: 1; top: -18px; pointer-events: auto; }
-        .icon-action-btn {
-            background-color: var(--card-bg-color); color: var(--text-color); border: 1px solid var(--separator-color);
-            border-radius: 50%; width: var(--action-button-size); height: var(--action-button-size);
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            transition: all 0.2s; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); padding: 0;
+        .color-category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
-        .icon-action-btn:hover { transform: scale(1.1); color: white; }
-        .icon-action-btn.edit-btn:hover { background-color: var(--warning-color); border-color: var(--warning-color); }
-        .icon-action-btn.pin-btn:hover { background-color: var(--primary-color); border-color: var(--primary-color);}
-        .icon-action-btn.unpin-btn:hover { background-color: var(--danger-color); border-color: var(--danger-color); }
-        .icon-action-btn.delete-btn:hover { background-color: var(--danger-color); border-color: var(--danger-color); }
-        .icon-action-btn.animate-btn:hover { background-color: var(--animate-color); border-color: var(--animate-color); }
-        .icon-action-btn.pin-btn.active { background-color: var(--primary-color); color: white; }
-        .icon-action-btn.animate-btn.active { background-color: var(--animate-color); color: white; }
-        .icon-action-btn svg { width: var(--action-button-icon-size); height: var(--action-button-icon-size); }
-        .icon-card-wrapper.publicly-pinned .icon-link { border: 2px solid var(--primary-color); box-shadow: 0 0 12px rgba(var(--primary-color-rgb), 0.3); }
-        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; } .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
-        .icon-visual[class*=" "] .icon-text-content { color: inherit; }
-        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.2s ease; }
-        #generator-modal-overlay.visible { display: block; opacity: 1; }
-        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 30px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-top: 4px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; }
-        #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 25px 0; font-size: 1.8em; border-bottom: 1px solid var(--separator-color); padding-bottom: 12px; font-weight: 600; }
-        #close-generator-modal-btn { position: absolute; top: 15px; right: 15px; background: var(--button-bg-color); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem; font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
-        #close-generator-modal-btn:hover { background-color: var(--danger-color); color: white; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); font-size: 0.95em; }
-        .form-group input[type="text"], .form-group input[type="url"], .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; font-size: 1em; font-family: 'Inter', sans-serif; background-color: var(--input-bg-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
-        .form-group input[type="text"]:focus, .form-group input[type="url"]:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); outline: none; }
-        .form-group input[type="color"] { width: 100%; padding: 6px; height: 40px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
-        #submit-icon-button { width: 100%; padding: 12px 18px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color .2s ease, transform .1s ease; font-weight: 500; margin-top: 15px; }
-        #submit-icon-button:hover { background-color: var(--primary-color-hover); transform: translateY(-1px); }
-        .label-hint { font-size: 0.8em; color: #6C757D; font-weight: 400; }
-        body.dark-mode .label-hint { color: #A0A0A0; }
-        #form-status-message { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; display: none; font-size: 0.95em; }
-        #form-status-message.success { background-color: #D4EDDA; color: #155724; display: block; }
-        #form-status-message.error { background-color: #F8D7DA; color: #721C24; display: block; }
+        body.dark-mode .color-category:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .color-category h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            color: #0056b3;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 10px;
+        }
+        body.dark-mode .color-category h2 {
+            color: #007bff;
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* MODIFICATIONS START HERE */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Increased min-width for larger icons on PC */
+            gap: 15px; /* Increased gap for better spacing */
+            justify-items: center;
+        }
+        .icon-item {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            text-decoration: none;
+            color: #fff;
+            overflow: hidden;
+            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
+            width: 100%; /* Ensure it takes full width of its grid column */
+            height: 55px; /* Slightly increased height */
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .icon-item.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            height: 0;
+            width: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+        }
+        .icon-item.showing {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        body.dark-mode .icon-item {
+            box-shadow: 0 2px 5px rgba(0,0,0,.3);
+        }
+        .icon-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,.15);
+        }
+        body.dark-mode .icon-item:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,.4);
+        }
+        .icon-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .icon-label {
+            font-size: 0.9em; /* Slightly increased font size */
+            text-align: center;
+            padding: 5px;
+            word-break: break-word;
+            font-weight: bold;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+        /* MODIFICATIONS END HERE */
+
+        /* Cores de ícones */
+        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
+        .copilot-icon {
+            background-image: linear-gradient(to bottom right,#2196F3,#4CAF50,#FFEB3B,#FF9800,#9C27B0);
+        }
+        .custom-icon-color .icon-content {
+            background-color: var(--icon-background-color);
+        }
+        
+        /* --- Estilos do Modal do Gerador de Código --- */
+        #generator-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1040;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #generator-modal-overlay.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        #generate-icon-code-section {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1050;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-top: 5px solid #007bff;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        #generate-icon-code-section.visible {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        body.dark-mode #generate-icon-code-section {
+            background-color: #3a3a3a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-top-color: #0056b3;
+        }
+        #generate-icon-code-section h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            padding-bottom: 10px;
+            transition: color .3s ease, border-bottom-color .3s ease;
+        }
+        body.dark-mode #generate-icon-code-section h2 {
+            color: #007bff;
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+        
+        #close-generator-modal-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            padding: 0;
+            transition: background-color .2s, color .2s;
+        }
+        #close-generator-modal-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+         body.dark-mode #close-generator-modal-btn {
+            background-color: #555;
+            color: #e0e0e0;
+        }
+        body.dark-mode #close-generator-modal-btn:hover {
+             background-color: #c82333;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            transition: color .3s ease;
+        }
+        body.dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            background-color: #fff;
+            color: #333;
+            transition: border-color .3s ease, background-color .3s ease, color .3s ease;
+        }
+        body.dark-mode .form-group input[type="text"],
+        body.dark-mode .form-group input[type="url"],
+        body.dark-mode .form-group select {
+            background-color: #3c3c3c;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        .form-group input[type="color"] {
+            width: 100%;
+            padding: 5px;
+            height: 45px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            cursor: pointer;
+            background-color: #fff;
+            transition: border-color .3s ease, background-color .3s ease;
+        }
+        body.dark-mode .form-group input[type="color"] {
+            border-color: #555;
+            background-color: #3c3c3c;
+        }
+        #generate-icon-code-button, #copy-icon-code-button {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color .3s ease;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        #generate-icon-code-button:hover, #copy-icon-code-button:hover {
+            background-color: #0056b3;
+        }
+        body.dark-mode #generate-icon-code-button, body.dark-mode #copy-icon-code-button {
+            background-color: #0056b3;
+        }
+        body.dark-mode #generate-icon-code-button:hover, body.dark-mode #copy-icon-code-button:hover {
+            background-color: #004a8f;
+        }
+        .label-hint {
+            font-size: 0.85em;
+            color: #777;
+            font-weight: 400;
+        }
+        body.dark-mode .label-hint {
+            color: #bbb;
+        }
+        #generatedCodeOutput {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 25px;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            background-color: #e9ecef;
+            color: #212529;
+            resize: vertical;
+            transition: border-color .3s ease, background-color .3s ease, color .3s ease;
+        }
+        body.dark-mode #generatedCodeOutput {
+            background-color: #2c2c2c;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+        #copy-icon-code-button {
+            margin-top: 15px;
+        }
+
+        /* Media Queries para responsividade */
         @media (max-width: 768px) {
-            body { padding-top: 80px; font-size: 0.95em;} main { padding: 15px; }
-            #page-header { padding: 12px 15px; } .category-grid { grid-template-columns: 1fr; gap: 20px; }
-            .category-card { padding: 20px; } .category-header h2 { font-size: 1.4em; }
-            .icons-grid, #search-results-container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-            .icon-link { height: 80px; } .icon-title { font-size: 0.9em; } .icon-description { font-size: 0.7em; }
-            #generate-icon-code-section { padding: 20px; } #generate-icon-code-section h2 { font-size: 1.5em; }
-            #search-input { font-size: 1em; padding: 10px 15px; }
-            .header-button { width: 42px; height: 42px; } .header-button svg { width: 22px; height: 22px; }
+            .category-container {
+                grid-template-columns: 1fr;
+            }
+            .color-category {
+                padding: 15px;
+            }
+            .color-category h2 {
+                font-size: 1.4em;
+            }
+            /* MODIFICATIONS FOR MOBILE */
+            .links-grid {
+                grid-template-columns: 1fr; /* Stack icons vertically on mobile */
+                gap: 15px; /* Adjust gap for vertical stacking */
+            }
+            .icon-item {
+                width: 100%; /* Make icons take full width of their container */
+                height: 55px; /* Maintain consistent height */
+                min-width: unset; /* Remove min-width for mobile */
+            }
+            .quick-result-item {
+                 width: 100% !important; /* Make quick results full width on mobile */
+                 height: 55px !important; /* Consistent height */
+                 min-width: unset; /* Remove min-width */
+                 max-width: unset; /* Remove max-width */
+                 flex-basis: auto;
+            }
+            .icon-label, .quick-result-item .icon-label {
+                font-size: 0.85em !important; /* Adjusted font size for mobile */
+            }
+            #generate-icon-code-section {
+                padding: 20px 15px;
+                 h2 {
+                    font-size: 1.4em;
+                }
+            }
+            #quick-results-content {
+                flex-direction: column; /* Stack quick results vertically */
+                gap: 10px;
+            }
+             #search-input {
+                padding: 10px 12px;
+                font-size: 1em;
+            }
+            #theme-toggle, #open-generator-modal-btn {
+                width: 36px;
+                height: 36px;
+            }
         }
-        @media (max-width: 480px) { .icons-grid, #search-results-container { grid-template-columns: repeat(2, 1fr); gap: 20px 15px; } }
     </style>
 </head>
-<body>
-    <header id="page-header">
-        <div class="header-content">
-            <input type="text" id="search-input" placeholder="Pesquisar ícones..." aria-label="Pesquisar ícones">
-            <button id="master-edit-toggle" class="header-button" title="Ativar Modo de Edição" aria-label="Ativar Modo de Edição">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
-            </button>
-            <button id="open-generator-modal-btn" class="header-button" title="Adicionar novo Ícone" aria-label="Adicionar novo Ícone">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            </button>
-            <button id="theme-toggle" class="header-button" title="Alternar Tema" aria-label="Alternar Tema"><span></span></button>
-        </div>
-    </header>
+<body class="dark-mode">
 
-    <main id="main-content">
-        <div id="master-edit-overlay"></div>
-        <div id="pinned-section"></div>
-        <div id="regular-section-wrapper">
-            <div class="category-grid" id="all-categories-grid"></div>
+    <div class="category-container" id="allCategoriesGrid">
+        <div class="color-category" style="border-color: rgb(111, 66, 193); display: block;" data-category="servicos-utilidades">
+            <h2>Serviços & Utilidades</h2>
+            <div class="links-grid">
+                <a href="https://musclewiki.com/pt-br/" class="icon-item musclewiki showing" data-label="MuscleWiki" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Academia</div>
+                    </div>
+                </a>
+                <a href="https://web.whatsapp.com/" class="icon-item whatsapp showing" data-label="Web WhatsApp" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">WhatsApp</div>
+                    </div>
+                </a>
+                <a href="http://138.255.240.6:8000/accounts/central/login" class="icon-item tsunami showing" data-label="Tsunami" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Tsunami</div>
+                    </div>
+                </a>
+                <a href="https://api.whatsapp.com/send?phone=557197170999&text=MENU" class="icon-item AZUL showing" data-label="Segunda Via de Água" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Segunda Via de Água</div>
+                    </div>
+                </a>
+                <a href="https://api.whatsapp.com/send?phone=557133706350&text=MENU" class="icon-item verde showing" data-label="Segunda Via de Luz" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Segunda Via de Luz</div>
+                    </div>
+                </a>
+                <a href="https://www.urban-vpn.com/pt-br/" class="icon-item vpn showing" data-label="vpn" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">VPN</div>
+                    </div>
+                </a>
+                <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh?hl=pt-BR" class="icon-item bloqueador showing" data-label="bloqueador" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Bloquear Anúncios</div>
+                    </div>
+                </a>
+                 <a href="https://feriados.site/ba/saubara/" class="icon-item feriados showing" data-label="Feriados" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Feriados</div>
+                    </div>
+                </a>
+                <a href="https://atendimentovirtual.embasa.ba.gov.br/login" class="icon-item embasa showing" data-label="Embasa" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Embasa</div>
+                    </div>
+                </a>
+                <a href="https://servicos.neoenergiacoelba.com.br/area-logada/Paginas/login.aspx?ref=https://servicos.neoenergiacoelba.com.br/servicos-ao-cliente/Pages/2-via-de-conta-coelba.aspx" class="icon-item coelba showing" data-label="Coelba" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Coelba</div>
+                    </div>
+                </a>
+                <a href="https://sso.acesso.gov.br/" class="icon-item azul2 showing" data-label="Gov.br" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Gov.br</div>
+                    </div>
+                </a>
+                <a href="https://www.linkcorreios.com.br/index.php" class="icon-item linkcorreios showing" data-label="Link Correios" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Link Correios</div>
+                    </div>
+                </a>
+                <a href="https://meu.inss.gov.br/" class="icon-item verde2 showing" data-label="Meu INSS" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Meu INSS</div>
+                    </div>
+                </a>
+            <a href="https://mail.google.com/mail/u/0/#inbox" class="icon-item custom-icon-color showing" data-label="GMAIL" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #cca000; background-color: var(--icon-background-color);">
+                        <div class="icon-label">GMAIL</div>
+                    </div>
+                </a></div>
         </div>
-        <div id="search-results-container"></div>
-    </main>
-
-    <div id="generator-modal-overlay"></div>
-    <div id="generate-icon-code-section" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <button id="close-generator-modal-btn" aria-label="Fechar modal">×</button>
-        <h2 id="modal-title">Adicionar Novo Ícone</h2>
-        <form id="icon-form" novalidate>
-            <input type="hidden" id="iconIdInput">
-            <div class="form-group">
-                <label for="iconNameInput">Título do Ícone:</label>
-                <input type="text" id="iconNameInput" required>
+        <div class="color-category" style="border-color: rgb(40, 167, 69); display: block;" data-category="cursos-concursos">
+            <h2>Cursos & Concursos</h2>
+            <div class="links-grid">
+                <a href="https://avamec.mec.gov.br/#/curso/listar?idCategoria=0" class="icon-item gov-curso showing" data-label="AVAMEC" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">AVAMEC CURSOS</div>
+                    </div>
+                </a>
+                <a href="https://www.escolavirtual.gov.br/catalogo" class="icon-item gov-curso showing" data-label="Escola Virtual GOV" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Escola Virtual</div>
+                    </div>
+                </a>
+                <a href="https://aprendamais.mec.gov.br/course/index.php" class="icon-item gov-curso showing" data-label="Aprenda Mais" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Aprenda Mais</div>
+                    </div>
+                </a>
+                <a href="https://www.pciconcursos.com.br/concursos/#BA" class="icon-item concursos showing" data-label="PCI Concurso" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">PCI Concurso</div>
+                    </div>
+                </a>
+                <a href="https://concursosnobrasil.com/concursos/ba/" class="icon-item concursos showing" data-label="Concursos Brasil" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Brasil Concurso</div>
+                    </div>
+                </a>
+                 <a href="https://www.acheconcursos.com.br/concursos-bahia" class="icon-item concursos showing" data-label="Ache Concursos" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Ache Concurso</div>
+                    </div>
+                </a>
+                <a href="https://www.futuro.digital/cursos-gratuitos" class="icon-item senai showing" data-label="Senai" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Senai Cursos</div>
+                    </div>
+                </a>
+                <a href="https://www.primecursos.com.br/" class="icon-item primecursos showing" data-label="Prime Cursos" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Prime Cursos</div>
+                    </div>
+                </a>
+                <a href="https://www.ev.org.br/" class="icon-item bradesco showing" data-label="Bradesco" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Bradesco Cursos</div>
+                    </div>
+                </a>
+                <a href="https://www.colaboraread.com.br/aluno/dashboard/index?matriculaId=3602038005" class="icon-item unopar showing" data-label="Unopar" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Unopar</div>
+                    </div>
+                </a>
+                
             </div>
+        </div>
+        <div class="color-category" style="border-color: rgb(0, 123, 255); display: block;" data-category="ferramentas-downloads">
+            <h2>Ferramentas & Downloads</h2>
+            <div class="links-grid">
+                <a href="https://github.com/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">GitHub</div>
+                    </div>
+                </a><a href="https://github.com/r8402/g/edit/main/index.html" class="icon-item custom-icon-color showing" data-label="APLICAR" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #050505; background-color: var(--icon-background-color);">
+                        <div class="icon-label">APLICAR</div>
+                    </div>
+                  </a><a href="https://htmlonline.org/pt/" class="icon-item custom-icon-color showing" data-label="EDITAR HTML" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #1f2020; background-color: var(--icon-background-color);">
+                        <div class="icon-label">EDITAR HTML</div>
+                    </div>
+                </a>
+                  <a href="https://codepen.io/pen/" class="icon-item codepen showing" data-label="Codepen" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">EDITAR HTML,CSS,JS</div>
+                    </div>
+                </a>
+                  <a href="https://github.com/camilatigre/listamaravilhosaopensource" class="icon-item codepen showing" data-label="GitHub OpenSource Lista" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">GitHub Lista OS</div>
+                    </div>
+                </a>
+                <a href="https://github.com/ishanvyas22/awesome-open-source-systems" class="icon-item codepen showing" data-label="Awesome Open Source Systems" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">Awesome OS</div>
+                    </div>
+                </a>
+                <a href="https://logodownload.org/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Logo Download</div>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/drive/u/0/my-drive?fd=true" class="icon-item drive showing" data-label="Drive" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Drive</div>
+                    </div>
+                </a>
+                <a href="https://onedrive.live.com/?id=root&cid=6DB96A6307BA3A1C" class="icon-item onedrive showing" data-label="OneDrive" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">OneDrive</div>
+                    </div>
+                </a>
+                <a href="https://yt5s.in/pt257mm/youtube-to-mp4" class="icon-item baixar showing" data-label="Baixar Videos" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Baixar</div>
+                    </div>
+                </a>
+                <a href="https://www.fosshub.com" class="icon-item azarado showing" data-label="FossHub" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">FossHub</div>
+                    </div>
+                </a>
+                
+                <a href="https://www.softpedia.com" class="icon-item azul2 showing" data-label="Softpedia" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">Softpedia</div>
+                    </div>
+                </a>
+                <a href="https://mega.nz" class="icon-item mega showing" data-label="Mega" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mega</div>
+                    </div>
+                </a>
+                <a href="https://sourceforge.net" class="icon-item utilit showing" data-label="SourceForge" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">SourceForge</div>
+                    </div>
+                </a>
+                <a href="https://osdn.net" class="icon-item verde2 showing" data-label="OSDN" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">OSDN</div>
+                    </div>
+                </a>
+              </div>
+        </div>
+        <div class="color-category" style="border-color: rgb(253, 126, 20); display: block;" data-category="compras-produtividade">
+            <h2>Compras & Produtividade</h2>
+            <div class="links-grid">
+                <a href="https://mercadolivre.com.br" class="icon-item mercadolivre showing" data-label="Mercado Livre" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mercado Livre</div>
+                    </div>
+                </a>
+                <a href="https://shopee.com.br/?uls_trackid=52t1gigt0064&utm_campaign=id_Y9ixAtyxay&utm_content=-ofasdbrshopeeshopeesddef---&utm_medium=affiliates&utm_source=an_18114130006&utm_term=d59sch2ft855" class="icon-item cuponomia showing" data-label="Shopee" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Shopee</div>
+                    </div>
+                </a>
+                <a href="https://kabum.com.br" class="icon-item custom-icon-color showing" data-label="Kabum" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Kabum</div>
+                    </div>
+                </a>
+                <a href="https://magazineluiza.com.br" class="icon-item custom-icon-color showing" data-label="Magazineluiza" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #fd7e14; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Magazine Luiza</div>
+                    </div>
+                </a>
+                <a href="Https://br.shein.com" class="icon-item custom-icon-color showing" data-label="Shein" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Shein</div>
+                    </div>
+                </a>
+                <a href="https://pt.aliexpress.com" class="icon-item custom-icon-color showing" data-label="Aliexpress" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Aliexpress</div>
+                    </div>
+                </a>
+                <a href="https://www.cuponomia.com.br/" class="icon-item cuponomia showing" data-label="Cuponomia" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Cupons Compras</div>
+                    </div>
+                </a>
+                <a href="https://mercadopago.com.br" class="icon-item mercadopago showing" data-label="Mercado Pago" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mercado Pago</div>
+                    </div>
+                </a>
+                <a href="https://buscape.com.br" class="icon-item buscape showing" data-label="Buscape" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Buscape</div>
+                    </div>
+                </a>
+                <a href="https://www.zoom.com.br/" class="icon-item zoom showing" data-label="Zoom" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Zoom</div>
+                    </div>
+                </a>
+                <a href="https://play.mercadolivre.com.br/?origin=internal" class="icon-item mercadolivre showing" data-label="Mercado Play" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mercado Play</div>
+                    </div>
+                </a>
+                <a href="https://gemini.google.com/app?hl=pt-BR" class="icon-item photoroom showing" data-label="Gemini AI" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">Gemini</div>
+                    </div>
+                </a>
+                <a href="https://copilot.microsoft.com/" class="icon-item copilot-icon showing" data-label="Copilot AI" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Copilot</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="color-category" style="border-color: rgb(255, 193, 7); display: block;" data-category="design-audio">
+            <h2>Design & Áudio</h2>
+            <div class="links-grid">
+                <a href="https://www.canva.com/pt_br/modelos/?category=tAEoFqaPb84&fFormat=MV8&pricing=FREE" class="icon-item canva showing" data-label="Canva" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Canva</div>
+                    </div>
+                </a>
+                <a href="https://icon-icons.com/" class="icon-item iconicons showing" data-label="Iconicons" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Iconicons</div>
+                    </div>
+                </a>
+                <a href="https://icons8.com.br/" class="icon-item icons8 showing" data-label="Icons8" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Icons8</div>
+                    </div>
+                </a>
+                <a href="https://www.gratispng.com/" class="icon-item gratispng showing" data-label="Grátis PNG" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Grátis PNG</div>
+                    </div>
+                </a>
+                <a href="https://www.photoroom.com/pt-br/ferramentas/remover-fundo-de-imagem" class="icon-item photoroom showing" data-label="Photoroom Remove Fundo" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Remove Fundo</div>
+                    </div>
+                </a>
+                <a href="https://clideo.com/pt" class="icon-item clideo showing" data-label="Clideo Video Editor" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Clideo</div>
+                    </div>
+                </a>
+                <a href="https://clideo.com/pt/cut-audio" class="icon-item clideoaudio showing" data-label="Clideo Audio Cutter" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Corte Áudio</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="color-category" style="border-color: rgb(220, 53, 69); display: block;" data-category="midia-entretenimento">
+            <h2>Mídia & Entretenimento</h2>
+            <div class="links-grid">
+                <a href="https://music.youtube.com/" class="icon-item youtube0 showing" data-label="YouTube Music" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">YouTube Music</div>
+                    </div>
+                </a>
+                <a href="https://YouTube.com.br" class="icon-item youtube1 showing" data-label="YouTube" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">YouTube</div>
+                    </div>
+                </a>
+                <a href="https://br.pinterest.com/" class="icon-item pinterest showing" data-label="Pinterest" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Pinterest</div>
+                    </div>
+                </a>
+                <a href="https://pluto.tv/" class="icon-item plutotv showing" data-label="Pluto TV" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Pluto TV</div>
+                    </div>
+                </a>
+                <a href="https://m.topflix.sh/genero/" class="icon-item topflix showing" data-label="TopFlix" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Topflix</div>
+                    </div>
+                </a>
+                <a href="https://meuguia.tv/programacao/categoria/Filmes" class="icon-item meuguia showing" data-label="Meu Guia TV" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Guia TV</div>
+                    </div>
+                </a>
+                <a href="https://www.azarado.com.br" class="icon-item azarado showing" data-label="Azarado Loterias" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Azarado</div>
+                    </div>
+                </a>
+                <a href="https://www.cartacapital.com.br/" class="icon-item cartacapital showing" data-label="CartaCapital" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Carta Capital</div>
+                    </div>
+                </a>
+                <a href="https://globfone.com/call-phone/" class="icon-item globfone showing" data-label="Globfone" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Globfone</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="generator-modal-overlay" class=""></div>
+    <div id="generate-icon-code-section" class="">
+        <button id="close-generator-modal-btn">×</button>
+        <h2>Gerar Código com Novo Ícone</h2>
+        <form id="generate-icon-code-form">
             <div class="form-group">
-                <label for="iconDescriptionInput">Descrição (Opcional):</label>
-                <textarea id="iconDescriptionInput" rows="2" placeholder="Um texto curto sobre o ícone..."></textarea>
+                <label for="iconNameInput">Texto do Ícone:</label>
+                <input type="text" id="iconNameInput" required="">
             </div>
             <div class="form-group">
                 <label for="iconLinkInput">Link do Ícone (URL):</label>
-                <input type="url" id="iconLinkInput" required>
+                <input type="url" id="iconLinkInput" required="">
             </div>
             <div class="form-group">
-                <label for="iconImageUrlInput">URL da Imagem do Ícone <span class="label-hint">(Opcional, se usar imagem em vez de cor de fundo)</span></label>
-                <input type="url" id="iconImageUrlInput" placeholder="https://example.com/icon.png">
-            </div>
-            <div class="form-group">
-                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2)</span></label>
+                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2 ou deixe em branco)</span></label>
                 <input type="text" id="iconColorClassInput">
             </div>
             <div class="form-group">
-                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(se classe de cor estiver em branco e sem URL de imagem)</span></label>
+                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(ignorado se classe de cor preenchida)</span></label>
                 <input type="color" id="iconCustomBgColorInput" value="#cccccc">
             </div>
             <div class="form-group">
-                <label for="iconCategorySelect">Categoria:</label>
-                <select id="iconCategorySelect" required>
-                    <option value="" disabled selected>Selecione uma categoria</option>
-                    </select>
+                <label for="iconCategorySelect">Categoria Onde Adicionar:</label>
+                <select id="iconCategorySelect" required="">
+                    <option value="" disabled="" selected="">Selecione uma categoria</option>
+                    <option value="servicos-utilidades">Serviços & Utilidades</option>
+                    <option value="cursos-concursos">Cursos & Concursos</option>
+                    <option value="ferramentas-downloads">Ferramentas & Downloads</option>
+                    <option value="compras-produtividade">Compras & Produtividade</option>
+                    <option value="design-audio">Design & Áudio</option>
+                    <option value="midia-entretenimento">Mídia & Entretenimento</option>
+                </select>
             </div>
-            <button type="submit" id="submit-icon-button">Salvar Ícone</button>
+            <button type="button" id="generate-icon-code-button">Gerar Código</button>
         </form>
-        <div id="form-status-message"></div>
+        <textarea id="generatedCodeOutput" readonly="" placeholder="O código HTML completo da página com o novo ícone aparecerá aqui..."></textarea>
+        <button type="button" id="copy-icon-code-button">Copiar Código</button>
+    </div>
+
+    <div id="floating-bar-wrapper">
+        <div id="quick-results-container">
+            <div id="quick-results-content"></div>
+        </div>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Pesquise Aqui...">
+            <button id="open-generator-modal-btn" title="Gerar Código do Ícone">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path></svg>
+            </button>
+            <button id="theme-toggle" title="Alternar Modo"><span>Claro</span></button>
+        </div>
     </div>
     
-    <script type="module">
-        // Importações do Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        // --- Constantes de Elementos do DOM ---
+        const searchInput = document.getElementById('search-input');
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const allCategoryDivs = document.querySelectorAll('.color-category');
+        const allCategoriesGrid = document.getElementById('allCategoriesGrid');
+        
+        const quickResultsContainer = document.getElementById('quick-results-container');
+        const quickResultsContent = document.getElementById('quick-results-content');
+        
+        // Elementos do Modal e do Gerador
+        const generatorModal = document.getElementById('generate-icon-code-section');
+        const modalOverlay = document.getElementById('generator-modal-overlay');
+        const openModalBtn = document.getElementById('open-generator-modal-btn');
+        const closeModalBtn = document.getElementById('close-generator-modal-btn');
+        const generateIconCodeForm = document.getElementById('generate-icon-code-form');
+        const iconNameInput = document.getElementById('iconNameInput');
+        const iconLinkInput = document.getElementById('iconLinkInput');
+        const iconColorClassInput = document.getElementById('iconColorClassInput');
+        const iconCustomBgColorInput = document.getElementById('iconCustomBgColorInput');
+        const iconCategorySelect = document.getElementById('iconCategorySelect');
+        const generateCodeButton = document.getElementById('generate-icon-code-button');
+        const generatedCodeOutput = document.getElementById('generatedCodeOutput');
+        const copyCodeButton = document.getElementById('copy-icon-code-button');
 
-        /**
-         * MÓDULO DE CONFIGURAÇÃO
-         * Centraliza todas as constantes e configurações da aplicação.
-         */
-        const config = {
-            firebase: {
-                apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
-                authDomain: "iconesutil.firebaseapp.com",
-                projectId: "iconesutil",
-                storageBucket: "iconesutil.appspot.com",
-                messagingSenderId: "88285859566",
-                appId: "1:88285859566:web:e15fdb0c615b494955edff"
-            },
-            categories: {
-                'public-featured': { name: 'Destaques', color: '#dc3545' }, // Ícones fixados publicamente
-                'servicos-utilidades': { name: 'Serviços & Utilidades', color: 'rgb(111, 66, 193)' },
-                'cursos-concursos': { name: 'Cursos & Concursos', color: 'rgb(40, 167, 69)' },
-                'ferramentas-downloads': { name: 'Ferramentas & Downloads', color: 'rgb(0, 123, 255)' },
-                'compras-produtividade': { name: 'Compras & Produtividade', color: 'rgb(253, 126, 20)' },
-                'design-audio': { name: 'Design & Áudio', color: 'rgb(255, 193, 7)' },
-                'midia-entretenimento': { name: 'Mídia & Entretenimento', color: 'rgb(220, 53, 69)' }
-            },
-            svgs: {
-                PIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 3v2h6v5h2v-5h6v-2l-2-3z"/></svg>`,
-                EDIT: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`,
-                UNPIN: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-10V4h-1v3l-2 3v2h6v-2l-2-3zM7 2v2h1v8l-2 3v2h6v-2l-2-3V4h1V2z"/></svg>`,
-                DELETE: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`,
-                ANIMATE: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9 4.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V5.25A.75.75 0 0 1 9 4.5Zm6.707 2.293a.75.75 0 0 1 0 1.06l-1.5 1.5a.75.75 0 1 1-1.06-1.06l1.5-1.5a.75.75 0 0 1 1.06 0ZM4.5 9.75A.75.75 0 0 1 5.25 9h1.5a.75.75 0 0 1 0 1.5H5.25A.75.75 0 0 1 4.5 9.75Zm11.25 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 15.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm5.646 2.146a.75.75 0 0 1 0 1.06l-1.5 1.5a.75.75 0 1 1-1.06-1.06l1.5-1.5a.75.75 0 0 1 1.06 0ZM12 11.25a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5a.75.75 0 0 1 .75-.75Zm-5.793 2.146a.75.75 0 0 1 1.06 0l1.5 1.5a.75.75 0 0 1-1.06 1.06l-1.5-1.5a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>`
+        let typingTimer;
+        const doneTypingInterval = 200; //ms
+
+        // --- Funções do Tema ---
+        function applyTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggle.querySelector('span').textContent = 'Claro';
+            } else {
+                body.classList.remove('dark-mode');
+                themeToggle.querySelector('span').textContent = 'Escuro';
             }
-        };
+        }
 
-        /**
-         * MÓDULO DE ESTADO
-         * Armazena o estado atual da aplicação.
-         */
-        const state = {
-            allIcons: [],
-            pinnedCategoryIds: [], // Categorias fixadas pelo usuário para destaque na tela inicial
-            currentUser: null,
-            isMasterEditMode: false,
-            isFormEditMode: false,
-            searchTerm: ''
-        };
-
-        /**
-         * SERVIÇO DO FIREBASE
-         * Lida com toda a comunicação com o banco de dados.
-         */
-        const FirebaseService = {
-            db: null,
-            auth: null,
-            init() {
-                const app = initializeApp(config.firebase);
-                this.db = getFirestore(app);
-                this.auth = getAuth(app);
-            },
-            authenticate(onAuthStateChangedCallback) {
-                onAuthStateChanged(this.auth, async (user) => {
-                    if (user) {
-                        state.currentUser = user;
-                        // Carrega as categorias fixadas para este usuário
-                        const userDocSnap = await getDoc(doc(this.db, "usuarios", user.uid));
-                        state.pinnedCategoryIds = userDocSnap.exists() ? userDocSnap.data().pinnedCategories || [] : [];
-                    } else {
-                        // Faz login anônimo se não houver usuário logado
-                        await signInAnonymously(this.auth);
-                    }
-                    onAuthStateChangedCallback(); // Garante que a renderização ocorra após carregar o estado do usuário
-                });
-            },
-            onIconsUpdate(callback) {
-                onSnapshot(collection(this.db, "icones"), (snapshot) => {
-                    const icons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    callback(icons);
-                });
-            },
-            async saveUserPinnedCategories(categories) {
-                if (!state.currentUser) return; // Não salva se não houver usuário
-                await setDoc(doc(this.db, "usuarios", state.currentUser.uid), { pinnedCategories: categories }, { merge: true });
-            },
-            async updateIcon(id, data) {
-                await updateDoc(doc(this.db, "icones", id), data);
-            },
-            async addIcon(data) {
-                await addDoc(collection(this.db, "icones"), { ...data, createdAt: serverTimestamp() });
-            } ,
-            async deleteIcon(id) {
-                await deleteDoc(doc(this.db, "icones", id));
+        function toggleTheme() {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeToggle.querySelector('span').textContent = 'Claro';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggle.querySelector('span').textContent = 'Escuro';
             }
-        };
+        }
 
-        /**
-         * GERENCIADOR DA INTERFACE (UI)
-         * Responsável por toda a manipulação do DOM.
-         */
-        const UIManager = {
-            elements: {},
-            init() {
-                const DOMElements = {
-                    body: document.body,
-                    mainContent: document.getElementById('main-content'),
-                    searchInput: document.getElementById('search-input'),
-                    themeToggle: document.getElementById('theme-toggle'),
-                    masterEditToggle: document.getElementById('master-edit-toggle'),
-                    pinnedSection: document.getElementById('pinned-section'),
-                    allCategoriesGrid: document.getElementById('all-categories-grid'), // Container para as categorias
-                    searchResultsContainer: document.getElementById('search-results-container'),
-                    modalOverlay: document.getElementById('generator-modal-overlay'),
-                    generatorModal: document.getElementById('generate-icon-code-section'),
-                    closeModalBtn: document.getElementById('close-generator-modal-btn'),
-                    iconForm: document.getElementById('icon-form'),
-                    formStatusMessage: document.getElementById('form-status-message'),
-                    modalTitle: document.getElementById('modal-title'),
-                    openModalBtn: document.getElementById('open-generator-modal-btn'),
-                    // Adicionado para acesso mais fácil ao botão de submit
-                    submitIconBtn: document.getElementById('submit-icon-button'),
-                };
-                this.elements = DOMElements;
-                this.populateCategorySelect(); // Popula o select de categorias no formulário
-            },
+        // --- Funções de Pesquisa e Filtro ---
+        function filterLinks() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
 
-            // Método para popular o select de categorias no formulário de adicionar/editar
-            populateCategorySelect() {
-                const selectElement = this.elements.iconForm.elements.iconCategorySelect;
-                // Limpa opções existentes, exceto a primeira (disabled selected)
-                while (selectElement.options.length > 1) {
-                    selectElement.remove(1);
-                }
-                for (const categoryId in config.categories) {
-                    // Ignora a categoria 'public-featured' para seleção manual no formulário
-                    if (categoryId === 'public-featured') continue;
-
-                    const option = document.createElement('option');
-                    option.value = categoryId;
-                    option.textContent = config.categories[categoryId].name;
-                    selectElement.appendChild(option);
-                }
-            },
-
-            createIconElement(icon) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'icon-card-wrapper';
-                wrapper.dataset.id = icon.id;
-                wrapper.dataset.label = icon.name;
-
-                if (icon.isAnimated) wrapper.classList.add('animated-icon');
-                // A classe 'publicly-pinned' é adicionada ao wrapper apenas quando o ícone é renderizado na seção de fixados
+            allCategoryDivs.forEach(categoryDiv => {
+                let hasVisibleLinksInCategory = false;
+                const linksInThisCategory = categoryDiv.querySelectorAll('.icon-item');
                 
-                const link = document.createElement('a');
-                link.href = icon.link;
-                link.className = 'icon-link';
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-
-                const visual = document.createElement('div');
-                visual.className = 'icon-visual';
-                if (icon.colorClass) {
-                    visual.classList.add(icon.colorClass);
-                } else {
-                    visual.style.backgroundColor = icon.customBgColor || '#cccccc';
-                }
-
-                // Verifica se há uma imagem de ícone para usar
-                if (icon.imageUrl) {
-                    const img = document.createElement('img');
-                    img.src = icon.imageUrl;
-                    img.alt = icon.name;
-                    visual.appendChild(img);
-                }
-
-                const textContent = document.createElement('div');
-                textContent.className = 'icon-text-content';
-
-                const title = document.createElement('span');
-                title.className = 'icon-title';
-                title.textContent = icon.name;
-                textContent.appendChild(title);
-
-                if (icon.description) {
-                    const description = document.createElement('span');
-                    description.className = 'icon-description';
-                    description.textContent = icon.description;
-                    textContent.appendChild(description);
-                }
-                
-                // O textContent é sempre adicionado ao visual para manter o layout, mesmo com imagem
-                // Garante que o texto fique por cima da imagem.
-                visual.appendChild(textContent);
-                
-                link.appendChild(visual);
-
-                const actions = this.createActionsElement(icon);
-                wrapper.appendChild(link);
-                wrapper.appendChild(actions);
-
-                return wrapper;
-            },
-            createActionsElement(icon) {
-                const actionsContainer = document.createElement('div');
-                actionsContainer.className = 'icon-actions';
-                
-                const createBtn = (className, title, svg, active = false) => {
-                    const btn = document.createElement('button');
-                    btn.className = `icon-action-btn ${className}`;
-                    btn.title = title;
-                    btn.innerHTML = svg;
-                    if (active) btn.classList.add('active');
-                    return btn;
-                };
-
-                actionsContainer.appendChild(createBtn('edit-btn', 'Editar Ícone', config.svgs.EDIT));
-                // O botão de fixar agora indica fixação pública
-                actionsContainer.appendChild(createBtn('pin-btn', icon.isPublicamenteFixado ? 'Desafixar Publicamente' : 'Fixar Publicamente', icon.isPublicamenteFixado ? config.svgs.UNPIN : config.svgs.PIN, icon.isPublicamenteFixado));
-                actionsContainer.appendChild(createBtn('animate-btn', icon.isAnimated ? 'Desativar Animação' : 'Ativar Animação', config.svgs.ANIMATE, icon.isAnimated));
-                actionsContainer.appendChild(createBtn('delete-btn', 'Remover Ícone', config.svgs.DELETE));
-
-                return actionsContainer;
-            },
-
-            render() {
-                const { pinnedSection, allCategoriesGrid, searchResultsContainer } = this.elements;
-                [pinnedSection, allCategoriesGrid, searchResultsContainer].forEach(el => el.innerHTML = '');
-
-                // Lógica de pesquisa
-                if (state.searchTerm) {
-                    searchResultsContainer.style.display = 'grid';
-                    allCategoriesGrid.style.display = 'none'; // Esconde as categorias
-                    pinnedSection.style.display = 'none'; // Esconde a seção de fixados
-
-                    const matchingIcons = state.allIcons.filter(icon =>
-                        icon.name.toLowerCase().includes(state.searchTerm) ||
-                        (icon.description && icon.description.toLowerCase().includes(state.searchTerm))
-                    );
-
-                    if (matchingIcons.length > 0) {
-                        matchingIcons.forEach(icon => searchResultsContainer.appendChild(this.createIconElement(icon)));
+                linksInThisCategory.forEach(item => {
+                    const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
+                    if (label.includes(searchTerm)) {
+                        item.classList.remove('hidden');
+                        item.classList.add('showing');
+                        hasVisibleLinksInCategory = true;
                     } else {
-                        searchResultsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; margin-top: 30px;">Nenhum ícone encontrado para "${state.searchTerm}".</p>`;
+                        item.classList.remove('showing');
+                        item.classList.add('hidden');
                     }
-                } else {
-                    // Lógica de renderização por categorias (tela inicial)
-                    searchResultsContainer.style.display = 'none';
-                    allCategoriesGrid.style.display = 'grid'; // Mostra o grid de categorias (container para os cards)
-                    pinnedSection.style.display = 'block'; // Mostra a seção de fixados
+                });
+                
+                // Mostra a categoria se ela tiver ícones visíveis
+                 categoryDiv.style.display = hasVisibleLinksInCategory ? 'block' : 'none';
+            });
+        }
+        
+        function updateQuickResults(searchTerm) {
+            quickResultsContent.innerHTML = ''; 
 
-                    const iconsByCategory = state.allIcons.reduce((acc, icon) => {
-                        (acc[icon.category] = acc[icon.category] || []).push(icon);
-                        return acc;
-                    }, {});
-
-                    // 1. Renderizar Ícones em Destaque (Publicamente Fixados)
-                    let publicFeaturedIcons = state.allIcons.filter(icon => icon.isPublicamenteFixado);
-                    
-                    // --- ORDENAÇÃO DOS ÍCONES DE DESTAQUE MAIS RECENTES EM PRIMEIRO ---
-                    publicFeaturedIcons.sort((a, b) => {
-                        // Garante que `createdAt` é um objeto Timestamp do Firebase ou um valor compatível.
-                        // Se for um objeto Timestamp, use `toDate()`. Caso contrário, tente converter para Date.
-                        const dateA = a.createdAt && typeof a.createdAt.toDate === 'function' ? a.createdAt.toDate() : (a.createdAt ? new Date(a.createdAt) : new Date(0));
-                        const dateB = b.createdAt && typeof b.createdAt.toDate === 'function' ? b.createdAt.toDate() : (b.createdAt ? new Date(b.createdAt) : new Date(0));
-                        return dateB.getTime() - dateA.getTime(); // Ordena do mais recente para o mais antigo
-                    });
-                    // ------------------------------------------------------------------
-
-                    if (publicFeaturedIcons.length > 0) {
-                        const featuredCategoryCard = this.createCategoryCard(
-                            'public-featured',
-                            config.categories['public-featured'].name,
-                            config.categories['public-featured'].color
-                        );
-                        // Remove o botão de fixar categoria para a seção de destaques públicos
-                        const pinBtn = featuredCategoryCard.querySelector('.pin-category-btn');
-                        if (pinBtn) pinBtn.remove();
-                        
-                        const featuredIconsGrid = featuredCategoryCard.querySelector('.icons-grid');
-                        publicFeaturedIcons.forEach(icon => {
-                            const iconEl = this.createIconElement(icon);
-                            iconEl.classList.add('publicly-pinned'); // Adiciona a classe para destaque visual
-                            featuredIconsGrid.appendChild(iconEl);
-                        });
-                        pinnedSection.appendChild(featuredCategoryCard);
-                    } else {
-                        // Se não houver ícones fixados, ainda podemos mostrar um placeholder ou ocultar a seção
-                        if (!state.isMasterEditMode) { // Oculta a mensagem se não estiver em modo de edição
-                            pinnedSection.innerHTML = `<p style="text-align: center; margin-bottom: 25px;">Nenhum ícone em destaque no momento.</p>`;
-                        } else {
-                             pinnedSection.innerHTML = `<p style="text-align: center; margin-bottom: 25px; opacity: 0.7;">Nenhum ícone em destaque. Use o modo de edição para fixar alguns!</p>`;
-                        }
-                    }
-
-                    // 2. Renderizar Outras Categorias
-                    // Garante a ordem das categorias definida no config.categories
-                    for (const categoryId in config.categories) {
-                        if (categoryId === 'public-featured') continue; // Já tratado acima
-
-                        const categoryName = config.categories[categoryId].name;
-                        const categoryColor = config.categories[categoryId].color;
-                        const iconsInThisCategory = iconsByCategory[categoryId] || [];
-
-                        // Só cria a seção se houver ícones nela ou se estiver em modo de edição
-                        if (iconsInThisCategory.length > 0 || state.isMasterEditMode) {
-                            const categoryCard = this.createCategoryCard(categoryId, categoryName, categoryColor);
-                            const iconsGrid = categoryCard.querySelector('.icons-grid');
-
-                            // Ordenar ícones alfabeticamente dentro da categoria (opcional)
-                            iconsInThisCategory.sort((a, b) => a.name.localeCompare(b.name));
-
-                            iconsInThisCategory.forEach(icon => {
-                                iconsGrid.appendChild(this.createIconElement(icon));
-                            });
-                            allCategoriesGrid.appendChild(categoryCard);
-                        }
-                    }
-
-                    // Se não houver nenhuma categoria com ícones e não estiver em modo de edição
-                    if (allCategoriesGrid.children.length === 0 && !state.isMasterEditMode) {
-                         allCategoriesGrid.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; margin-top: 30px;">Não há categorias com ícones para exibir no momento.</p>`;
-                    }
-                }
-            },
-
-            // Método para criar a estrutura do card de categoria
-            createCategoryCard(categoryId, name, color) {
-                const card = document.createElement('section');
-                card.className = 'category-card';
-                card.style.borderColor = color;
-                card.id = `category-${categoryId}`;
-
-                const header = document.createElement('div');
-                header.className = 'category-header';
-
-                const title = document.createElement('h2');
-                title.textContent = name;
-                header.appendChild(title);
-
-                // Botão de fixar/desafixar categoria (só aparece no modo de edição)
-                const pinBtn = document.createElement('button');
-                pinBtn.className = 'pin-category-btn';
-                pinBtn.title = state.pinnedCategoryIds.includes(categoryId) ? 'Desafixar Categoria' : 'Fixar Categoria';
-                pinBtn.innerHTML = state.pinnedCategoryIds.includes(categoryId) ? config.svgs.UNPIN : config.svgs.PIN;
-                if (state.pinnedCategoryIds.includes(categoryId)) {
-                    pinBtn.classList.add('pinned');
-                }
-                pinBtn.dataset.categoryId = categoryId; // Armazena o ID da categoria para manipulação
-                header.appendChild(pinBtn);
-
-                card.appendChild(header);
-
-                const iconsGrid = document.createElement('div');
-                iconsGrid.className = 'icons-grid';
-                card.appendChild(iconsGrid);
-
-                return card;
-            },
-
-            toggleMasterEditMode(isActive) {
-                this.elements.body.classList.toggle('master-edit-mode', isActive);
-                this.elements.masterEditToggle.classList.toggle('active', isActive);
-                this.render(); // Re-renderizar para mostrar/ocultar botões e categorias vazias
-            },
-            toggleTheme(isDark) {
-                this.elements.body.classList.toggle('dark-mode', isDark);
-                this.elements.themeToggle.querySelector('span').textContent = isDark ? 'Claro' : 'Escuro';
-                this.elements.themeToggle.title = `Alternar para Tema ${isDark ? 'Claro' : 'Escuro'}`;
-            },
-            openModal(iconData = null) {
-                state.isFormEditMode = !!iconData;
-                const { iconForm, modalTitle, generatorModal, modalOverlay, submitIconBtn } = this.elements;
-                iconForm.reset();
-                this.clearFormStatus(); // Limpa mensagens de status anteriores
-
-                modalTitle.textContent = state.isFormEditMode ? 'Editar Ícone' : 'Adicionar Novo Ícone';
-                submitIconBtn.textContent = state.isFormEditMode ? 'Atualizar Ícone' : 'Salvar Ícone';
-
-                iconForm.elements.iconIdInput.value = iconData?.id || '';
-                iconForm.elements.iconNameInput.value = iconData?.name || '';
-                iconForm.elements.iconDescriptionInput.value = iconData?.description || '';
-                iconForm.elements.iconLinkInput.value = iconData?.link || '';
-                iconForm.elements.iconImageUrlInput.value = iconData?.imageUrl || ''; // Preenche o campo de URL da imagem
-                iconForm.elements.iconColorClassInput.value = iconData?.colorClass || '';
-                iconForm.elements.iconCustomBgColorInput.value = iconData?.customBgColor || '#cccccc';
-                iconForm.elements.iconCategorySelect.value = iconData?.category || ''; // Assegura que a categoria correta esteja selecionada
-
-                generatorModal.classList.add('visible');
-                modalOverlay.classList.add('visible');
-                this.elements.body.classList.add('modal-open'); // Previne scroll do body
-            },
-            closeModal() {
-                this.elements.generatorModal.classList.remove('visible');
-                this.elements.modalOverlay.classList.remove('visible');
-                this.elements.body.classList.remove('modal-open'); // Permite scroll do body
-            },
-            showFormStatus(message, type) {
-                const statusEl = this.elements.formStatusMessage;
-                statusEl.textContent = message;
-                statusEl.className = `form-status-message ${type}`;
-            },
-            clearFormStatus() {
-                this.elements.formStatusMessage.className = 'form-status-message';
-                this.elements.formStatusMessage.textContent = '';
+            if (searchTerm.length === 0) {
+                quickResultsContainer.style.display = 'none';
+                body.classList.remove('no-scroll', 'search-active');
+                return;
             }
-        };
+            
+            quickResultsContainer.style.display = 'block';
+            body.classList.add('no-scroll', 'search-active');
 
-        /**
-         * CONTROLADOR DA APLICAÇÃO (APP)
-         * Orquestra os módulos e lida com os eventos do usuário.
-         */
-        const App = {
-            init() {
-                FirebaseService.init();
-                UIManager.init();
-                this.setupEventListeners();
-                
-                // Carrega o tema salvo do localStorage
-                const savedTheme = localStorage.getItem('theme') || 'light';
-                UIManager.toggleTheme(savedTheme === 'dark');
+            let found = false;
+            const allIcons = document.querySelectorAll('#allCategoriesGrid .icon-item');
 
-                // Autentica e inicia o monitoramento dos ícones e do estado do usuário
-                FirebaseService.authenticate(() => {
-                    FirebaseService.onIconsUpdate(newIcons => {
-                        state.allIcons = newIcons;
-                        UIManager.render(); // Renderiza após carregar os ícones e o estado do usuário
-                    });
-                });
-            },
-            setupEventListeners() {
-                const { themeToggle, masterEditToggle, searchInput, mainContent, openModalBtn, closeModalBtn, iconForm, submitIconBtn } = UIManager.elements;
-                
-                themeToggle.addEventListener('click', () => {
-                    const isDark = document.body.classList.toggle('dark-mode');
-                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                    UIManager.toggleTheme(isDark);
-                });
-
-                masterEditToggle.addEventListener('click', () => {
-                    state.isMasterEditMode = !state.isMasterEditMode;
-                    UIManager.toggleMasterEditMode(state.isMasterEditMode);
-                });
-
-                searchInput.addEventListener('input', () => {
-                    state.searchTerm = searchInput.value.toLowerCase().trim();
-                    UIManager.render();
-                });
-
-                openModalBtn.addEventListener('click', () => UIManager.openModal());
-                closeModalBtn.addEventListener('click', () => UIManager.closeModal());
-
-                iconForm.addEventListener('submit', this.handleFormSubmit);
-
-                mainContent.addEventListener('click', this.handleMainContentClick);
-            },
-            handleFormSubmit(e) {
-                e.preventDefault();
-                const form = e.target;
-                const iconData = {
-                    name: form.elements.iconNameInput.value.trim(),
-                    description: form.elements.iconDescriptionInput.value.trim(),
-                    link: form.elements.iconLinkInput.value.trim(),
-                    imageUrl: form.elements.iconImageUrlInput.value.trim(), // Novo campo
-                    colorClass: form.elements.iconColorClassInput.value.trim(),
-                    customBgColor: form.elements.iconCustomBgColorInput.value,
-                    category: form.elements.iconCategorySelect.value,
-                };
-                const id = form.elements.iconIdInput.value;
-
-                UIManager.clearFormStatus(); // Limpa status anterior
-                if (!iconData.name || !iconData.link || !iconData.category) {
-                    UIManager.showFormStatus('Por favor, preencha o Título, Link e Categoria do ícone.', 'error');
-                    return;
+            allIcons.forEach(item => {
+                const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
+                if (label.includes(searchTerm)) {
+                    const clone = item.cloneNode(true);
+                    clone.classList.remove('hidden', 'showing');
+                    clone.classList.add('quick-result-item');
+                    quickResultsContent.appendChild(clone);
+                    found = true;
                 }
+            });
 
-                if (id) {
-                    // Mantenha o estado atual de isAnimated e isPublicamenteFixado ao editar
-                    const existingIcon = state.allIcons.find(i => i.id === id);
-                    iconData.isAnimated = existingIcon ? existingIcon.isAnimated : false;
-                    iconData.isPublicamenteFixado = existingIcon ? existingIcon.isPublicamenteFixado : false;
-                    // Mantenha o `createdAt` original ao editar
-                    iconData.createdAt = existingIcon ? existingIcon.createdAt : serverTimestamp();
-
-
-                    FirebaseService.updateIcon(id, iconData)
-                        .then(() => {
-                            UIManager.closeModal();
-                            UIManager.showFormStatus('Ícone atualizado com sucesso!', 'success');
-                            setTimeout(() => UIManager.clearFormStatus(), 3000);
-                        })
-                        .catch(error => {
-                            console.error("Erro ao atualizar ícone:", error);
-                            UIManager.showFormStatus('Erro ao atualizar ícone.', 'error');
-                        });
-                } else {
-                    // Para novos ícones, defina como false por padrão e adicione o timestamp
-                    iconData.isAnimated = false;
-                    iconData.isPublicamenteFixado = false;
-                    iconData.createdAt = serverTimestamp(); // Adiciona o timestamp para novos ícones
-
-                    FirebaseService.addIcon(iconData)
-                        .then(() => {
-                            UIManager.closeModal();
-                            UIManager.showFormStatus('Ícone adicionado com sucesso!', 'success');
-                            setTimeout(() => UIManager.clearFormStatus(), 3000);
-                        })
-                        .catch(error => {
-                            console.error("Erro ao adicionar ícone:", error);
-                            UIManager.showFormStatus('Erro ao adicionar ícone.', 'error');
-                        });
-                }
-            },
-            handleMainContentClick(e) {
-                // Manipula cliques nos botões de ação do ícone
-                const wrapper = e.target.closest('.icon-card-wrapper');
-                if (wrapper) {
-                    const id = wrapper.dataset.id;
-                    const icon = state.allIcons.find(i => i.id === id);
-
-                    const actionBtn = e.target.closest('.icon-action-btn');
-                    if (actionBtn) {
-                        // Estas ações só podem ser feitas se o modo de edição estiver ATIVO
-                        if (!state.isMasterEditMode) {
-                            alert('Por favor, ative o Modo de Edição (botão de cadeado) para realizar esta ação.');
-                            return;
-                        }
-
-                        if (actionBtn.classList.contains('edit-btn')) {
-                            UIManager.openModal(icon);
-                        }
-                        else if (actionBtn.classList.contains('delete-btn')) {
-                            if (confirm(`Tem certeza que deseja remover o ícone "${icon.name}"?`)) {
-                                FirebaseService.deleteIcon(id)
-                                    .then(() => console.log('Ícone removido com sucesso!'))
-                                    .catch(err => console.error('Erro ao remover ícone:', err));
-                            }
-                        }
-                        else if (actionBtn.classList.contains('pin-btn')) {
-                            // Ao fixar, atualiza o timestamp `createdAt` para que apareça em primeiro
-                            FirebaseService.updateIcon(id, { isPublicamenteFixado: !icon.isPublicamenteFixado, createdAt: serverTimestamp() });
-                        }
-                        else if (actionBtn.classList.contains('animate-btn')) {
-                            FirebaseService.updateIcon(id, { isAnimated: !icon.isAnimated });
-                        }
-                    }
-                }
-
-                // Manipula cliques nos botões de fixar/desafixar categoria (apenas no modo de edição mestre)
-                const pinCategoryBtn = e.target.closest('.pin-category-btn');
-                if (pinCategoryBtn && state.isMasterEditMode) {
-                    const categoryId = pinCategoryBtn.dataset.categoryId;
-                    let newPinnedCategories = [...state.pinnedCategoryIds];
-
-                    if (newPinnedCategories.includes(categoryId)) {
-                        // Desafixa a categoria
-                        newPinnedCategories = newPinnedCategories.filter(id => id !== categoryId);
-                    } else {
-                        // Fixa a categoria
-                        newPinnedCategories.push(categoryId);
-                    }
-                    state.pinnedCategoryIds = newPinnedCategories; // Atualiza o estado local
-                    FirebaseService.saveUserPinnedCategories(newPinnedCategories) // Salva no Firebase
-                        .then(() => UIManager.render()) // Re-renderiza para atualizar o estado visual dos botões
-                        .catch(err => console.error("Erro ao salvar categorias fixadas:", err));
-                }
+            if (!found) {
+                quickResultsContent.innerHTML = '<p class="no-results-message">Nenhum ícone encontrado.</p>';
             }
-        };
+        }
 
-        // Inicia a aplicação quando o DOM estiver pronto.
-        document.addEventListener('DOMContentLoaded', () => App.init());
+        function handleSearchFocus() {
+            body.classList.add('search-active', 'no-scroll');
+            // Mostra todas as categorias para permitir a busca em todas elas
+            allCategoryDivs.forEach(categoryDiv => {
+                categoryDiv.style.display = 'block';
+            });
+        }
 
+        // --- Funções do Modal ---
+        function openGeneratorModal() {
+            modalOverlay.classList.add('visible');
+            generatorModal.classList.add('visible');
+            body.classList.add('modal-open');
+        }
+
+        function closeGeneratorModal() {
+            modalOverlay.classList.remove('visible');
+            generatorModal.classList.remove('visible');
+            body.classList.remove('modal-open');
+        }
+
+        // --- Funções do Gerador de Código ---
+        function generateIconCode() {
+            const name = iconNameInput.value.trim();
+            const link = iconLinkInput.value.trim();
+            const colorClass = iconColorClassInput.value.trim();
+            const customBgColor = iconCustomBgColorInput.value;
+            const category = iconCategorySelect.value;
+
+            if (!name || !link || !category) {
+                generatedCodeOutput.value = 'Por favor, preencha todos os campos obrigatórios.';
+                return;
+            }
+            
+            let newIconHtml = `                <a href="${link}" class="icon-item`;
+            newIconHtml += colorClass ? ` ${colorClass}"` : ` custom-icon-color"`;
+            newIconHtml += ` data-label="${name}" target="_blank">\n                    <div class="icon-content"`;
+            if (!colorClass) {
+                newIconHtml += ` style="--icon-background-color: ${customBgColor}; background-color: var(--icon-background-color);"`;
+            }
+            newIconHtml += `>\n                        <div class="icon-label">${name}</div>\n                    </div>\n                </a>`;
+
+            const targetCategoryGrid = document.querySelector(`.color-category[data-category="${category}"] .links-grid`);
+             if (!targetCategoryGrid) {
+                generatedCodeOutput.value = `Erro: A categoria "${category}" não foi encontrada.`;
+                return;
+            }
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newIconHtml;
+            const newIconElement = tempDiv.firstElementChild;
+            
+            // --- INÍCIO DA CORREÇÃO ---
+            // 1. Guarda o estado original da página
+            const originalBodyClasses = body.className;
+            const modalElements = document.querySelectorAll('#generator-modal-overlay, #generate-icon-code-section');
+
+            // 2. Prepara o DOM para a captura: remove classes de bloqueio e visibilidade do modal.
+            body.className = originalBodyClasses.replace(/modal-open|no-scroll|search-active/g, '').trim();
+            modalElements.forEach(el => el.classList.remove('visible'));
+
+            // 3. Adiciona o novo ícone para que ele faça parte do HTML capturado.
+            targetCategoryGrid.appendChild(newIconElement);
+
+            // 4. Captura o código HTML completo da página agora "limpa".
+            const fullPageHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+            // 5. Restaura o estado original da página para o usuário não notar a mudança.
+            targetCategoryGrid.removeChild(newIconElement); // Remove o ícone temporário
+            body.className = originalBodyClasses; // Devolve as classes originais ao body
+            modalElements.forEach(el => el.classList.add('visible')); // Garante que o modal continue visível
+            // --- FIM DA CORREÇÃO ---
+
+            generatedCodeOutput.value = fullPageHtml;
+            generatedCodeOutput.focus();
+            generatedCodeOutput.select();
+        }
+
+        function copyGeneratedCode() {
+            if(!generatedCodeOutput.value) return;
+
+            generatedCodeOutput.select();
+            generatedCodeOutput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            
+            const messageBox = document.createElement('div');
+            messageBox.textContent = 'Código copiado!';
+            messageBox.style.cssText = `
+                position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+                background-color: #4caf50; color: white; padding: 10px 20px;
+                border-radius: 5px; z-index: 1060; opacity: 0;
+                transition: opacity 0.5s, top 0.5s;
+            `;
+            document.body.appendChild(messageBox);
+
+            setTimeout(() => {
+                messageBox.style.opacity = '1';
+                messageBox.style.top = '30px';
+            }, 10);
+
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+                messageBox.addEventListener('transitionend', () => messageBox.remove());
+            }, 2000);
+        }
+
+        // --- Event Listeners ---
+        themeToggle.addEventListener('click', toggleTheme);
+        openModalBtn.addEventListener('click', openGeneratorModal);
+        closeModalBtn.addEventListener('click', closeGeneratorModal);
+        modalOverlay.addEventListener('click', closeGeneratorModal);
+        
+        searchInput.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            const searchTerm = searchInput.value.toLowerCase().trim();
+             // Mostra todas as categorias imediatamente quando o usuário começa a digitar
+            if (searchTerm.length > 0) {
+                 allCategoryDivs.forEach(div => div.style.display = 'block');
+            }
+            typingTimer = setTimeout(() => {
+                filterLinks();
+                updateQuickResults(searchTerm);
+            }, doneTypingInterval);
+        });
+
+        searchInput.addEventListener('focus', handleSearchFocus);
+        
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                if(searchInput.value.trim().length === 0) {
+                    quickResultsContainer.style.display = 'none';
+                    body.classList.remove('no-scroll', 'search-active');
+                    // Restaura a visualização de todas as categorias quando o foco é perdido e o campo está vazio
+                    allCategoryDivs.forEach(div => div.style.display = 'block');
+                    filterLinks(); // Re-filtra para mostrar tudo
+                }
+            }, 200);
+        });
+
+        generateCodeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            generateIconCode();
+        });
+        copyCodeButton.addEventListener('click', copyGeneratedCode);
+
+        // --- Inicialização ---
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            allCategoryDivs.forEach(categoryDiv => {
+                categoryDiv.style.display = 'block';
+            });
+            filterLinks();
+        });
     </script>
 </body>
 </html>
