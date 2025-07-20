@@ -73,7 +73,7 @@
             align-items: center;
             padding: 8px;
             background-color: #ffffff;
-            border-radius: 50px;
+            border-radius: 50px; /* Matched to the search bar for consistency */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: background-color .3s ease, box-shadow .3s ease;
         }
@@ -143,7 +143,7 @@
             max-width: 600px;
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
-            border-radius: 16px;
+            border-radius: 50px; /* Matched to the search bar for consistency */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-top: 10px; /* Espaçamento da barra de pesquisa */
             padding: 10px;
@@ -172,7 +172,7 @@
             width: 160px; /* Mantém a largura consistente com os ícones principais */
             height: 45px;
             min-width: 160px;
-            border-radius: 50px;
+            border-radius: 50px; /* Made fully rounded to match search bar */
             flex-shrink: 0;
             flex-grow: 0;
             flex-basis: auto;
@@ -182,6 +182,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: transform .2s ease-in-out, box-shadow .2s ease;
         }
         body.dark-mode .quick-result-item {
             box-shadow: 0 2px 5px rgba(0,0,0,.3);
@@ -191,15 +192,12 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-        
-        .no-results-message {
-            width: 100%;
-            text-align: center;
-            padding: 15px 0;
-            color: #777;
+        .quick-result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,.15);
         }
-        body.dark-mode .no-results-message {
-            color: #bbb;
+        body.dark-mode .quick-result-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,.35);
         }
 
         /* Styles for hiding main content when searching */
@@ -217,11 +215,13 @@
         }
         .color-category {
             background-color: #ffffff;
-            border-radius: 12px;
+            border-radius: 20px; /* Increased border-radius for categories */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             padding: 25px;
             transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s, display 0.3s;
             border-top: 5px solid;
+            cursor: pointer; /* Indicate it's clickable */
+            overflow: hidden; /* Ensures content inside doesn't overflow during collapse */
         }
         body.dark-mode .color-category {
             background-color: #3a3a3a;
@@ -235,70 +235,90 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         .color-category h2 {
-            text-align: center;
+            text-align: center; /* Centraliza o texto do título */
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 25px; /* Adjust if needed */
             font-size: 1.8em;
             color: #0056b3;
             border-bottom: 2px solid rgba(0, 0, 0, 0.05);
             padding-bottom: 10px;
+            position: relative;
+            user-select: none; /* Prevent text selection on click */
+            /* Removidas as propriedades flex para centralizar o texto */
+            /* display: flex; */
+            /* justify-content: space-between; */
+            /* align-items: center; */
         }
         body.dark-mode .color-category h2 {
             color: #007bff;
             border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* MODIFICATIONS START HERE */
+        /* Ícone de toggle para cabeçalhos de categoria - REMOVIDO OU OCULTADO JÁ QUE O TRIÂNGULO FOI SOLICITADO PARA REMOVER */
+        .color-category h2 .toggle-icon {
+            display: none; /* Oculta o ícone de triângulo */
+        }
+        /* Não é mais necessário porque o ícone foi removido */
+        /* .color-category.expanded h2 .toggle-icon {
+            transform: rotate(90deg);
+        } */
+
+        /* MODIFICATIONS START HERE - Icon Appearance and Category Toggle */
         .links-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Increased min-width for larger icons on PC */
-            gap: 15px; /* Increased gap for better spacing */
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted min-width for more compact layout */
+            gap: 12px; /* Slightly reduced gap */
             justify-items: center;
+            max-height: 0; /* Initially hidden */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out;
+            padding-top: 0; /* Remove initial padding */
         }
+
+        .color-category.expanded .links-grid {
+            max-height: 1000px; /* Arbitrary large value to allow full expansion */
+            opacity: 1;
+            padding-top: 20px; /* Add padding when expanded */
+        }
+
         .icon-item {
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            border-radius: 50px; /* Made fully rounded to match search bar */
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Slightly more prominent shadow */
             text-decoration: none;
             color: #fff;
             overflow: hidden;
-            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
+            transition: transform .2s ease-in-out, box-shadow .2s ease, background-color .3s ease;
             width: 100%; /* Ensure it takes full width of its grid column */
-            height: 55px; /* Slightly increased height */
+            height: 65px; /* Increased height for better tap target */
             position: relative;
             opacity: 1;
-            transform: translateY(0);
         }
         .icon-item.hidden {
             opacity: 0;
-            transform: scale(0.8);
+            transform: scale(0.9);
             pointer-events: none;
-            height: 0;
-            width: 0;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
         }
         .icon-item.showing {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: scale(1);
             pointer-events: auto;
         }
 
         body.dark-mode .icon-item {
-            box-shadow: 0 2px 5px rgba(0,0,0,.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
         .icon-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,.15);
+            transform: translateY(-3px) scale(1.02); /* Subtle lift and slight scale on hover */
+            box-shadow: 0 6px 15px rgba(0,0,0,.2);
         }
         body.dark-mode .icon-item:hover {
-            box-shadow: 0 4px 10px rgba(0,0,0,.4);
+            box-shadow: 0 6px 15px rgba(0,0,0,.4);
         }
         .icon-content {
             display: flex;
@@ -309,12 +329,12 @@
             height: 100%;
         }
         .icon-label {
-            font-size: 0.9em; /* Slightly increased font size */
+            font-size: 0.95em; /* Slightly increased font size for readability */
             text-align: center;
-            padding: 5px;
+            padding: 0 8px; /* Added horizontal padding */
             word-break: break-word;
-            font-weight: bold;
-            line-height: 1.2;
+            font-weight: 600; /* Bolder font for emphasis */
+            line-height: 1.3; /* Improved line spacing */
             text-transform: uppercase;
         }
         /* MODIFICATIONS END HERE */
@@ -542,7 +562,7 @@
             /* MODIFICATIONS FOR MOBILE */
             .links-grid {
                 grid-template-columns: 1fr; /* Stack icons vertically on mobile */
-                gap: 15px; /* Adjust gap for vertical stacking */
+                gap: 12px; /* Adjust gap for vertical stacking */
             }
             .icon-item {
                 width: 100%; /* Make icons take full width of their container */
@@ -555,9 +575,10 @@
                  min-width: unset; /* Remove min-width */
                  max-width: unset; /* Remove max-width */
                  flex-basis: auto;
+                 border-radius: 50px; /* Ensure rounded on mobile too */
             }
             .icon-label, .quick-result-item .icon-label {
-                font-size: 0.85em !important; /* Adjusted font size for mobile */
+                font-size: 0.8em !important; /* Adjusted font size for mobile */
             }
             #generate-icon-code-section {
                 padding: 20px 15px;
@@ -1055,10 +1076,10 @@
             const searchTerm = searchInput.value.toLowerCase().trim();
 
             if (searchTerm.length > 0) {
-                // Hide the main content (all categories)
+                // Esconde o conteúdo principal (todas as categorias)
                 body.classList.add('main-content-hidden');
             } else {
-                // Show the main content (all categories)
+                // Mostra o conteúdo principal (todas as categorias)
                 body.classList.remove('main-content-hidden');
             }
 
@@ -1068,7 +1089,6 @@
                 
                 linksInThisCategory.forEach(item => {
                     const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
-                    // Verifica se o termo de pesquisa está contido no rótulo
                     if (label.includes(searchTerm)) {
                         item.classList.remove('hidden');
                         item.classList.add('showing');
@@ -1079,9 +1099,13 @@
                     }
                 });
                 
-                // Keep individual categories visible if they have matching links, regardless of 'main-content-hidden'
-                // The 'main-content-hidden' will handle the overall display.
-                // This part ensures internal display logic for "showing" vs "hidden" icons works.
+                // Se estiver pesquisando e houver links visíveis, garante que a categoria está expandida
+                if (searchTerm.length > 0 && hasVisibleLinksInCategory) {
+                    categoryDiv.classList.add('expanded');
+                } else if (searchTerm.length === 0) {
+                    // Quando a pesquisa é limpa, recolhe todas as categorias por padrão
+                    categoryDiv.classList.remove('expanded');
+                }
             });
         }
         
@@ -1115,7 +1139,6 @@
         }
 
         function handleSearchFocus() {
-            // When the search field gains focus, always show quick results and hide main categories if typing
             const searchTerm = searchInput.value.toLowerCase().trim();
             if (searchTerm.length > 0) {
                  body.classList.add('main-content-hidden');
@@ -1245,7 +1268,11 @@
             setTimeout(() => {
                 if(searchInput.value.trim().length === 0) {
                     quickResultsContainer.style.display = 'none';
-                    body.classList.remove('main-content-hidden'); // Ensure main content is visible again
+                    body.classList.remove('main-content-hidden'); // Garante que o conteúdo principal fique visível novamente
+                    // Ao sair da pesquisa e ela estiver vazia, recolhe todas as categorias
+                    allCategoryDivs.forEach(categoryDiv => {
+                        categoryDiv.classList.remove('expanded');
+                    });
                 }
             }, 200); // Pequeno atraso para permitir cliques nos resultados rápidos
         });
@@ -1256,15 +1283,32 @@
         });
         copyCodeButton.addEventListener('click', copyGeneratedCode);
 
+        // --- Categoria Toggle (New) ---
+        document.querySelectorAll('.color-category h2').forEach(heading => {
+            heading.addEventListener('click', function() {
+                const parentCategory = this.closest('.color-category');
+                // Alterna a classe 'expanded' na categoria pai
+                parentCategory.classList.toggle('expanded');
+            });
+        });
+
         // --- Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme();
-            // Initially ensure main content is visible and quick results are hidden
+            // Inicialmente, garanta que o conteúdo principal esteja visível e os resultados rápidos ocultos
             body.classList.remove('main-content-hidden');
             quickResultsContainer.style.display = 'none';
+
+            // Recolhe todas as categorias por padrão no carregamento da página
+            allCategoryDivs.forEach(categoryDiv => {
+                categoryDiv.classList.remove('expanded');
+            });
+
+            // Expande a primeira categoria por padrão no carregamento da página
+            if (allCategoryDivs.length > 0) {
+                allCategoryDivs[0].classList.add('expanded');
+            }
         });
     </script>
-
-
 </body>
 </html>
