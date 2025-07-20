@@ -29,109 +29,45 @@
             color: #e0e0e0;
         }
 
-        /* SOBREPOSIÇÃO PARA O MODO DE PESQUISA */
-        body.search-active::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 999;
-            backdrop-filter: blur(3px);
-            transition: opacity 0.3s ease;
-            opacity: 1;
-        }
+        /* Removidas as sobreposições e lógicas complexas para o search-active */
+        body.search-active::before,
         body:not(.search-active)::before {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
-
-        /* Oculta e desabilita interações no conteúdo principal quando a pesquisa está ativa */
         .category-container {
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
         body.search-active .category-container {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+            opacity: 1; /* Mantém visível para filtrar */
+            visibility: visible;
+            pointer-events: auto;
         }
-        body.search-active #top-fixed-bar {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        /* --- Container para a barra flutuante e resultados --- */
-        #floating-bar-wrapper {
+        
+        /* --- Nova barra de pesquisa fixa no topo --- */
+        #top-search-bar-wrapper {
             position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 600px;
+            top: 0;
+            left: 0;
+            width: 100%;
             z-index: 1000;
+            background-color: #f0f2f5; /* Cor de fundo para cobrir o conteúdo ao rolar */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color .3s ease, box-shadow .3s ease;
         }
 
-        /* Container para os resultados rápidos */
-        #quick-results-container {
-            display: none;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(5px);
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            padding: 10px;
-            box-sizing: border-box;
-            overflow: hidden;
+        body.dark-mode #top-search-bar-wrapper {
+            background-color: #2c2c2c;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
-        body.dark-mode #quick-results-container {
-             background-color: rgba(58, 58, 58, 0.95);
-             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        #quick-results-content {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 5px;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        /* Estilo para os ícones dentro da barra de resultados rápidos */
-        .quick-result-item {
-            box-sizing: border-box;
-            width: 160px;
-            height: 45px;
-            min-width: 160px;
-            border-radius: 50px;
-            flex-shrink: 0;
-            flex-grow: 0;
-            flex-basis: auto;
-        }
-        .quick-result-item .icon-label {
-            font-size: 0.9em !important;
-        }
-        
-        .no-results-message {
-            width: 100%;
-            text-align: center;
-            padding: 15px 0;
-            color: #777;
-        }
-        body.dark-mode .no-results-message {
-            color: #bbb;
-        }
-
-        /* Barra de pesquisa em si */
         #search-container {
             width: 100%;
+            max-width: 600px; /* Limita a largura para melhor aparência */
             display: flex;
             align-items: center;
             padding: 8px;
@@ -199,12 +135,78 @@
             height: 22px;
         }
 
+        /* Container para os resultados rápidos */
+        #quick-results-container {
+            display: none; /* Inicia oculto */
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 10px; /* Espaçamento da barra de pesquisa */
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body.dark-mode #quick-results-container {
+             background-color: rgba(58, 58, 58, 0.95);
+             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #quick-results-content {
+            display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem linha */
+            gap: 10px;
+            padding: 5px;
+            -webkit-overflow-scrolling: touch;
+            max-height: 200px; /* Limita a altura para evitar que os resultados ocupem muito espaço */
+            overflow-y: auto; /* Adiciona scroll se os resultados excederem a altura */
+        }
+        
+        /* Estilo para os ícones dentro da barra de resultados rápidos */
+        .quick-result-item {
+            box-sizing: border-box;
+            width: 160px; /* Mantém a largura consistente com os ícones principais */
+            height: 45px;
+            min-width: 160px;
+            border-radius: 50px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            flex-basis: auto;
+            text-decoration: none;
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body.dark-mode .quick-result-item {
+            box-shadow: 0 2px 5px rgba(0,0,0,.3);
+        }
+        .quick-result-item .icon-label {
+            font-size: 0.9em !important;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .no-results-message {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            color: #777;
+        }
+        body.dark-mode .no-results-message {
+            color: #bbb;
+        }
+
         .category-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             max-width: 1200px;
-            margin: 0 auto 30px auto;
+            margin: 150px auto 30px auto; /* Adiciona margem superior para compensar a barra fixa */
             width: 100%;
         }
         .color-category {
@@ -523,6 +525,7 @@
         @media (max-width: 768px) {
             .category-container {
                 grid-template-columns: 1fr;
+                margin-top: 130px; /* Ajusta a margem superior para mobile */
             }
             .color-category {
                 padding: 15px;
@@ -572,6 +575,19 @@
     </style>
 </head>
 <body class="dark-mode">
+
+    <div id="top-search-bar-wrapper">
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Pesquise Aqui...">
+            <button id="open-generator-modal-btn" title="Gerar Código do Ícone">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path></svg>
+            </button>
+            <button id="theme-toggle" title="Alternar Modo"><span>Claro</span></button>
+        </div>
+        <div id="quick-results-container">
+            <div id="quick-results-content"></div>
+        </div>
+    </div>
 
     <div class="category-container" id="allCategoriesGrid">
         <div class="color-category" style="border-color: rgb(111, 66, 193); display: block;" data-category="servicos-utilidades">
@@ -976,19 +992,6 @@
         <textarea id="generatedCodeOutput" readonly="" placeholder="O código HTML completo da página com o novo ícone aparecerá aqui..."></textarea>
         <button type="button" id="copy-icon-code-button">Copiar Código</button>
     </div>
-
-    <div id="floating-bar-wrapper">
-        <div id="quick-results-container">
-            <div id="quick-results-content"></div>
-        </div>
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Pesquise Aqui...">
-            <button id="open-generator-modal-btn" title="Gerar Código do Ícone">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path></svg>
-            </button>
-            <button id="theme-toggle" title="Alternar Modo"><span>Claro</span></button>
-        </div>
-    </div>
     
     <script>
         // --- Constantes de Elementos do DOM ---
@@ -1052,6 +1055,7 @@
                 
                 linksInThisCategory.forEach(item => {
                     const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
+                    // Verifica se o termo de pesquisa está contido no rótulo
                     if (label.includes(searchTerm)) {
                         item.classList.remove('hidden');
                         item.classList.add('showing');
@@ -1062,8 +1066,12 @@
                     }
                 });
                 
-                // Mostra a categoria se ela tiver ícones visíveis
-                 categoryDiv.style.display = hasVisibleLinksInCategory ? 'block' : 'none';
+                // Mostra a categoria se ela tiver ícones visíveis, ou se não houver termo de pesquisa
+                if (searchTerm.length === 0 || hasVisibleLinksInCategory) {
+                     categoryDiv.style.display = 'block';
+                } else {
+                     categoryDiv.style.display = 'none';
+                }
             });
         }
         
@@ -1072,12 +1080,10 @@
 
             if (searchTerm.length === 0) {
                 quickResultsContainer.style.display = 'none';
-                body.classList.remove('no-scroll', 'search-active');
                 return;
             }
             
             quickResultsContainer.style.display = 'block';
-            body.classList.add('no-scroll', 'search-active');
 
             let found = false;
             const allIcons = document.querySelectorAll('#allCategoriesGrid .icon-item');
@@ -1099,11 +1105,12 @@
         }
 
         function handleSearchFocus() {
-            body.classList.add('search-active', 'no-scroll');
-            // Mostra todas as categorias para permitir a busca em todas elas
+            // Quando o campo de busca ganha foco, garante que todas as categorias estejam visíveis
             allCategoryDivs.forEach(categoryDiv => {
                 categoryDiv.style.display = 'block';
             });
+            // Opcionalmente, pode-se limpar a pesquisa rápida se houver algo
+            updateQuickResults(searchInput.value.toLowerCase().trim());
         }
 
         // --- Funções do Modal ---
@@ -1213,10 +1220,6 @@
         searchInput.addEventListener('input', () => {
             clearTimeout(typingTimer);
             const searchTerm = searchInput.value.toLowerCase().trim();
-             // Mostra todas as categorias imediatamente quando o usuário começa a digitar
-            if (searchTerm.length > 0) {
-                 allCategoryDivs.forEach(div => div.style.display = 'block');
-            }
             typingTimer = setTimeout(() => {
                 filterLinks();
                 updateQuickResults(searchTerm);
@@ -1229,12 +1232,9 @@
             setTimeout(() => {
                 if(searchInput.value.trim().length === 0) {
                     quickResultsContainer.style.display = 'none';
-                    body.classList.remove('no-scroll', 'search-active');
-                    // Restaura a visualização de todas as categorias quando o foco é perdido e o campo está vazio
-                    allCategoryDivs.forEach(div => div.style.display = 'block');
                     filterLinks(); // Re-filtra para mostrar tudo
                 }
-            }, 200);
+            }, 200); // Pequeno atraso para permitir cliques nos resultados rápidos
         });
 
         generateCodeButton.addEventListener('click', (e) => {
@@ -1246,10 +1246,11 @@
         // --- Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme();
+            // Garante que todas as categorias estejam visíveis por padrão ao carregar
             allCategoryDivs.forEach(categoryDiv => {
                 categoryDiv.style.display = 'block';
             });
-            filterLinks();
+            filterLinks(); // Aplica o filtro inicial (mostrar tudo)
         });
     </script>
 </body>
