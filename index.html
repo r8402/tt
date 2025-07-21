@@ -68,12 +68,12 @@
 
         #search-container {
             width: 100%;
-            max-width: 600px; /* Mantido para preservar a aparência da barra */
+            max-width: 500px; /* MODIFICADO: Reduzido de 600px */
             display: flex;
             align-items: center;
             padding: 8px;
             background-color: #ffffff;
-            border-radius: 50px; /* Matched to the search bar for consistency */
+            border-radius: 50px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: background-color .3s ease, box-shadow .3s ease;
         }
@@ -140,10 +140,10 @@
         #quick-results-container {
             display: none; /* Inicia oculto */
             width: 100%;
-            max-width: 600px; /* Mantido para preservar a aparência da barra */
+            max-width: 500px; /* Alinhado com a nova largura da barra de pesquisa */
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
-            border-radius: 50px; /* Matched to the search bar for consistency */
+            border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-top: 10px; /* Espaçamento da barra de pesquisa */
             padding: 10px;
@@ -172,7 +172,7 @@
             width: 160px; /* Mantém a largura consistente com os ícones principais */
             height: 45px;
             min-width: 160px;
-            border-radius: 50px; /* Made fully rounded to match search bar */
+            border-radius: 50px;
             flex-shrink: 0;
             flex-grow: 0;
             flex-basis: auto;
@@ -182,7 +182,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform .2s ease-in-out, box-shadow .2s ease;
         }
         body.dark-mode .quick-result-item {
             box-shadow: 0 2px 5px rgba(0,0,0,.3);
@@ -192,12 +191,15 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-        .quick-result-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,.15);
+        
+        .no-results-message {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            color: #777;
         }
-        body.dark-mode .quick-result-item:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,.35);
+        body.dark-mode .no-results-message {
+            color: #bbb;
         }
 
         /* Styles for hiding main content when searching */
@@ -209,19 +211,17 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
-            /* max-width: 1200px; << REMOVIDO PARA EXPANDIR O CONTEÚDO */
+            max-width: 1200px;
             margin: 75px auto 30px auto; /* Adiciona margem superior para compensar a barra fixa */
             width: 100%;
         }
         .color-category {
             background-color: #ffffff;
-            border-radius: 20px; /* Increased border-radius for categories */
+            border-radius: 30px; /* MODIFICADO: Aumentado de 12px para bordas mais arredondadas */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             padding: 25px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s, display 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s;
             border-top: 5px solid;
-            cursor: pointer; /* Indicate it's clickable */
-            overflow: hidden; /* Ensures content inside doesn't overflow during collapse */
         }
         body.dark-mode .color-category {
             background-color: #3a3a3a;
@@ -234,42 +234,53 @@
         body.dark-mode .color-category:hover {
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
+        
         .color-category h2 {
-            text-align: center; /* Centraliza o texto do título */
+            text-align: center;
             margin-top: 0;
-            margin-bottom: 25px; /* Adjust if needed */
+            margin-bottom: 25px;
             font-size: 1.8em;
             color: #0056b3;
             border-bottom: 2px solid rgba(0, 0, 0, 0.05);
             padding-bottom: 10px;
+            /* ADIÇÕES PARA CATEGORIA RETRÁTIL */
+            cursor: pointer;
+            user-select: none;
             position: relative;
-            user-select: none; /* Prevent text selection on click */
+            transition: margin-bottom 0.4s ease-in-out;
         }
+
+        /* REMOVIDO: Indicador de expandir/recolher (seta) */
+        .color-category h2::after {
+            content: ''; /* Remove o conteúdo do triângulo */
+            display: none; /* Garante que o pseudo-elemento não seja renderizado */
+        }
+
+        /* NOVO: Estilo para quando a categoria está recolhida */
+        .color-category.collapsed h2 {
+            margin-bottom: 0;
+        }
+        
         body.dark-mode .color-category h2 {
             color: #007bff;
             border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
-        .color-category h2 .toggle-icon {
-            display: none; /* Oculta o ícone de triângulo */
-        }
-
+        /* MODIFICATIONS START HERE */
         .links-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted min-width for more compact layout */
-            gap: 12px; /* Slightly reduced gap */
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Increased min-width for larger icons on PC */
+            gap: 15px; /* Increased gap for better spacing */
             justify-items: center;
-            max-height: 0; /* Initially hidden */
+            /* ADIÇÕES PARA CATEGORIA RETRÁTIL */
             overflow: hidden;
-            opacity: 0;
-            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out;
-            padding-top: 0; /* Remove initial padding */
+            max-height: 3000px; /* Altura máxima para permitir a transição */
+            transition: max-height 0.5s ease-in-out;
         }
-
-        .color-category.expanded .links-grid {
-            max-height: 1000px; /* Arbitrary large value to allow full expansion */
-            opacity: 1;
-            padding-top: 20px; /* Add padding when expanded */
+        
+        /* NOVO: Esconde a grid de links quando a categoria está recolhida */
+        .color-category.collapsed .links-grid {
+            max-height: 0;
         }
 
         .icon-item {
@@ -278,37 +289,44 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 50px; /* Made fully rounded to match search bar */
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Slightly more prominent shadow */
+            border-radius: 50px;
+            box-shadow: 0 2px 5px rgba(0,0,0,.1);
             text-decoration: none;
             color: #fff;
             overflow: hidden;
-            transition: transform .2s ease-in-out, box-shadow .2s ease, background-color .3s ease;
+            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
             width: 100%; /* Ensure it takes full width of its grid column */
-            height: 65px; /* Increased height for better tap target */
+            height: 55px; /* Slightly increased height */
             position: relative;
             opacity: 1;
+            transform: translateY(0);
         }
         .icon-item.hidden {
             opacity: 0;
-            transform: scale(0.9);
+            transform: scale(0.8);
             pointer-events: none;
+            height: 0;
+            width: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
         }
         .icon-item.showing {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateY(0);
             pointer-events: auto;
         }
 
         body.dark-mode .icon-item {
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 5px rgba(0,0,0,.3);
         }
         .icon-item:hover {
-            transform: translateY(-3px) scale(1.02); /* Subtle lift and slight scale on hover */
-            box-shadow: 0 6px 15px rgba(0,0,0,.2);
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,.15);
         }
         body.dark-mode .icon-item:hover {
-            box-shadow: 0 6px 15px rgba(0,0,0,.4);
+            box-shadow: 0 4px 10px rgba(0,0,0,.4);
         }
         .icon-content {
             display: flex;
@@ -319,14 +337,15 @@
             height: 100%;
         }
         .icon-label {
-            font-size: 0.95em; /* Slightly increased font size for readability */
+            font-size: 0.9em; /* Slightly increased font size */
             text-align: center;
-            padding: 0 8px; /* Added horizontal padding */
+            padding: 5px;
             word-break: break-word;
-            font-weight: 600; /* Bolder font for emphasis */
-            line-height: 1.3; /* Improved line spacing */
+            font-weight: bold;
+            line-height: 1.2;
             text-transform: uppercase;
         }
+        /* MODIFICATIONS END HERE */
 
         /* Cores de ícones */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
@@ -548,9 +567,10 @@
             .color-category h2 {
                 font-size: 1.4em;
             }
+            /* MODIFICATIONS FOR MOBILE */
             .links-grid {
                 grid-template-columns: 1fr; /* Stack icons vertically on mobile */
-                gap: 12px; /* Adjust gap for vertical stacking */
+                gap: 15px; /* Adjust gap for vertical stacking */
             }
             .icon-item {
                 width: 100%; /* Make icons take full width of their container */
@@ -563,10 +583,9 @@
                  min-width: unset; /* Remove min-width */
                  max-width: unset; /* Remove max-width */
                  flex-basis: auto;
-                 border-radius: 50px; /* Ensure rounded on mobile too */
             }
             .icon-label, .quick-result-item .icon-label {
-                font-size: 0.8em !important; /* Adjusted font size for mobile */
+                font-size: 0.85em !important; /* Adjusted font size for mobile */
             }
             #generate-icon-code-section {
                 padding: 20px 15px;
@@ -841,7 +860,7 @@
                         <div class="icon-label">Aliexpress</div>
                     </div>
                 </a>
-                <a href="https://www.cuponomia.com.br/" class="icon-item cuponomia showing" data-label="Cupons Compras" target="_blank">
+                <a href="https://www.cuponomia.com.br/" class="icon-item cuponomia showing" data-label="Cuponomia" target="_blank">
                     <div class="icon-content">
                         <div class="icon-label">Cupons Compras</div>
                     </div>
@@ -1064,10 +1083,10 @@
             const searchTerm = searchInput.value.toLowerCase().trim();
 
             if (searchTerm.length > 0) {
-                // Esconde o conteúdo principal (todas as categorias)
+                // Hide the main content (all categories)
                 body.classList.add('main-content-hidden');
             } else {
-                // Mostra o conteúdo principal (todas as categorias)
+                // Show the main content (all categories)
                 body.classList.remove('main-content-hidden');
             }
 
@@ -1077,6 +1096,7 @@
                 
                 linksInThisCategory.forEach(item => {
                     const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
+                    // Verifica se o termo de pesquisa está contido no rótulo
                     if (label.includes(searchTerm)) {
                         item.classList.remove('hidden');
                         item.classList.add('showing');
@@ -1087,13 +1107,8 @@
                     }
                 });
                 
-                // Se estiver pesquisando e houver links visíveis, garante que a categoria está expandida
-                if (searchTerm.length > 0 && hasVisibleLinksInCategory) {
-                    categoryDiv.classList.add('expanded');
-                } else if (searchTerm.length === 0) {
-                    // Quando a pesquisa é limpa, recolhe todas as categorias por padrão
-                    categoryDiv.classList.remove('expanded');
-                }
+                // Keep individual categories visible if they have matching links, regardless of 'main-content-hidden'
+                // This part ensures internal display logic for "showing" vs "hidden" icons works.
             });
         }
         
@@ -1127,6 +1142,7 @@
         }
 
         function handleSearchFocus() {
+            // When the search field gains focus, always show quick results and hide main categories if typing
             const searchTerm = searchInput.value.toLowerCase().trim();
             if (searchTerm.length > 0) {
                  body.classList.add('main-content-hidden');
@@ -1256,11 +1272,7 @@
             setTimeout(() => {
                 if(searchInput.value.trim().length === 0) {
                     quickResultsContainer.style.display = 'none';
-                    body.classList.remove('main-content-hidden'); // Garante que o conteúdo principal fique visível novamente
-                    // Ao sair da pesquisa e ela estiver vazia, recolhe todas as categorias
-                    allCategoryDivs.forEach(categoryDiv => {
-                        categoryDiv.classList.remove('expanded');
-                    });
+                    body.classList.remove('main-content-hidden'); // Ensure main content is visible again
                 }
             }, 200); // Pequeno atraso para permitir cliques nos resultados rápidos
         });
@@ -1271,32 +1283,33 @@
         });
         copyCodeButton.addEventListener('click', copyGeneratedCode);
 
-        // --- Categoria Toggle (New) ---
-        document.querySelectorAll('.color-category h2').forEach(heading => {
-            heading.addEventListener('click', function() {
-                const parentCategory = this.closest('.color-category');
-                // Alterna a classe 'expanded' na categoria pai
-                parentCategory.classList.toggle('expanded');
-            });
-        });
-
         // --- Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme();
-            // Inicialmente, garanta que o conteúdo principal esteja visível e os resultados rápidos ocultos
+            // Initially ensure main content is visible and quick results are hidden
             body.classList.remove('main-content-hidden');
             quickResultsContainer.style.display = 'none';
 
-            // Recolhe todas as categorias por padrão no carregamento da página
-            allCategoryDivs.forEach(categoryDiv => {
-                categoryDiv.classList.remove('expanded');
-            });
+            // --- NOVO: LÓGICA PARA CATEGORIAS RETRÁTEIS ---
+            const categories = document.querySelectorAll('.color-category');
 
-            // Expande a primeira categoria por padrão no carregamento da página
-            if (allCategoryDivs.length > 0) {
-                allCategoryDivs[0].classList.add('expanded');
-            }
+            categories.forEach((category, index) => {
+                const header = category.querySelector('h2');
+
+                // Por padrão, recolhe todas as categorias, exceto a primeira
+                if (index > 0) {
+                    category.classList.add('collapsed');
+                }
+
+                if (header) {
+                    header.addEventListener('click', () => {
+                        category.classList.toggle('collapsed');
+                    });
+                }
+            });
         });
     </script>
+
+
 </body>
 </html>
