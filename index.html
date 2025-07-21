@@ -17,10 +17,12 @@
             color: #333;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            /* align-items: center; REMOVIDO PARA PERMITIR EXPANSÃO LATERAL */
             padding: 20px 20px 120px 20px;
             transition: background-color .3s ease, color .3s ease;
             position: relative;
+            width: 100%; /* ADICIONADO PARA OCUPAR A LARGURA TOTAL */
+            box-sizing: border-box; /* ADICIONADO PARA INCLUIR PADDING NA LARGURA */
         }
         body.no-scroll, body.modal-open {
             overflow: hidden;
@@ -211,9 +213,11 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
-            max-width: 1200px;
+            max-width: 100%; /* ALTERADO PARA PERMITIR EXPANSÃO */
             margin: 75px auto 30px auto; /* Adiciona margem superior para compensar a barra fixa */
-            width: 100%;
+            width: calc(100% - 40px); /* Ajusta a largura para levar em conta o padding do body */
+            padding: 0; /* REMOVIDO PADDING AQUI, JÁ ESTÁ NO BODY */
+            box-sizing: border-box; /* Garante que o padding e border sejam incluídos na largura */
         }
         .color-category {
             background-color: #ffffff;
@@ -543,6 +547,10 @@
             .category-container {
                 grid-template-columns: 1fr;
                 margin-top: 65px; /* Ajusta a margem superior para mobile */
+                width: calc(100% - 40px); /* Mantém o padding lateral */
+            }
+            body {
+                padding: 15px; /* Ajusta o padding para telas menores */
             }
             .color-category {
                 padding: 15px;
