@@ -17,12 +17,10 @@
             color: #333;
             display: flex;
             flex-direction: column;
-            /* align-items: center; REMOVIDO PARA PERMITIR EXPANSÃO LATERAL */
+            align-items: center;
             padding: 20px 20px 120px 20px;
             transition: background-color .3s ease, color .3s ease;
             position: relative;
-            width: 100%; /* ADICIONADO PARA OCUPAR A LARGURA TOTAL */
-            box-sizing: border-box; /* ADICIONADO PARA INCLUIR PADDING NA LARGURA */
         }
         body.no-scroll, body.modal-open {
             overflow: hidden;
@@ -70,18 +68,18 @@
 
         #search-container {
             width: 100%;
-            max-width: 600px; /* Limita a largura para melhor aparência */
+            /* max-width: 600px; << REMOVIDO PARA EXPANDIR */
             display: flex;
             align-items: center;
             padding: 8px;
             background-color: #ffffff;
-            border-radius: 50px;
+            border-radius: 50px; /* Matched to the search bar for consistency */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             transition: background-color .3s ease, box-shadow .3s ease;
         }
         body.dark-mode #search-container {
             background-color: #3a3a3a;
-            box-shadow: 0 44px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         #search-input {
@@ -142,10 +140,10 @@
         #quick-results-container {
             display: none; /* Inicia oculto */
             width: 100%;
-            max-width: 600px;
+            /* max-width: 600px; << REMOVIDO PARA EXPANDIR */
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
-            border-radius: 16px;
+            border-radius: 50px; /* Matched to the search bar for consistency */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-top: 10px; /* Espaçamento da barra de pesquisa */
             padding: 10px;
@@ -174,7 +172,7 @@
             width: 160px; /* Mantém a largura consistente com os ícones principais */
             height: 45px;
             min-width: 160px;
-            border-radius: 50px;
+            border-radius: 50px; /* Made fully rounded to match search bar */
             flex-shrink: 0;
             flex-grow: 0;
             flex-basis: auto;
@@ -184,6 +182,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: transform .2s ease-in-out, box-shadow .2s ease;
         }
         body.dark-mode .quick-result-item {
             box-shadow: 0 2px 5px rgba(0,0,0,.3);
@@ -193,15 +192,12 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-        
-        .no-results-message {
-            width: 100%;
-            text-align: center;
-            padding: 15px 0;
-            color: #777;
+        .quick-result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,.15);
         }
-        body.dark-mode .no-results-message {
-            color: #bbb;
+        body.dark-mode .quick-result-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,.35);
         }
 
         /* Styles for hiding main content when searching */
@@ -213,19 +209,19 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
-            max-width: 100%; /* ALTERADO PARA PERMITIR EXPANSÃO */
+            /* max-width: 1200px; << REMOVIDO PARA EXPANDIR */
             margin: 75px auto 30px auto; /* Adiciona margem superior para compensar a barra fixa */
-            width: calc(100% - 40px); /* Ajusta a largura para levar em conta o padding do body */
-            padding: 0; /* REMOVIDO PADDING AQUI, JÁ ESTÁ NO BODY */
-            box-sizing: border-box; /* Garante que o padding e border sejam incluídos na largura */
+            width: 100%;
         }
         .color-category {
             background-color: #ffffff;
-            border-radius: 25px; /* <<-- ALTERADO -->> */
+            border-radius: 20px; /* Increased border-radius for categories */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             padding: 25px;
             transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s, display 0.3s;
             border-top: 5px solid;
+            cursor: pointer; /* Indicate it's clickable */
+            overflow: hidden; /* Ensures content inside doesn't overflow during collapse */
         }
         body.dark-mode .color-category {
             background-color: #3a3a3a;
@@ -238,83 +234,81 @@
         body.dark-mode .color-category:hover {
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
-        
-        /* <<-- NOVO -->> */
-        summary {
-            cursor: pointer;
-            outline: none;
-        }
-        /* REMOVENDO OS TRIÂNGULOS */
-        summary::-webkit-details-marker, summary::marker {
-            display: none;
-        }
-
-        /* <<-- SELETOR ALTERADO DE h2 para summary -->> */
-        .color-category summary {
-            text-align: center;
+        .color-category h2 {
+            text-align: center; /* Centraliza o texto do título */
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 25px; /* Adjust if needed */
             font-size: 1.8em;
-            font-weight: normal;
             color: #0056b3;
             border-bottom: 2px solid rgba(0, 0, 0, 0.05);
             padding-bottom: 10px;
+            position: relative;
+            user-select: none; /* Prevent text selection on click */
         }
-        body.dark-mode .color-category summary {
+        body.dark-mode .color-category h2 {
             color: #007bff;
             border-bottom-color: rgba(255, 255, 255, 0.1);
         }
-        
+
+        .color-category h2 .toggle-icon {
+            display: none;
+        }
+
         .links-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Increased min-width for larger icons on PC */
-            gap: 15px; /* Increased gap for better spacing */
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted min-width for more compact layout */
+            gap: 12px; /* Slightly reduced gap */
             justify-items: center;
+            max-height: 0; /* Initially hidden */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out;
+            padding-top: 0; /* Remove initial padding */
         }
+
+        .color-category.expanded .links-grid {
+            max-height: 1000px; /* Arbitrary large value to allow full expansion */
+            opacity: 1;
+            padding-top: 20px; /* Add padding when expanded */
+        }
+
         .icon-item {
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,.1);
+            border-radius: 50px; /* Made fully rounded to match search bar */
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* Slightly more prominent shadow */
             text-decoration: none;
             color: #fff;
             overflow: hidden;
-            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
+            transition: transform .2s ease-in-out, box-shadow .2s ease, background-color .3s ease;
             width: 100%; /* Ensure it takes full width of its grid column */
-            height: 55px; /* Slightly increased height */
+            height: 65px; /* Increased height for better tap target */
             position: relative;
             opacity: 1;
-            transform: translateY(0);
         }
         .icon-item.hidden {
             opacity: 0;
-            transform: scale(0.8);
+            transform: scale(0.9);
             pointer-events: none;
-            height: 0;
-            width: 0;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
         }
         .icon-item.showing {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: scale(1);
             pointer-events: auto;
         }
 
         body.dark-mode .icon-item {
-            box-shadow: 0 2px 5px rgba(0,0,0,.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
         .icon-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,.15);
+            transform: translateY(-3px) scale(1.02); /* Subtle lift and slight scale on hover */
+            box-shadow: 0 6px 15px rgba(0,0,0,.2);
         }
         body.dark-mode .icon-item:hover {
-            box-shadow: 0 4px 10px rgba(0,0,0,.4);
+            box-shadow: 0 6px 15px rgba(0,0,0,.4);
         }
         .icon-content {
             display: flex;
@@ -325,15 +319,15 @@
             height: 100%;
         }
         .icon-label {
-            font-size: 0.9em; /* Slightly increased font size */
+            font-size: 0.95em; /* Slightly increased font size for readability */
             text-align: center;
-            padding: 5px;
+            padding: 0 8px; /* Added horizontal padding */
             word-break: break-word;
-            font-weight: bold;
-            line-height: 1.2;
+            font-weight: 600; /* Bolder font for emphasis */
+            line-height: 1.3; /* Improved line spacing */
             text-transform: uppercase;
         }
-        
+
         /* Cores de ícones */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
         .copilot-icon {
@@ -547,22 +541,16 @@
             .category-container {
                 grid-template-columns: 1fr;
                 margin-top: 65px; /* Ajusta a margem superior para mobile */
-                width: calc(100% - 40px); /* Mantém o padding lateral */
-            }
-            body {
-                padding: 15px; /* Ajusta o padding para telas menores */
             }
             .color-category {
                 padding: 15px;
             }
-            /* <<-- SELETOR ALTERADO DE h2 para summary -->> */
-            .color-category summary {
+            .color-category h2 {
                 font-size: 1.4em;
             }
-            /* MODIFICATIONS FOR MOBILE */
             .links-grid {
                 grid-template-columns: 1fr; /* Stack icons vertically on mobile */
-                gap: 15px; /* Adjust gap for vertical stacking */
+                gap: 12px; /* Adjust gap for vertical stacking */
             }
             .icon-item {
                 width: 100%; /* Make icons take full width of their container */
@@ -575,15 +563,16 @@
                  min-width: unset; /* Remove min-width */
                  max-width: unset; /* Remove max-width */
                  flex-basis: auto;
+                 border-radius: 50px; /* Ensure rounded on mobile too */
             }
             .icon-label, .quick-result-item .icon-label {
-                font-size: 0.85em !important; /* Adjusted font size for mobile */
+                font-size: 0.8em !important; /* Adjusted font size for mobile */
             }
             #generate-icon-code-section {
                 padding: 20px 15px;
-            }
-            #generate-icon-code-section h2 {
-                font-size: 1.4em;
+                 h2 {
+                    font-size: 1.4em;
+                }
             }
             #quick-results-content {
                 flex-direction: column; /* Stack quick results vertically */
@@ -617,378 +606,365 @@
 
     <div class="category-container" id="allCategoriesGrid">
         <div class="color-category" style="border-color: rgb(111, 66, 193);" data-category="servicos-utilidades">
-            <details open>
-                <summary>Serviços & Utilidades</summary>
-                <div class="links-grid">
-                    <a href="https://api.whatsapp.com/send?phone=557133706350&text=MENU" class="icon-item verde showing" data-label="Segunda Via de Luz" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Segunda Via de Luz</div>
-                        </div>
-                    </a>
-                    <a href="https://api.whatsapp.com/send?phone=557197170999&text=MENU" class="icon-item AZUL showing" data-label="Segunda Via de Água" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Segunda Via de Água</div>
-                        </div>
-                    </a>
-                    <a href="http://138.255.240.6:8000/accounts/central/login" class="icon-item tsunami showing" data-label="Tsunami" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Tsunami</div>
-                        </div>
-                    </a>
-                    <a href="https://musclewiki.com/pt-br/" class="icon-item musclewiki showing" data-label="academia" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Academia</div>
-                        </div>
-                    </a>
-                    <a href="https://web.whatsapp.com/" class="icon-item whatsapp showing" data-label="Web WhatsApp" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">WhatsApp Web</div>
-                        </div>
-                    </a>
-                    <a href="https://www.urban-vpn.com/pt-br/" class="icon-item vpn showing" data-label="vpn" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">VPN</div>
-                        </div>
-                    </a>
-                    <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh?hl=pt-BR" class="icon-item bloqueador showing" data-label="bloqueador" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Bloquear Anúncios</div>
-                        </div>
-                    </a>
-                     <a href="https://feriados.site/ba/saubara/" class="icon-item feriados showing" data-label="Feriados" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Feriados</div>
-                        </div>
-                    </a>
-                    <a href="https://atendimentovirtual.embasa.ba.gov.br/login" class="icon-item embasa showing" data-label="Embasa" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Embasa</div>
-                        </div>
-                    </a>
-                    <a href="https://servicos.neoenergiacoelba.com.br/area-logada/Paginas/login.aspx?ref=https://servicos.neoenergiacoelba.com.br/servicos-ao-cliente/Pages/2-via-de-conta-coelba.aspx" class="icon-item coelba showing" data-label="Coelba" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Coelba</div>
-                        </div>
-                    </a>
-                    <a href="https://sso.acesso.gov.br/" class="icon-item azul2 showing" data-label="Gov.br" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Gov.br</div>
-                        </div>
-                    </a>
-                    <a href="https://www.linkcorreios.com.br/index.php" class="icon-item linkcorreios showing" data-label="Link Correios" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Link Correios</div>
-                        </div>
-                    </a>
-                    <a href="https://meu.inss.gov.br/" class="icon-item verde2 showing" data-label="Meu INSS" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Meu INSS</div>
-                        </div>
-                    </a>
-                    <a href="https://mail.google.com/mail/u/0/#inbox" class="icon-item custom-icon-color showing" data-label="GMAIL" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #cca000; background-color: var(--icon-background-color);">
-                            <div class="icon-label">GMAIL</div>
-                        </div>
-                    </a>
-                </div>
-            </details>
+            <h2>Serviços & Utilidades</h2>
+            <div class="links-grid">
+                <a href="https://api.whatsapp.com/send?phone=557133706350&text=MENU" class="icon-item verde showing" data-label="Segunda Via de Luz" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Segunda Via de Luz</div>
+                    </div>
+                </a>
+                <a href="https://api.whatsapp.com/send?phone=557197170999&text=MENU" class="icon-item AZUL showing" data-label="Segunda Via de Água" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Segunda Via de Água</div>
+                    </div>
+                </a>
+                <a href="http://138.255.240.6:8000/accounts/central/login" class="icon-item tsunami showing" data-label="Tsunami" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Tsunami</div>
+                    </div>
+                </a>
+                <a href="https://musclewiki.com/pt-br/" class="icon-item musclewiki showing" data-label="academia" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Academia</div>
+                    </div>
+                </a>
+                <a href="https://web.whatsapp.com/" class="icon-item whatsapp showing" data-label="Web WhatsApp" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">WhatsApp Web</div>
+                    </div>
+                </a>
+                <a href="https://www.urban-vpn.com/pt-br/" class="icon-item vpn showing" data-label="vpn" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">VPN</div>
+                    </div>
+                </a>
+                <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh?hl=pt-BR" class="icon-item bloqueador showing" data-label="bloqueador" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Bloquear Anúncios</div>
+                    </div>
+                </a>
+                 <a href="https://feriados.site/ba/saubara/" class="icon-item feriados showing" data-label="Feriados" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Feriados</div>
+                    </div>
+                </a>
+                <a href="https://atendimentovirtual.embasa.ba.gov.br/login" class="icon-item embasa showing" data-label="Embasa" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Embasa</div>
+                    </div>
+                </a>
+                <a href="https://servicos.neoenergiacoelba.com.br/area-logada/Paginas/login.aspx?ref=https://servicos.neoenergiacoelba.com.br/servicos-ao-cliente/Pages/2-via-de-conta-coelba.aspx" class="icon-item coelba showing" data-label="Coelba" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Coelba</div>
+                    </div>
+                </a>
+                <a href="https://sso.acesso.gov.br/" class="icon-item azul2 showing" data-label="Gov.br" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Gov.br</div>
+                    </div>
+                </a>
+                <a href="https://www.linkcorreios.com.br/index.php" class="icon-item linkcorreios showing" data-label="Link Correios" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Link Correios</div>
+                    </div>
+                </a>
+                <a href="https://meu.inss.gov.br/" class="icon-item verde2 showing" data-label="Meu INSS" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Meu INSS</div>
+                    </div>
+                </a>
+            <a href="https://mail.google.com/mail/u/0/#inbox" class="icon-item custom-icon-color showing" data-label="GMAIL" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #cca000; background-color: var(--icon-background-color);">
+                        <div class="icon-label">GMAIL</div>
+                    </div>
+                </a></div>
         </div>
         <div class="color-category" style="border-color: rgb(40, 167, 69);" data-category="cursos-concursos">
-            <details>
-                <summary>Cursos & Concursos</summary>
-                <div class="links-grid">
-                    <a href="https://avamec.mec.gov.br/#/curso/listar?idCategoria=0" class="icon-item gov-curso showing" data-label="AVAMEC" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">AVAMEC CURSOS</div>
-                        </div>
-                    </a>
-                    <a href="https://www.escolavirtual.gov.br/catalogo" class="icon-item gov-curso showing" data-label="Escola Virtual GOV" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Escola Virtual</div>
-                        </div>
-                    </a>
-                    <a href="https://aprendamais.mec.gov.br/course/index.php" class="icon-item gov-curso showing" data-label="Aprenda Mais" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Aprenda Mais</div>
-                        </div>
-                    </a>
-                    <a href="https://www.pciconcursos.com.br/concursos/#BA" class="icon-item concursos showing" data-label="PCI Concurso" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">PCI Concurso</div>
-                        </div>
-                    </a>
-                    <a href="https://concursosnobrasil.com/concursos/ba/" class="icon-item concursos showing" data-label="Concursos Brasil" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Brasil Concurso</div>
-                        </div>
-                    </a>
-                     <a href="https://www.acheconcursos.com.br/concursos-bahia" class="icon-item concursos showing" data-label="Ache Concursos" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Ache Concurso</div>
-                        </div>
-                    </a>
-                    <a href="https://www.futuro.digital/cursos-gratuitos" class="icon-item senai showing" data-label="Senai" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Senai Cursos</div>
-                        </div>
-                    </a>
-                    <a href="https://www.primecursos.com.br/" class="icon-item primecursos showing" data-label="Prime Cursos" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Prime Cursos</div>
-                        </div>
-                    </a>
-                    <a href="https://www.ev.org.br/" class="icon-item bradesco showing" data-label="Bradesco" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Bradesco Cursos</div>
-                        </div>
-                    </a>
-                    <a href="https://www.colaboraread.com.br/aluno/dashboard/index?matriculaId=3602038005" class="icon-item unopar showing" data-label="Unopar" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Unopar</div>
-                        </div>
-                    </a>
-                </div>
-            </details>
+            <h2>Cursos & Concursos</h2>
+            <div class="links-grid">
+                <a href="https://avamec.mec.gov.br/#/curso/listar?idCategoria=0" class="icon-item gov-curso showing" data-label="AVAMEC" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">AVAMEC CURSOS</div>
+                    </div>
+                </a>
+                <a href="https://www.escolavirtual.gov.br/catalogo" class="icon-item gov-curso showing" data-label="Escola Virtual GOV" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Escola Virtual</div>
+                    </div>
+                </a>
+                <a href="https://aprendamais.mec.gov.br/course/index.php" class="icon-item gov-curso showing" data-label="Aprenda Mais" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Aprenda Mais</div>
+                    </div>
+                </a>
+                <a href="https://www.pciconcursos.com.br/concursos/#BA" class="icon-item concursos showing" data-label="PCI Concurso" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">PCI Concurso</div>
+                    </div>
+                </a>
+                <a href="https://concursosnobrasil.com/concursos/ba/" class="icon-item concursos showing" data-label="Concursos Brasil" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Brasil Concurso</div>
+                    </div>
+                </a>
+                 <a href="https://www.acheconcursos.com.br/concursos-bahia" class="icon-item concursos showing" data-label="Ache Concursos" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Ache Concurso</div>
+                    </div>
+                </a>
+                <a href="https://www.futuro.digital/cursos-gratuitos" class="icon-item senai showing" data-label="Senai" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Senai Cursos</div>
+                    </div>
+                </a>
+                <a href="https://www.primecursos.com.br/" class="icon-item primecursos showing" data-label="Prime Cursos" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Prime Cursos</div>
+                    </div>
+                </a>
+                <a href="https://www.ev.org.br/" class="icon-item bradesco showing" data-label="Bradesco" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Bradesco Cursos</div>
+                    </div>
+                </a>
+                <a href="https://www.colaboraread.com.br/aluno/dashboard/index?matriculaId=3602038005" class="icon-item unopar showing" data-label="Unopar" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Unopar</div>
+                    </div>
+                </a>
+                
+            </div>
         </div>
         <div class="color-category" style="border-color: rgb(0, 123, 255);" data-category="ferramentas-downloads">
-            <details>
-                <summary>Ferramentas & Downloads</summary>
-                <div class="links-grid">
-                    <a href="https://github.com/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">GitHub</div>
-                        </div>
-                    </a><a href="https://github.com/r8402/g/edit/main/index.html" class="icon-item custom-icon-color showing" data-label="APLICAR" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #050505; background-color: var(--icon-background-color);">
-                            <div class="icon-label">APLICAR</div>
-                        </div>
-                      </a><a href="https://htmlonline.org/pt/" class="icon-item custom-icon-color showing" data-label="EDITAR HTML" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #1f2020; background-color: var(--icon-background-color);">
-                            <div class="icon-label">EDITAR HTML</div>
-                        </div>
-                    </a>
-                      <a href="https://codepen.io/pen/" class="icon-item codepen showing" data-label="Codepen" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">EDITAR HTML,CSS,JS</div>
-                        </div>
-                    </a>
-                      <a href="https://github.com/camilatigre/listamaravilhosaopensource" class="icon-item codepen showing" data-label="GitHub OpenSource Lista" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">GitHub Lista OS</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/ishanvyas22/awesome-open-source-systems" class="icon-item codepen showing" data-label="Awesome Open Source Systems" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">Awesome OS</div>
-                        </div>
-                    </a>
-                    <a href="https://logodownload.org/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Logo Download</div>
-                        </div>
-                    </a>
-                    <a href="https://drive.google.com/drive/u/0/my-drive?fd=true" class="icon-item drive showing" data-label="Drive" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Drive</div>
-                        </div>
-                    </a>
-                    <a href="https://onedrive.live.com/?id=root&cid=6DB96A6307BA3A1C" class="icon-item onedrive showing" data-label="OneDrive" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">OneDrive</div>
-                        </div>
-                    </a>
-                    <a href="https://yt5s.in/pt257mm/youtube-to-mp4" class="icon-item baixar showing" data-label="Baixar Videos" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Baixar</div>
-                        </div>
-                    </a>
-                    <a href="https://www.fosshub.com" class="icon-item azarado showing" data-label="FossHub" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">FossHub</div>
-                        </div>
-                    </a>
-                    
-                    <a href="https://www.softpedia.com" class="icon-item azul2 showing" data-label="Softpedia" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">Softpedia</div>
-                        </div>
-                    </a>
-                    <a href="https://mega.nz" class="icon-item mega showing" data-label="Mega" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Mega</div>
-                        </div>
-                    </a>
-                    <a href="https://sourceforge.net" class="icon-item utilit showing" data-label="SourceForge" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">SourceForge</div>
-                        </div>
-                    </a>
-                    <a href="https://osdn.net" class="icon-item verde2 showing" data-label="OSDN" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">OSDN</div>
-                        </div>
-                    </a>
-                  </div>
-            </details>
+            <h2>Ferramentas & Downloads</h2>
+            <div class="links-grid">
+                <a href="https://github.com/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">GitHub</div>
+                    </div>
+                </a><a href="https://github.com/r8402/g/edit/main/index.html" class="icon-item custom-icon-color showing" data-label="APLICAR" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #050505; background-color: var(--icon-background-color);">
+                        <div class="icon-label">APLICAR</div>
+                    </div>
+                  </a><a href="https://htmlonline.org/pt/" class="icon-item custom-icon-color showing" data-label="EDITAR HTML" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #1f2020; background-color: var(--icon-background-color);">
+                        <div class="icon-label">EDITAR HTML</div>
+                    </div>
+                </a>
+                  <a href="https://codepen.io/pen/" class="icon-item codepen showing" data-label="Codepen" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">EDITAR HTML,CSS,JS</div>
+                    </div>
+                </a>
+                  <a href="https://github.com/camilatigre/listamaravilhosaopensource" class="icon-item codepen showing" data-label="GitHub OpenSource Lista" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">GitHub Lista OS</div>
+                    </div>
+                </a>
+                <a href="https://github.com/ishanvyas22/awesome-open-source-systems" class="icon-item codepen showing" data-label="Awesome Open Source Systems" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">Awesome OS</div>
+                    </div>
+                </a>
+                <a href="https://logodownload.org/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Logo Download</div>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/drive/u/0/my-drive?fd=true" class="icon-item drive showing" data-label="Drive" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Drive</div>
+                    </div>
+                </a>
+                <a href="https://onedrive.live.com/?id=root&cid=6DB96A6307BA3A1C" class="icon-item onedrive showing" data-label="OneDrive" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">OneDrive</div>
+                    </div>
+                </a>
+                <a href="https://yt5s.in/pt257mm/youtube-to-mp4" class="icon-item baixar showing" data-label="Baixar Videos" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Baixar</div>
+                    </div>
+                </a>
+                <a href="https://www.fosshub.com" class="icon-item azarado showing" data-label="FossHub" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">FossHub</div>
+                    </div>
+                </a>
+                
+                <a href="https://www.softpedia.com" class="icon-item azul2 showing" data-label="Softpedia" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">Softpedia</div>
+                    </div>
+                </a>
+                <a href="https://mega.nz" class="icon-item mega showing" data-label="Mega" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mega</div>
+                    </div>
+                </a>
+                <a href="https://sourceforge.net" class="icon-item utilit showing" data-label="SourceForge" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">SourceForge</div>
+                    </div>
+                </a>
+                <a href="https://osdn.net" class="icon-item verde2 showing" data-label="OSDN" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">OSDN</div>
+                    </div>
+                </a>
+              </div>
         </div>
         <div class="color-category" style="border-color: rgb(253, 126, 20);" data-category="compras-produtividade">
-            <details>
-                <summary>Compras & Produtividade</summary>
-                <div class="links-grid">
-                    <a href="https://mercadolivre.com.br" class="icon-item mercadolivre showing" data-label="Mercado Livre" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Mercado Livre</div>
-                        </div>
-                    </a>
-                    <a href="https://shopee.com.br/?uls_trackid=52t1gigt0064&utm_campaign=id_Y9ixAtyxay&utm_content=-ofasdbrshopeeshopeesddef---&utm_medium=affiliates&utm_source=an_18114130006&utm_term=d59sch2ft855" class="icon-item cuponomia showing" data-label="Shopee" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Shopee</div>
-                        </div>
-                    </a>
-                    <a href="https://kabum.com.br" class="icon-item custom-icon-color showing" data-label="Kabum" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
-                            <div class="icon-label">Kabum</div>
-                        </div>
-                    </a>
-                    <a href="https://magazineluiza.com.br" class="icon-item custom-icon-color showing" data-label="Magazineluiza" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #fd7e14; background-color: var(--icon-background-color);">
-                            <div class="icon-label">Magazine Luiza</div>
-                        </div>
-                    </a>
-                    <a href="Https://br.shein.com" class="icon-item custom-icon-color showing" data-label="Shein" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
-                            <div class="icon-label">Shein</div>
-                        </div>
-                    </a>
-                    <a href="https://pt.aliexpress.com" class="icon-item custom-icon-color showing" data-label="Aliexpress" target="_blank">
-                        <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
-                            <div class="icon-label">Aliexpress</div>
-                        </div>
-                    </a>
-                    <a href="https://www.cuponomia.com.br/" class="icon-item cuponomia showing" data-label="Cuponomia" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Cupons Compras</div>
-                        </div>
-                    </a>
-                    <a href="https://mercadopago.com.br" class="icon-item mercadopago showing" data-label="Mercado Pago" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Mercado Pago</div>
-                        </div>
-                    </a>
-                    <a href="https://buscape.com.br" class="icon-item buscape showing" data-label="Buscape" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Buscapé</div>
-                        </div>
-                    </a>
-                    <a href="https://www.zoom.com.br/" class="icon-item zoom showing" data-label="Zoom" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Zoom</div>
-                        </div>
-                    </a>
-                    <a href="https://play.mercadolivre.com.br/?origin=internal" class="icon-item mercadolivre showing" data-label="Mercado Play" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Mercado Play</div>
-                        </div>
-                    </a>
-                    <a href="https://gemini.google.com/app?hl=pt-BR" class="icon-item photoroom showing" data-label="Gemini AI" target="_blank"> <div class="icon-content">
-                            <div class="icon-label">Gemini</div>
-                        </div>
-                    </a>
-                    <a href="https://copilot.microsoft.com/" class="icon-item copilot-icon showing" data-label="Copilot AI" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Copilot</div>
-                        </div>
-                    </a>
-                </div>
-            </details>
+            <h2>Compras & Produtividade</h2>
+            <div class="links-grid">
+                <a href="https://mercadolivre.com.br" class="icon-item mercadolivre showing" data-label="Mercado Livre" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mercado Livre</div>
+                    </div>
+                </a>
+                <a href="https://shopee.com.br/?uls_trackid=52t1gigt0064&utm_campaign=id_Y9ixAtyxay&utm_content=-ofasdbrshopeeshopeesddef---&utm_medium=affiliates&utm_source=an_18114130006&utm_term=d59sch2ft855" class="icon-item cuponomia showing" data-label="Shopee" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Shopee</div>
+                    </div>
+                </a>
+                <a href="https://kabum.com.br" class="icon-item custom-icon-color showing" data-label="Kabum" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Kabum</div>
+                    </div>
+                </a>
+                <a href="https://magazineluiza.com.br" class="icon-item custom-icon-color showing" data-label="Magazineluiza" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #fd7e14; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Magazine Luiza</div>
+                    </div>
+                </a>
+                <a href="Https://br.shein.com" class="icon-item custom-icon-color showing" data-label="Shein" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Shein</div>
+                    </div>
+                </a>
+                <a href="https://pt.aliexpress.com" class="icon-item custom-icon-color showing" data-label="Aliexpress" target="_blank">
+                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
+                        <div class="icon-label">Aliexpress</div>
+                    </div>
+                </a>
+                <a href="https://www.cuponomia.com.br/" class="icon-item cuponomia showing" data-label="Cupons Compras" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Cupons Compras</div>
+                    </div>
+                </a>
+                <a href="https://mercadopago.com.br" class="icon-item mercadopago showing" data-label="Mercado Pago" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mercado Pago</div>
+                    </div>
+                </a>
+                <a href="https://buscape.com.br" class="icon-item buscape showing" data-label="Buscape" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Buscapé</div>
+                    </div>
+                </a>
+                <a href="https://www.zoom.com.br/" class="icon-item zoom showing" data-label="Zoom" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Zoom</div>
+                    </div>
+                </a>
+                <a href="https://play.mercadolivre.com.br/?origin=internal" class="icon-item mercadolivre showing" data-label="Mercado Play" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Mercado Play</div>
+                    </div>
+                </a>
+                <a href="https://gemini.google.com/app?hl=pt-BR" class="icon-item photoroom showing" data-label="Gemini AI" target="_blank"> <div class="icon-content">
+                        <div class="icon-label">Gemini</div>
+                    </div>
+                </a>
+                <a href="https://copilot.microsoft.com/" class="icon-item copilot-icon showing" data-label="Copilot AI" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Copilot</div>
+                    </div>
+                </a>
+            </div>
         </div>
         <div class="color-category" style="border-color: rgb(255, 193, 7);" data-category="design-audio">
-            <details>
-                <summary>Design & Áudio</summary>
-                <div class="links-grid">
-                    <a href="https://www.canva.com/pt_br/modelos/?category=tAEoFqaPb84&fFormat=MV8&pricing=FREE" class="icon-item canva showing" data-label="Canva" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Canva</div>
-                        </div>
-                    </a>
-                    <a href="https://icon-icons.com/" class="icon-item iconicons showing" data-label="Iconicons" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Iconicons</div>
-                        </div>
-                    </a>
-                    <a href="https://icons8.com.br/" class="icon-item icons8 showing" data-label="Icons8" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Icons8</div>
-                        </div>
-                    </a>
-                    <a href="https://www.gratispng.com/" class="icon-item gratispng showing" data-label="Grátis PNG" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Grátis PNG</div>
-                        </div>
-                    </a>
-                    <a href="https://www.photoroom.com/pt-br/ferramentas/remover-fundo-de-imagem" class="icon-item photoroom showing" data-label="Photoroom Remove Fundo" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Remove Fundo</div>
-                        </div>
-                    </a>
-                    <a href="https://clideo.com/pt" class="icon-item clideo showing" data-label="Clideo Video Editor" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Clideo</div>
-                        </div>
-                    </a>
-                    <a href="https://clideo.com/pt/cut-audio" class="icon-item clideoaudio showing" data-label="Clideo Audio Cutter" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Corte Áudio</div>
-                        </div>
-                    </a>
-                </div>
-            </details>
+            <h2>Design & Áudio</h2>
+            <div class="links-grid">
+                <a href="https://www.canva.com/pt_br/modelos/?category=tAEoFqaPb84&fFormat=MV8&pricing=FREE" class="icon-item canva showing" data-label="Canva" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Canva</div>
+                    </div>
+                </a>
+                <a href="https://icon-icons.com/" class="icon-item iconicons showing" data-label="Iconicons" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Iconicons</div>
+                    </div>
+                </a>
+                <a href="https://icons8.com.br/" class="icon-item icons8 showing" data-label="Icons8" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Icons8</div>
+                    </div>
+                </a>
+                <a href="https://www.gratispng.com/" class="icon-item gratispng showing" data-label="Grátis PNG" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Grátis PNG</div>
+                    </div>
+                </a>
+                <a href="https://www.photoroom.com/pt-br/ferramentas/remover-fundo-de-imagem" class="icon-item photoroom showing" data-label="Photoroom Remove Fundo" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Remove Fundo</div>
+                    </div>
+                </a>
+                <a href="https://clideo.com/pt" class="icon-item clideo showing" data-label="Clideo Video Editor" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Clideo</div>
+                    </div>
+                </a>
+                <a href="https://clideo.com/pt/cut-audio" class="icon-item clideoaudio showing" data-label="Clideo Audio Cutter" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Corte Áudio</div>
+                    </div>
+                </a>
+            </div>
         </div>
         <div class="color-category" style="border-color: rgb(220, 53, 69);" data-category="midia-entretenimento">
-            <details>
-                <summary>Mídia & Entretenimento</summary>
-                <div class="links-grid">
-                    <a href="https://music.youtube.com/" class="icon-item youtube0 showing" data-label="YouTube Music" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">YouTube Music</div>
-                        </div>
-                    </a>
-                    <a href="https://YouTube.com.br" class="icon-item youtube1 showing" data-label="YouTube" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">YouTube</div>
-                        </div>
-                    </a>
-                    <a href="https://br.pinterest.com/" class="icon-item pinterest showing" data-label="Pinterest" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Pinterest</div>
-                        </div>
-                    </a>
-                    <a href="https://pluto.tv/" class="icon-item plutotv showing" data-label="Pluto TV" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Pluto TV</div>
-                        </div>
-                    </a>
-                    <a href="https://m.topflix.sh/genero/" class="icon-item topflix showing" data-label="TopFlix" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Topflix</div>
-                        </div>
-                    </a>
-                    <a href="https://meuguia.tv/programacao/categoria/Filmes" class="icon-item meuguia showing" data-label="Meu Guia TV" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Guia TV</div>
-                        </div>
-                    </a>
-                    <a href="https://www.azarado.com.br" class="icon-item azarado showing" data-label="Azarado Loterias" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Azarado</div>
-                        </div>
-                    </a>
-                    <a href="https://www.cartacapital.com.br/" class="icon-item cartacapital showing" data-label="CartaCapital" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Carta Capital</div>
-                        </div>
-                    </a>
-                    <a href="https://globfone.com/call-phone/" class="icon-item globfone showing" data-label="Globfone" target="_blank">
-                        <div class="icon-content">
-                            <div class="icon-label">Globfone</div>
-                        </div>
-                    </a>
-                </div>
-            </details>
+            <h2>Mídia & Entretenimento</h2>
+            <div class="links-grid">
+                <a href="https://music.youtube.com/" class="icon-item youtube0 showing" data-label="YouTube Music" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">YouTube Music</div>
+                    </div>
+                </a>
+                <a href="https://YouTube.com.br" class="icon-item youtube1 showing" data-label="YouTube" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">YouTube</div>
+                    </div>
+                </a>
+                <a href="https://br.pinterest.com/" class="icon-item pinterest showing" data-label="Pinterest" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Pinterest</div>
+                    </div>
+                </a>
+                <a href="https://pluto.tv/" class="icon-item plutotv showing" data-label="Pluto TV" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Pluto TV</div>
+                    </div>
+                </a>
+                <a href="https://m.topflix.sh/genero/" class="icon-item topflix showing" data-label="TopFlix" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Topflix</div>
+                    </div>
+                </a>
+                <a href="https://meuguia.tv/programacao/categoria/Filmes" class="icon-item meuguia showing" data-label="Meu Guia TV" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Guia TV</div>
+                    </div>
+                </a>
+                <a href="https://www.azarado.com.br" class="icon-item azarado showing" data-label="Azarado Loterias" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Azarado</div>
+                    </div>
+                </a>
+                <a href="https://www.cartacapital.com.br/" class="icon-item cartacapital showing" data-label="CartaCapital" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Carta Capital</div>
+                    </div>
+                </a>
+                <a href="https://globfone.com/call-phone/" class="icon-item globfone showing" data-label="Globfone" target="_blank">
+                    <div class="icon-content">
+                        <div class="icon-label">Globfone</div>
+                    </div>
+                </a></div>
         </div>
     </div>
 
@@ -1088,10 +1064,10 @@
             const searchTerm = searchInput.value.toLowerCase().trim();
 
             if (searchTerm.length > 0) {
-                // Hide the main content (all categories)
+                // Esconde o conteúdo principal (todas as categorias)
                 body.classList.add('main-content-hidden');
             } else {
-                // Show the main content (all categories)
+                // Mostra o conteúdo principal (todas as categorias)
                 body.classList.remove('main-content-hidden');
             }
 
@@ -1101,7 +1077,6 @@
                 
                 linksInThisCategory.forEach(item => {
                     const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
-                    // Verifica se o termo de pesquisa está contido no rótulo
                     if (label.includes(searchTerm)) {
                         item.classList.remove('hidden');
                         item.classList.add('showing');
@@ -1111,6 +1086,14 @@
                         item.classList.add('hidden');
                     }
                 });
+                
+                // Se estiver pesquisando e houver links visíveis, garante que a categoria está expandida
+                if (searchTerm.length > 0 && hasVisibleLinksInCategory) {
+                    categoryDiv.classList.add('expanded');
+                } else if (searchTerm.length === 0) {
+                    // Quando a pesquisa é limpa, recolhe todas as categorias por padrão
+                    categoryDiv.classList.remove('expanded');
+                }
             });
         }
         
@@ -1144,7 +1127,6 @@
         }
 
         function handleSearchFocus() {
-            // When the search field gains focus, always show quick results and hide main categories if typing
             const searchTerm = searchInput.value.toLowerCase().trim();
             if (searchTerm.length > 0) {
                  body.classList.add('main-content-hidden');
@@ -1274,7 +1256,11 @@
             setTimeout(() => {
                 if(searchInput.value.trim().length === 0) {
                     quickResultsContainer.style.display = 'none';
-                    body.classList.remove('main-content-hidden'); // Ensure main content is visible again
+                    body.classList.remove('main-content-hidden'); // Garante que o conteúdo principal fique visível novamente
+                    // Ao sair da pesquisa e ela estiver vazia, recolhe todas as categorias
+                    allCategoryDivs.forEach(categoryDiv => {
+                        categoryDiv.classList.remove('expanded');
+                    });
                 }
             }, 200); // Pequeno atraso para permitir cliques nos resultados rápidos
         });
@@ -1285,12 +1271,31 @@
         });
         copyCodeButton.addEventListener('click', copyGeneratedCode);
 
+        // --- Categoria Toggle (New) ---
+        document.querySelectorAll('.color-category h2').forEach(heading => {
+            heading.addEventListener('click', function() {
+                const parentCategory = this.closest('.color-category');
+                // Alterna a classe 'expanded' na categoria pai
+                parentCategory.classList.toggle('expanded');
+            });
+        });
+
         // --- Inicialização ---
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme();
-            // Initially ensure main content is visible and quick results are hidden
+            // Inicialmente, garanta que o conteúdo principal esteja visível e os resultados rápidos ocultos
             body.classList.remove('main-content-hidden');
             quickResultsContainer.style.display = 'none';
+
+            // Recolhe todas as categorias por padrão no carregamento da página
+            allCategoryDivs.forEach(categoryDiv => {
+                categoryDiv.classList.remove('expanded');
+            });
+
+            // Expande a primeira categoria por padrão no carregamento da página
+            if (allCategoryDivs.length > 0) {
+                allCategoryDivs[0].classList.add('expanded');
+            }
         });
     </script>
 </body>
