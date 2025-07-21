@@ -68,7 +68,7 @@
 
         #search-container {
             width: 100%;
-            /* max-width: 600px; << REMOVIDO PARA EXPANDIR */
+            max-width: 600px; /* Mantido para preservar a aparência da barra */
             display: flex;
             align-items: center;
             padding: 8px;
@@ -140,7 +140,7 @@
         #quick-results-container {
             display: none; /* Inicia oculto */
             width: 100%;
-            /* max-width: 600px; << REMOVIDO PARA EXPANDIR */
+            max-width: 600px; /* Mantido para preservar a aparência da barra */
             background-color: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
             border-radius: 50px; /* Matched to the search bar for consistency */
@@ -209,7 +209,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
-            /* max-width: 1200px; << REMOVIDO PARA EXPANDIR */
+            /* max-width: 1200px; << REMOVIDO PARA EXPANDIR O CONTEÚDO */
             margin: 75px auto 30px auto; /* Adiciona margem superior para compensar a barra fixa */
             width: 100%;
         }
@@ -251,7 +251,7 @@
         }
 
         .color-category h2 .toggle-icon {
-            display: none;
+            display: none; /* Oculta o ícone de triângulo */
         }
 
         .links-grid {
