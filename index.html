@@ -1,1328 +1,708 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head>
+<html lang="pt-BR">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gratuitos!</title>
-    <link rel="icon" type="image/png" href="logo1.png">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>Gratuitos! - Acesso Rápido (Refatorado)</title>
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        html {
-            scroll-behavior: smooth;
+        :root {
+            --bg-color: #F0F2F5; /* Light mode default */
+            --text-color: #333333;
+            --text-color-light: #4A4A4A;
+            --card-bg-color: #FFFFFF;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --header-bg-color: #FFFFFF;
+            --input-bg-color: #F8F8F8;
+            --input-border-color: #DDDDDD;
+            --button-bg-color: #E0E0E0;
+            --button-text-color: #333333;
+            --primary-color: #007BFF;
+            --primary-color-rgb: 0, 123, 255;
+            --primary-color-hover: #0069D9;
+            --separator-color: #EEEEEE;
+            --danger-color: #DC3545;
+            --warning-color: #FFC107;
+            --animate-color: #9C27B0;
+            --action-button-size: 32px;
+            --action-button-icon-size: 16px;
+            --context-menu-bg: #FFFFFF;
+            --context-menu-border: #EEEEEE;
+            --context-menu-item-hover: #F0F0F0;
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 20px 120px 20px;
-            transition: background-color .3s ease, color .3s ease;
-            position: relative;
-        }
-        body.no-scroll, body.modal-open {
-            overflow: hidden;
-        }
+
         body.dark-mode {
-            background-color: #2c2c2c;
-            color: #e0e0e0;
+            --bg-color: #363636;
+            --text-color: #E0E0E0;
+            --text-color-light: #FFFFFF;
+            --card-bg-color: transparent;
+            --card-shadow: none;
+            --header-bg-color: #212121;
+            --input-bg-color: #3A3D42;
+            --input-border-color: #5B6068;
+            --button-bg-color: #4A4D52;
+            --button-text-color: #E0E0E0;
+            --separator-color: #4A4D52;
+            --context-menu-bg: #3A3D42;
+            --context-menu-border: #5B6068;
+            --context-menu-item-hover: #4A4D52;
         }
 
-        /* Removidas as sobreposições e lógicas complexas para o search-active */
-        body.search-active::before,
-        body:not(.search-active)::before {
-            display: none;
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg-color);
+            color: var(--text-color); padding-top: 90px;
+            transition: background-color .3s ease, color .3s ease;
+            font-size: 1em; line-height: 1.6;
         }
-        .category-container {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        body.search-active .category-container {
-            opacity: 1; /* Mantém visível para filtrar */
-            visibility: visible;
-            pointer-events: auto;
-        }
-        
-        /* --- Nova barra de pesquisa fixa no topo --- */
-        #top-search-bar-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background-color: #f0f2f5; /* Cor de fundo para cobrir o conteúdo ao rolar */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: background-color .3s ease, box-shadow .3s ease;
+        body.modal-open { overflow: hidden; }
+
+        main {
+            padding: 25px; width: 100%; max-width: 600px;
+            margin: 0 auto; box-sizing: border-box;
+            position: relative; z-index: 1;
         }
 
-        body.dark-mode #top-search-bar-wrapper {
-            background-color: #2c2c2c;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        #page-header {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 18px 25px;
+            background-color: var(--header-bg-color);
+            backdrop-filter: none; -webkit-backdrop-filter: none; z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box; display: flex; justify-content: center; align-items: center;
         }
-
-        #search-container {
-            width: 100%;
-            max-width: 500px; /* MODIFICADO: Reduzido de 600px */
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            background-color: #ffffff;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: background-color .3s ease, box-shadow .3s ease;
-        }
-        body.dark-mode #search-container {
-            background-color: #3a3a3a;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
+        .header-content { width: 100%; max-width: 800px; display: flex; gap: 10px; align-items: center; }
         #search-input {
-            flex-grow: 1;
-            width: 100%;
-            padding: 12px 15px;
-            border: none;
-            font-size: 1.1em;
-            box-sizing: border-box;
-            background-color: transparent;
-            color: #333;
-            box-shadow: none;
-            outline: none;
-            transition: color .3s ease;
+            flex-grow: 1; padding: 12px 18px; border: 1px solid var(--input-border-color);
+            border-radius: 25px; font-size: 1.05em; background-color: var(--input-bg-color);
+            color: var(--text-color); outline: none; transition: all .2s ease;
         }
-
-        body.dark-mode #search-input {
-            color: #e0e0e0;
+        #search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
+        .header-button {
+            flex-shrink: 0; background-color: var(--button-bg-color); color: var(--button-text-color);
+            border: none; border-radius: 50%; width: 48px; height: 48px; cursor: pointer;
+            font-size: 1rem; transition: all .2s ease; display: flex; justify-content: center;
+            align-items: center; padding: 0; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-
-        #theme-toggle, #open-generator-modal-btn {
-            flex-shrink: 0;
-            margin-left: 8px;
-            background-color: #e9ecef;
-            color: #333;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color .3s ease, color .3s ease, transform .2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0;
-        }
-        
-        body.dark-mode #theme-toggle, body.dark-mode #open-generator-modal-btn {
-            background-color: #555;
-            color: #e0e0e0;
-        }
-        #theme-toggle:hover, #open-generator-modal-btn:hover {
-            transform: scale(1.1);
-            opacity: .9;
-        }
-        
-        #theme-toggle span {
-             font-size: 0.7em;
-             font-weight: bold;
-        }
-        #open-generator-modal-btn svg {
-            width: 22px;
-            height: 22px;
-        }
-
-        /* Container para os resultados rápidos */
-        #quick-results-container {
-            display: none; /* Inicia oculto */
-            width: 100%;
-            max-width: 500px; /* Alinhado com a nova largura da barra de pesquisa */
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(5px);
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 10px; /* Espaçamento da barra de pesquisa */
-            padding: 10px;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
-        body.dark-mode #quick-results-container {
-             background-color: rgba(58, 58, 58, 0.95);
-             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        #quick-results-content {
-            display: flex;
-            flex-wrap: wrap; /* Permite que os itens quebrem linha */
-            gap: 10px;
-            padding: 5px;
-            -webkit-overflow-scrolling: touch;
-            max-height: 200px; /* Limita a altura para evitar que os resultados ocupem muito espaço */
-            overflow-y: auto; /* Adiciona scroll se os resultados excederem a altura */
-        }
-        
-        /* Estilo para os ícones dentro da barra de resultados rápidos */
-        .quick-result-item {
-            box-sizing: border-box;
-            width: 160px; /* Mantém a largura consistente com os ícones principais */
-            height: 45px;
-            min-width: 160px;
-            border-radius: 50px;
-            flex-shrink: 0;
-            flex-grow: 0;
-            flex-basis: auto;
-            text-decoration: none;
-            color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        body.dark-mode .quick-result-item {
-            box-shadow: 0 2px 5px rgba(0,0,0,.3);
-        }
-        .quick-result-item .icon-label {
-            font-size: 0.9em !important;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        
-        .no-results-message {
-            width: 100%;
-            text-align: center;
-            padding: 15px 0;
-            color: #777;
-        }
-        body.dark-mode .no-results-message {
-            color: #bbb;
-        }
-
-        /* Styles for hiding main content when searching */
-        .main-content-hidden .category-container {
-            display: none !important;
-        }
-
-        .category-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 75px auto 30px auto; /* Adiciona margem superior para compensar a barra fixa */
-            width: 100%;
-        }
-        .color-category {
-            background-color: #ffffff;
-            border-radius: 30px; /* MODIFICADO: Aumentado de 12px para bordas mais arredondadas */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            padding: 25px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s;
-            border-top: 5px solid;
-        }
-        body.dark-mode .color-category {
-            background-color: #3a3a3a;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        .color-category:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-        body.dark-mode .color-category:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
-        
-        .color-category h2 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            color: #0056b3;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-            padding-bottom: 10px;
-            /* ADIÇÕES PARA CATEGORIA RETRÁTIL */
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-            transition: margin-bottom 0.4s ease-in-out;
-        }
-
-        /* REMOVIDO: Indicador de expandir/recolher (seta) */
-        .color-category h2::after {
-            content: ''; /* Remove o conteúdo do triângulo */
-            display: none; /* Garante que o pseudo-elemento não seja renderizado */
-        }
-
-        /* NOVO: Estilo para quando a categoria está recolhida */
-        .color-category.collapsed h2 {
-            margin-bottom: 0;
-        }
-        
-        body.dark-mode .color-category h2 {
-            color: #007bff;
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* MODIFICATIONS START HERE */
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Increased min-width for larger icons on PC */
-            gap: 15px; /* Increased gap for better spacing */
-            justify-items: center;
-            /* ADIÇÕES PARA CATEGORIA RETRÁTIL */
-            overflow: hidden;
-            max-height: 3000px; /* Altura máxima para permitir a transição */
-            transition: max-height 0.5s ease-in-out;
-        }
-        
-        /* NOVO: Esconde a grid de links quando a categoria está recolhida */
-        .color-category.collapsed .links-grid {
-            max-height: 0;
-        }
-
-        .icon-item {
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50px;
-            box-shadow: 0 2px 5px rgba(0,0,0,.1);
-            text-decoration: none;
-            color: #fff;
-            overflow: hidden;
-            transition: transform .2s ease-in-out, opacity .3s ease, background-color .3s ease;
-            width: 100%; /* Ensure it takes full width of its grid column */
-            height: 55px; /* Slightly increased height */
-            position: relative;
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .icon-item.hidden {
-            opacity: 0;
-            transform: scale(0.8);
-            pointer-events: none;
-            height: 0;
-            width: 0;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease, width 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
-        }
-        .icon-item.showing {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-        }
-
-        body.dark-mode .icon-item {
-            box-shadow: 0 2px 5px rgba(0,0,0,.3);
-        }
-        .icon-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,.15);
-        }
-        body.dark-mode .icon-item:hover {
-            box-shadow: 0 4px 10px rgba(0,0,0,.4);
-        }
-        .icon-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-        .icon-label {
-            font-size: 0.9em; /* Slightly increased font size */
-            text-align: center;
-            padding: 5px;
-            word-break: break-word;
-            font-weight: bold;
-            line-height: 1.2;
-            text-transform: uppercase;
-        }
-        /* MODIFICATIONS END HERE */
-
-        /* Cores de ícones */
-        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
-        .copilot-icon {
-            background-image: linear-gradient(to bottom right,#2196F3,#4CAF50,#FFEB3B,#FF9800,#9C27B0);
-        }
-        .custom-icon-color .icon-content {
-            background-color: var(--icon-background-color);
-        }
-        
-        /* --- Estilos do Modal do Gerador de Código --- */
-        #generator-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 1040;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        #generator-modal-overlay.visible {
-            display: block;
-            opacity: 1;
-        }
-
-        #generate-icon-code-section {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            z-index: 1050;
-            padding: 25px;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            border-top: 5px solid #007bff;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        
-        #generate-icon-code-section.visible {
-            display: block;
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        body.dark-mode #generate-icon-code-section {
-            background-color: #3a3a3a;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border-top-color: #0056b3;
-        }
-        #generate-icon-code-section h2 {
-            text-align: center;
-            color: #0056b3;
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            border-bottom: 2px solid rgba(0,0,0,0.05);
-            padding-bottom: 10px;
-            transition: color .3s ease, border-bottom-color .3s ease;
-        }
-        body.dark-mode #generate-icon-code-section h2 {
-            color: #007bff;
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-        
-        #close-generator-modal-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #e9ecef;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #555;
-            cursor: pointer;
+        .header-button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .header-button.active { background-color: var(--primary-color); color: white; box-shadow: 0 2px 5px rgba(var(--primary-color-rgb), 0.3); }
+        .header-button svg { width: 24px; height: 24px; }
+        #theme-toggle {
             display: flex;
             align-items: center;
-            justify-content: center;
-            line-height: 1;
-            padding: 0;
-            transition: background-color .2s, color .2s;
+            gap: 8px;
+            border-radius: 25px;
+            padding: 0 15px;
+            width: auto;
+            min-width: 100px;
         }
-        #close-generator-modal-btn:hover {
-            background-color: #dc3545;
-            color: white;
-        }
-         body.dark-mode #close-generator-modal-btn {
-            background-color: #555;
-            color: #e0e0e0;
-        }
-        body.dark-mode #close-generator-modal-btn:hover {
-             background-color: #c82333;
-        }
+        #theme-toggle span { font-size: 0.75em; font-weight: 600; }
 
-        .form-group {
-            margin-bottom: 18px;
+        #master-edit-overlay {
+            display: none !important; /* Managed by JS for display */
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #333;
-            transition: color .3s ease;
+        .category-grid { display: block; gap: 0; }
+        .category-card {
+            background-color: transparent; border: none; padding: 0;
+            box-shadow: none; margin-bottom: 15px;
         }
-        body.dark-mode .form-group label {
-            color: #e0e0e0;
-        }
-        .form-group input[type="text"],
-        .form-group input[type="url"],
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1em;
-            background-color: #fff;
-            color: #333;
-            transition: border-color .3s ease, background-color .3s ease, color .3s ease;
-        }
-        body.dark-mode .form-group input[type="text"],
-        body.dark-mode .form-group input[type="url"],
-        body.dark-mode .form-group select {
-            background-color: #3c3c3c;
-            border-color: #555;
-            color: #e0e0e0;
-        }
-        .form-group input[type="color"] {
-            width: 100%;
-            padding: 5px;
-            height: 45px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            cursor: pointer;
-            background-color: #fff;
-            transition: border-color .3s ease, background-color .3s ease;
-        }
-        body.dark-mode .form-group input[type="color"] {
-            border-color: #555;
-            background-color: #3c3c3c;
-        }
-        #generate-icon-code-button, #copy-icon-code-button {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color .3s ease;
-            font-weight: 500;
-            margin-top: 10px;
-        }
-        #generate-icon-code-button:hover, #copy-icon-code-button:hover {
-            background-color: #0056b3;
-        }
-        body.dark-mode #generate-icon-code-button, body.dark-mode #copy-icon-code-button {
-            background-color: #0056b3;
-        }
-        body.dark-mode #generate-icon-code-button:hover, body.dark-mode #copy-icon-code-button:hover {
-            background-color: #004a8f;
-        }
-        .label-hint {
-            font-size: 0.85em;
-            color: #777;
-            font-weight: 400;
-        }
-        body.dark-mode .label-hint {
-            color: #bbb;
-        }
-        #generatedCodeOutput {
-            width: 100%;
-            min-height: 150px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-top: 25px;
-            box-sizing: border-box;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9em;
-            background-color: #e9ecef;
-            color: #212529;
-            resize: vertical;
-            transition: border-color .3s ease, background-color .3s ease, color .3s ease;
-        }
-        body.dark-mode #generatedCodeOutput {
+        .category-card:hover { transform: none; box-shadow: none; }
+
+        .category-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border: none; padding: 15px;
             background-color: #2c2c2c;
-            border-color: #555;
-            color: #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-radius 0.3s ease;
         }
-        #copy-icon-code-button {
-            margin-top: 15px;
+        .category-header h2 {
+            margin: 0; font-size: 1.2em;
+            color: var(--text-color-light); font-weight: 600;
+        }
+        .category-header::after {
+            content: '−'; /* Símbolo de "menos" para expandido */
+            font-size: 1.8em; font-weight: bold;
+            color: #fff;
+            transition: transform 0.3s ease-out;
+        }
+        .category-card.collapsed .category-header {
+            border-radius: 12px;
+        }
+        .category-card:not(.collapsed) .category-header {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .category-card.collapsed .category-header::after {
+            transform: rotate(-90deg); /* Gira para formar um "+" */
+            content: '+';
         }
 
-        /* Media Queries para responsividade */
-        @media (max-width: 768px) {
-            .category-container {
-                grid-template-columns: 1fr;
-                margin-top: 65px; /* Ajusta a margem superior para mobile */
-            }
-            .color-category {
-                padding: 15px;
-            }
-            .color-category h2 {
-                font-size: 1.4em;
-            }
-            /* MODIFICATIONS FOR MOBILE */
-            .links-grid {
-                grid-template-columns: 1fr; /* Stack icons vertically on mobile */
-                gap: 15px; /* Adjust gap for vertical stacking */
-            }
-            .icon-item {
-                width: 100%; /* Make icons take full width of their container */
-                height: 55px; /* Maintain consistent height */
-                min-width: unset; /* Remove min-width for mobile */
-            }
-            .quick-result-item {
-                 width: 100% !important; /* Make quick results full width on mobile */
-                 height: 55px !important; /* Consistent height */
-                 min-width: unset; /* Remove min-width */
-                 max-width: unset; /* Remove max-width */
-                 flex-basis: auto;
-            }
-            .icon-label, .quick-result-item .icon-label {
-                font-size: 0.85em !important; /* Adjusted font size for mobile */
-            }
-            #generate-icon-code-section {
-                padding: 20px 15px;
-                 h2 {
-                    font-size: 1.4em;
-                }
-            }
-            #quick-results-content {
-                flex-direction: column; /* Stack quick results vertically */
-                gap: 10px;
-            }
-             #search-input {
-                padding: 10px 12px;
-                font-size: 1em;
-            }
-            #theme-toggle, #open-generator-modal-btn {
-                width: 36px;
-                height: 36px;
-            }
+        .pin-category-btn { display: none !important; }
+
+        .icons-grid, #search-results-container {
+            display: flex; flex-direction: column;
+            gap: 12px; padding: 15px;
+            background-color: #2c2c2c;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            max-height: 2000px; /* Altura máxima para animação */
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
         }
+        .category-card.collapsed .icons-grid {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .icon-card-wrapper { position: relative; }
+        body.master-edit-mode .icon-link { pointer-events: auto !important; }
+        .icon-link {
+            display: flex; text-decoration: none; border-radius: 12px;
+            box-shadow: none; transition: transform 0.2s ease;
+            border: none; height: auto; box-sizing: border-box;
+            overflow: hidden; background-color: #555;
+            position: relative; /* Needed for positioning action button */
+        }
+        .icon-link:hover { transform: scale(1.02); }
+        .icon-visual {
+            display: flex; align-items: center; justify-content: center;
+            flex-grow: 1; padding: 18px 15px; transition: none;
+            position: relative; width: 100%; box-sizing: border-box;
+        }
+        .icon-visual img { display: none; }
+        .icon-text-content {
+            position: static; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1; padding: 0;
+            color: #FFFFFF !important; text-shadow: none;
+        }
+        .icon-title {
+            font-size: 1em; font-weight: 600; text-align: center;
+            text-transform: uppercase; line-height: 1.2; word-break: break-word;
+            white-space: normal; overflow: visible; text-overflow: clip; max-width: 100%;
+        }
+        .icon-description, .icon-actions { display: none !important; }
+
+        /* Icon actions button (lock icon) */
+        .icon-actions-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.2s ease;
+        }
+
+        .icon-card-wrapper:hover .icon-actions-button,
+        .icon-actions-button.active {
+            opacity: 1;
+        }
+
+        .icon-actions-button svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            top: 45px; /* Adjust as needed, below the button */
+            right: 8px;
+            background-color: var(--context-menu-bg);
+            border: 1px solid var(--context-menu-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+            z-index: 100;
+            min-width: 150px;
+            display: none; /* Hidden by default */
+        }
+
+        .context-menu.show {
+            display: block;
+        }
+
+        .context-menu li {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 0.9em;
+            transition: background-color 0.2s ease;
+        }
+
+        .context-menu li:hover {
+            background-color: var(--context-menu-item-hover);
+        }
+
+        .context-menu li.danger-option:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        /* Animation for icon */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .icon-link.animate-bounce .icon-visual {
+            animation: bounce 1s ease-in-out;
+        }
+
+        /* Cores */
+        .verde { background-color: #89C623; } .AZUL { background-color: #2D9BFF; } .tsunami { background-color: #1F73B7; } .academia { background-color: #10559A; } .whatsapp { background-color: #40C351; } .vpn { background-color: #DF337A; } .bloqueador { background-color: #EE3433; } .feriados { background-color: #F84F39; } .codepen { background-color: #424242; } .coelba { background-color: #00a99d; } .embasa { background-color: #03a9f4; } .govbr { background-color: #01A78B; } .icon-visual.mercadolivre, .icon-visual.primecursos, .icon-visual.linkcorreios, .icon-visual.azarado { color: #FFFFFF; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .gov-curso { background-color: #006400; } .plutotv { background-color: #121212; } .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
+
+        /* Estilos do Modal (mantidos intactos) */
+        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.2s ease; }
+        #generator-modal-overlay.visible { display: block; opacity: 1; }
+        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 30px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-top: 4px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; }
+        #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 25px 0; font-size: 1.8em; border-bottom: 1px solid var(--separator-color); padding-bottom: 12px; font-weight: 600; }
+        #close-generator-modal-btn { position: absolute; top: 15px; right: 15px; background: var(--button-bg-color); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem; font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
+        #close-generator-modal-btn:hover { background-color: var(--danger-color); color: white; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); font-size: 0.95em; }
+        .form-group input[type="text"], .form-group input[type="url"], .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; font-size: 1em; font-family: 'Inter', sans-serif; background-color: var(--input-bg-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
+        .form-group input[type="text"]:focus, .form-group input[type="url"]:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); outline: none; }
+        .form-group input[type="color"] { width: 100%; padding: 6px; height: 40px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
+        #submit-icon-button { width: 100%; padding: 12px 18px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color .2s ease, transform .1s ease; font-weight: 500; margin-top: 15px; }
+        #submit-icon-button:hover { background-color: var(--primary-color-hover); transform: translateY(-1px); }
+        .label-hint { font-size: 0.8em; color: #A0A0A0; font-weight: 400; }
+        #form-status-message { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; display: none; font-size: 0.95em; }
+        #form-status-message.success { background-color: #D4EDDA; color: #155724; display: block; }
+        #form-status-message.error { background-color: #F8D7DA; color: #721C24; display: block; }
+
+        @media (max-width: 768px) { body { padding-top: 80px; font-size: 0.95em;} main { padding: 15px; } #page-header { padding: 12px 15px; } .category-header h2 { font-size: 1.4em; } #generate-icon-code-section { padding: 20px; } #generate-icon-code-section h2 { font-size: 1.5em; } #search-input { font-size: 1em; padding: 10px 15px; } .header-button { width: 42px; height: 42px; } .header-button svg { width: 22px; height: 22px; } }
     </style>
 </head>
-<body class="">
-
-    <div id="top-search-bar-wrapper">
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Pesquise Aqui...">
-            <button id="open-generator-modal-btn" title="Gerar Código do Ícone">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path></svg>
+<body>
+    <header id="page-header">
+        <div class="header-content">
+            <input type="text" id="search-input" placeholder="Pesquisar..." aria-label="Pesquisar ícones">
+            <button id="open-generator-modal-btn" class="header-button" title="Adicionar novo Ícone" aria-label="Adicionar novo Ícone">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
-            <button id="theme-toggle" title="Alternar Modo"><span>Escuro</span></button>
+            <button id="theme-toggle" class="header-button" title="Alternar Tema" aria-label="Alternar Tema">
+                <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.045 7.045a.75.75 0 0 1 1.06-1.06l1.591 1.59a.75.75 0 0 1-1.06 1.06l-1.59-1.591ZM18.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5h2.25a.75.75 0 0 1 .75.75ZM6.205 17.795a.75.75 0 0 1-1.06-1.06l1.59-1.591a.75.75 0 0 1 1.06 1.06l-1.591 1.59ZM12 15.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5ZM12 9a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V9.75A.75.75 0 0 1 12 9Z" />
+                </svg>
+                <span>Claro</span>
+            </button>
         </div>
-        <div id="quick-results-container" style="display: none;">
-            <div id="quick-results-content"></div>
-        </div>
-    </div>
+    </header>
 
-    <div class="category-container" id="allCategoriesGrid">
-        <div class="color-category" style="border-color: rgb(111, 66, 193);" data-category="servicos-utilidades">
-            <h2>Serviços &amp; Utilidades</h2>
-            <div class="links-grid">
-                <a href="https://api.whatsapp.com/send?phone=557133706350&amp;text=MENU" class="icon-item verde showing" data-label="Segunda Via de Luz" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Segunda Via de Luz</div>
-                    </div>
-                </a>
-                <a href="https://api.whatsapp.com/send?phone=557197170999&amp;text=MENU" class="icon-item AZUL showing" data-label="Segunda Via de Água" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Segunda Via de Água</div>
-                    </div>
-                </a>
-                <a href="http://138.255.240.6:8000/accounts/central/login" class="icon-item tsunami showing" data-label="Tsunami" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Tsunami</div>
-                    </div>
-                </a>
-                <a href="https://musclewiki.com/pt-br/" class="icon-item musclewiki showing" data-label="academia" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Academia</div>
-                    </div>
-                </a>
-                <a href="https://web.whatsapp.com/" class="icon-item whatsapp showing" data-label="Web WhatsApp" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">WhatsApp Web</div>
-                    </div>
-                </a>
-                <a href="https://www.urban-vpn.com/pt-br/" class="icon-item vpn showing" data-label="vpn" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">VPN</div>
-                    </div>
-                </a>
-                <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh?hl=pt-BR" class="icon-item bloqueador showing" data-label="bloqueador" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Bloquear Anúncios</div>
-                    </div>
-                </a>
-                 <a href="https://feriados.site/ba/saubara/" class="icon-item feriados showing" data-label="Feriados" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Feriados</div>
-                    </div>
-                </a>
-                <a href="https://htmlonline.org/pt/" class="icon-item custom-icon-color showing" data-label="EDITAR HTML" target="_blank"> <div class="icon-content" style="--icon-background-color: #1f2020; background-color: var(--icon-background-color);"> <div class="icon-label">EDITAR HTML</div> </div> </a>
-                <a href="https://atendimentovirtual.embasa.ba.gov.br/login" class="icon-item embasa showing" data-label="Embasa" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Embasa</div>
-                    </div>
-                </a>
-                <a href="https://servicos.neoenergiacoelba.com.br/area-logada/Paginas/login.aspx?ref=https://servicos.neoenergiacoelba.com.br/servicos-ao-cliente/Pages/2-via-de-conta-coelba.aspx" class="icon-item coelba showing" data-label="Coelba" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Coelba</div>
-                    </div>
-                </a>
-                <a href="https://sso.acesso.gov.br/" class="icon-item azul2 showing" data-label="Gov.br" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Gov.br</div>
-                    </div>
-                </a>
-                <a href="https://www.linkcorreios.com.br/index.php" class="icon-item linkcorreios showing" data-label="Link Correios" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Link Correios</div>
-                    </div>
-                </a>
-                <a href="https://meu.inss.gov.br/" class="icon-item verde2 showing" data-label="Meu INSS" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Meu INSS</div>
-                    </div>
-                </a>
-            <a href="https://mail.google.com/mail/u/0/#inbox" class="icon-item custom-icon-color showing" data-label="GMAIL" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #cca000; background-color: var(--icon-background-color);">
-                        <div class="icon-label">GMAIL</div>
-                    </div>
-                </a><a href="https://geradordepix.com/" class="icon-item custom-icon-color" data-label="Gere seu QR Code PIX" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #00b00c; background-color: var(--icon-background-color);">
-                        <div class="icon-label">Gere seu QR Code PIX</div>
-                    </div>
-                </a><a href="https://fast.com/pt/" class="icon-item custom-icon-color" data-label="Teste sua Internet" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #d10000; background-color: var(--icon-background-color);">
-                        <div class="icon-label">Teste sua Internet</div>
-                    </div>
-                </a><a href="https://archive.newpipe.net/fdroid/repo/NewPipe_v0.27.7.apk" class="icon-item custom-icon-color" data-label="NEW PIPE : Melhor Baixador do YouTube" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #ba0000; background-color: var(--icon-background-color);">
-                        <div class="icon-label">NEW PIPE : Melhor Baixador do YouTube</div>
-                    </div>
-                </a><a href="https://www.office.com/login?es=UnauthClick&amp;ru=%2f%3ffromcode%3dcmmiadtp424%26refOrigin%3dGoogle" class="icon-item custom-icon-color" data-label="M365 Microsoft" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #0000ff; background-color: var(--icon-background-color);">
-                        <div class="icon-label">M365 Microsoft</div>
-                    </div>
-                </a></div>
+    <main id="main-content">
+        <div id="master-edit-overlay"></div>
+        <div id="regular-section-wrapper">
+            <div class="category-grid" id="all-categories-grid"></div>
         </div>
-        <div class="color-category collapsed" style="border-color: rgb(40, 167, 69);" data-category="cursos-concursos">
-            <h2>Cursos &amp; Concursos</h2>
-            <div class="links-grid">
-                <a href="https://avamec.mec.gov.br/#/curso/listar?idCategoria=0" class="icon-item gov-curso showing" data-label="AVAMEC" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">AVAMEC CURSOS</div>
-                    </div>
-                </a>
-                <a href="https://www.escolavirtual.gov.br/catalogo" class="icon-item gov-curso showing" data-label="Escola Virtual GOV" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Escola Virtual</div>
-                    </div>
-                </a>
-                <a href="https://aprendamais.mec.gov.br/course/index.php" class="icon-item gov-curso showing" data-label="Aprenda Mais" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Aprenda Mais</div>
-                    </div>
-                </a>
-                <a href="https://www.pciconcursos.com.br/concursos/#BA" class="icon-item concursos showing" data-label="PCI Concurso" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">PCI Concurso</div>
-                    </div>
-                </a>
-                <a href="https://concursosnobrasil.com/concursos/ba/" class="icon-item concursos showing" data-label="Concursos Brasil" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Brasil Concurso</div>
-                    </div>
-                </a>
-                 <a href="https://www.acheconcursos.com.br/concursos-bahia" class="icon-item concursos showing" data-label="Ache Concursos" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Ache Concurso</div>
-                    </div>
-                </a>
-                <a href="https://www.futuro.digital/cursos-gratuitos" class="icon-item senai showing" data-label="Senai" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Senai Cursos</div>
-                    </div>
-                </a>
-                <a href="https://www.primecursos.com.br/" class="icon-item primecursos showing" data-label="Prime Cursos" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Prime Cursos</div>
-                    </div>
-                </a>
-                <a href="https://www.ev.org.br/" class="icon-item bradesco showing" data-label="Bradesco" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Bradesco Cursos</div>
-                    </div>
-                </a>
-                <a href="https://www.colaboraread.com.br/aluno/dashboard/index?matriculaId=3602038005" class="icon-item unopar showing" data-label="Unopar" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Unopar</div>
-                    </div>
-                </a>
-                
-            </div>
-        </div>
-        <div class="color-category collapsed" style="border-color: rgb(0, 123, 255);" data-category="ferramentas-downloads">
-            <h2>Ferramentas &amp; Downloads</h2>
-            <div class="links-grid">
-                <a href="https://github.com/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">GitHub</div>
-                    </div>
-                </a><a href="https://github.com/r8402/g/edit/main/index.html" class="icon-item custom-icon-color showing" data-label="APLICAR" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #050505; background-color: var(--icon-background-color);">
-                        <div class="icon-label">APLICAR</div>
-                    </div>
-                </a>
-                  <a href="https://codepen.io/pen/" class="icon-item codepen showing" data-label="Codepen" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">EDITAR HTML,CSS,JS</div>
-                    </div>
-                </a>
-                  <a href="https://github.com/camilatigre/listamaravilhosaopensource" class="icon-item codepen showing" data-label="GitHub OpenSource Lista" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">GitHub Lista OS</div>
-                    </div>
-                </a>
-                <a href="https://github.com/ishanvyas22/awesome-open-source-systems" class="icon-item codepen showing" data-label="Awesome Open Source Systems" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">Awesome OS</div>
-                    </div>
-                </a>
-                <a href="https://logodownload.org/" class="icon-item logodownload showing" data-label="Logo Download" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Logo Download</div>
-                    </div>
-                </a>
-                <a href="https://drive.google.com/drive/u/0/my-drive?fd=true" class="icon-item drive showing" data-label="Drive" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Drive</div>
-                    </div>
-                </a>
-                <a href="https://onedrive.live.com/?id=root&amp;cid=6DB96A6307BA3A1C" class="icon-item onedrive showing" data-label="OneDrive" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">OneDrive</div>
-                    </div>
-                </a>
-                <a href="https://yt5s.in/pt257mm/youtube-to-mp4" class="icon-item baixar showing" data-label="Baixar Videos" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Baixar</div>
-                    </div>
-                </a>
-                <a href="https://www.fosshub.com" class="icon-item azarado showing" data-label="FossHub" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">FossHub</div>
-                    </div>
-                </a>
-                
-                <a href="https://www.softpedia.com" class="icon-item azul2 showing" data-label="Softpedia" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">Softpedia</div>
-                    </div>
-                </a>
-                <a href="https://mega.nz" class="icon-item mega showing" data-label="Mega" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Mega</div>
-                    </div>
-                </a>
-                <a href="https://sourceforge.net" class="icon-item utilit showing" data-label="SourceForge" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">SourceForge</div>
-                    </div>
-                </a>
-                <a href="https://osdn.net" class="icon-item verde2 showing" data-label="OSDN" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">OSDN</div>
-                    </div>
-                </a>
-              </div>
-        </div>
-        <div class="color-category collapsed" style="border-color: rgb(253, 126, 20);" data-category="compras-produtividade">
-            <h2>Compras &amp; Produtividade</h2>
-            <div class="links-grid">
-                <a href="https://mercadolivre.com.br" class="icon-item mercadolivre showing" data-label="Mercado Livre" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Mercado Livre</div>
-                    </div>
-                </a>
-                <a href="https://shopee.com.br/?uls_trackid=52t1gigt0064&amp;utm_campaign=id_Y9ixAtyxay&amp;utm_content=-ofasdbrshopeeshopeesddef---&amp;utm_medium=affiliates&amp;utm_source=an_18114130006&amp;utm_term=d59sch2ft855" class="icon-item cuponomia showing" data-label="Shopee" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Shopee</div>
-                    </div>
-                </a>
-                <a href="https://kabum.com.br" class="icon-item custom-icon-color showing" data-label="Kabum" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
-                        <div class="icon-label">Kabum</div>
-                    </div>
-                </a>
-                <a href="https://magazineluiza.com.br" class="icon-item custom-icon-color showing" data-label="Magazineluiza" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #fd7e14; background-color: var(--icon-background-color);">
-                        <div class="icon-label">Magazine Luiza</div>
-                    </div>
-                </a>
-                <a href="Https://br.shein.com" class="icon-item custom-icon-color showing" data-label="Shein" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
-                        <div class="icon-label">Shein</div>
-                    </div>
-                </a>
-                <a href="https://pt.aliexpress.com" class="icon-item custom-icon-color showing" data-label="Aliexpress" target="_blank">
-                    <div class="icon-content" style="--icon-background-color: #f27107; background-color: var(--icon-background-color);">
-                        <div class="icon-label">Aliexpress</div>
-                    </div>
-                </a>
-                <a href="https://www.cuponomia.com.br/" class="icon-item cuponomia showing" data-label="Cuponomia" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Cupons Compras</div>
-                    </div>
-                </a>
-                <a href="https://mercadopago.com.br" class="icon-item mercadopago showing" data-label="Mercado Pago" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Mercado Pago</div>
-                    </div>
-                </a>
-                <a href="https://buscape.com.br" class="icon-item buscape showing" data-label="Buscape" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Buscapé</div>
-                    </div>
-                </a>
-                <a href="https://www.zoom.com.br/" class="icon-item zoom showing" data-label="Zoom" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Zoom</div>
-                    </div>
-                </a>
-                <a href="https://play.mercadolivre.com.br/?origin=internal" class="icon-item mercadolivre showing" data-label="Mercado Play" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Mercado Play</div>
-                    </div>
-                </a>
-                <a href="https://gemini.google.com/app?hl=pt-BR" class="icon-item photoroom showing" data-label="Gemini AI" target="_blank"> <div class="icon-content">
-                        <div class="icon-label">Gemini</div>
-                    </div>
-                </a>
-                <a href="https://copilot.microsoft.com/" class="icon-item copilot-icon showing" data-label="Copilot AI" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Copilot</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="color-category collapsed" style="border-color: rgb(255, 193, 7);" data-category="design-audio">
-            <h2>Design &amp; Áudio</h2>
-            <div class="links-grid">
-                <a href="https://www.canva.com/pt_br/modelos/?category=tAEoFqaPb84&amp;fFormat=MV8&amp;pricing=FREE" class="icon-item canva showing" data-label="Canva" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Canva</div>
-                    </div>
-                </a>
-                <a href="https://icon-icons.com/" class="icon-item iconicons showing" data-label="Iconicons" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Iconicons</div>
-                    </div>
-                </a>
-                <a href="https://icons8.com.br/" class="icon-item icons8 showing" data-label="Icons8" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Icons8</div>
-                    </div>
-                </a>
-                <a href="https://www.gratispng.com/" class="icon-item gratispng showing" data-label="Grátis PNG" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Grátis PNG</div>
-                    </div>
-                </a>
-                <a href="https://www.photoroom.com/pt-br/ferramentas/remover-fundo-de-imagem" class="icon-item photoroom showing" data-label="Photoroom Remove Fundo" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Remove Fundo</div>
-                    </div>
-                </a>
-                <a href="https://clideo.com/pt" class="icon-item clideo showing" data-label="Clideo Video Editor" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Clideo</div>
-                    </div>
-                </a>
-                <a href="https://clideo.com/pt/cut-audio" class="icon-item clideoaudio showing" data-label="Clideo Audio Cutter" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Corte Áudio</div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="color-category collapsed" style="border-color: rgb(220, 53, 69);" data-category="midia-entretenimento">
-            <h2>Mídia &amp; Entretenimento</h2>
-            <div class="links-grid">
-                <a href="https://music.youtube.com/" class="icon-item youtube0 showing" data-label="YouTube Music" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">YouTube Music</div>
-                    </div>
-                </a>
-                <a href="https://YouTube.com.br" class="icon-item youtube1 showing" data-label="YouTube" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">YouTube</div>
-                    </div>
-                </a>
-                <a href="https://br.pinterest.com/" class="icon-item pinterest showing" data-label="Pinterest" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Pinterest</div>
-                    </div>
-                </a>
-                <a href="https://pluto.tv/" class="icon-item plutotv showing" data-label="Pluto TV" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Pluto TV</div>
-                    </div>
-                </a>
-                <a href="https://m.topflix.sh/genero/" class="icon-item topflix showing" data-label="TopFlix" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Topflix</div>
-                    </div>
-                </a>
-                <a href="https://meuguia.tv/programacao/categoria/Filmes" class="icon-item meuguia showing" data-label="Meu Guia TV" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Guia TV</div>
-                    </div>
-                </a>
-                <a href="https://www.azarado.com.br" class="icon-item azarado showing" data-label="Azarado Loterias" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Azarado</div>
-                    </div>
-                </a>
-                <a href="https://www.cartacapital.com.br/" class="icon-item cartacapital showing" data-label="CartaCapital" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Carta Capital</div>
-                    </div>
-                </a>
-                <a href="https://globfone.com/call-phone/" class="icon-item globfone showing" data-label="Globfone" target="_blank">
-                    <div class="icon-content">
-                        <div class="icon-label">Globfone</div>
-                    </div>
-                </a></div>
-        </div>
-    </div>
+        <div id="search-results-container"></div>
+    </main>
 
-    <div id="generator-modal-overlay" class=""></div>
-    <div id="generate-icon-code-section" class="">
-        <button id="close-generator-modal-btn">×</button>
-        <h2>Gerar Código com Novo Ícone</h2>
-        <form id="generate-icon-code-form">
+    <div id="generator-modal-overlay"></div>
+    <div id="generate-icon-code-section" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button id="close-generator-modal-btn" aria-label="Fechar modal">×</button>
+        <h2 id="modal-title">Adicionar Novo Ícone</h2>
+        <form id="icon-form" novalidate>
+            <input type="hidden" id="iconIdInput">
             <div class="form-group">
-                <label for="iconNameInput">Texto do Ícone:</label>
-                <input type="text" id="iconNameInput" required="">
+                <label for="iconNameInput">Título do Ícone:</label>
+                <input type="text" id="iconNameInput" required>
+            </div>
+            <div class="form-group">
+                <label for="iconDescriptionInput">Descrição (Opcional):</label>
+                <textarea id="iconDescriptionInput" rows="2" placeholder="Um texto curto sobre o ícone..."></textarea>
             </div>
             <div class="form-group">
                 <label for="iconLinkInput">Link do Ícone (URL):</label>
-                <input type="url" id="iconLinkInput" required="">
+                <input type="url" id="iconLinkInput" required>
             </div>
             <div class="form-group">
-                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2 ou deixe em branco)</span></label>
+                <label for="iconImageUrlInput">URL da Imagem do Ícone <span class="label-hint">(Opcional)</span></label>
+                <input type="url" id="iconImageUrlInput" placeholder="https://example.com/icon.png">
+            </div>
+            <div class="form-group">
+                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2, vpn)</span></label>
                 <input type="text" id="iconColorClassInput">
             </div>
             <div class="form-group">
-                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(ignorado se classe de cor preenchida)</span></label>
+                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(se classe de cor estiver em branco)</span></label>
                 <input type="color" id="iconCustomBgColorInput" value="#cccccc">
             </div>
             <div class="form-group">
-                <label for="iconCategorySelect">Categoria Onde Adicionar:</label>
-                <select id="iconCategorySelect" required="">
-                    <option value="" disabled="" selected="">Selecione uma categoria</option>
-                    <option value="servicos-utilidades">Serviços &amp; Utilidades</option>
-                    <option value="cursos-concursos">Cursos &amp; Concursos</option>
-                    <option value="ferramentas-downloads">Ferramentas &amp; Downloads</option>
-                    <option value="compras-produtividade">Compras &amp; Produtividade</option>
-                    <option value="design-audio">Design &amp; Áudio</option>
-                    <option value="midia-entretenimento">Mídia &amp; Entretenimento</option>
-                </select>
+                <label for="iconCategorySelect">Categoria:</label>
+                <select id="iconCategorySelect" required>
+                    <option value="" disabled selected>Selecione uma categoria</option>
+                    </select>
             </div>
-            <button type="button" id="generate-icon-code-button">Gerar Código</button>
+            <button type="submit" id="submit-icon-button">Salvar Ícone</button>
         </form>
-        <textarea id="generatedCodeOutput" readonly="" placeholder="O código HTML completo da página com o novo ícone aparecerá aqui..."></textarea>
-        <button type="button" id="copy-icon-code-button">Copiar Código</button>
+        <div id="form-status-message"></div>
     </div>
-    
-    <script>
-        // --- Constantes de Elementos do DOM ---
-        const searchInput = document.getElementById('search-input');
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const allCategoryDivs = document.querySelectorAll('.color-category');
-        const allCategoriesGrid = document.getElementById('allCategoriesGrid');
-        
-        const quickResultsContainer = document.getElementById('quick-results-container');
-        const quickResultsContent = document.getElementById('quick-results-content');
-        
-        // Elementos do Modal e do Gerador
-        const generatorModal = document.getElementById('generate-icon-code-section');
-        const modalOverlay = document.getElementById('generator-modal-overlay');
-        const openModalBtn = document.getElementById('open-generator-modal-btn');
-        const closeModalBtn = document.getElementById('close-generator-modal-btn');
-        const generateIconCodeForm = document.getElementById('generate-icon-code-form');
-        const iconNameInput = document.getElementById('iconNameInput');
-        const iconLinkInput = document.getElementById('iconLinkInput');
-        const iconColorClassInput = document.getElementById('iconColorClassInput');
-        const iconCustomBgColorInput = document.getElementById('iconCustomBgColorInput');
-        const iconCategorySelect = document.getElementById('iconCategorySelect');
-        const generateCodeButton = document.getElementById('generate-icon-code-button');
-        const generatedCodeOutput = document.getElementById('generatedCodeOutput');
-        const copyCodeButton = document.getElementById('copy-icon-code-button');
 
-        let typingTimer;
-        const doneTypingInterval = 200; //ms
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Funções do Tema ---
-        function applyTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                body.classList.add('dark-mode');
-                themeToggle.querySelector('span').textContent = 'Claro';
-            } else {
-                body.classList.remove('dark-mode');
-                themeToggle.querySelector('span').textContent = 'Escuro';
-            }
-        }
+        const config = {
+            firebase: {
+                apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
+                authDomain: "iconesutil.firebaseapp.com",
+                projectId: "iconesutil",
+                storageBucket: "iconesutil.appspot.com",
+                messagingSenderId: "88285859566",
+                appId: "1:88285859566:web:e15fdb0c615b494955edff"
+            },
+            categories: {
+                'servicos-utilidades': { name: 'Serviços & Utilidades', color: 'rgb(111, 66, 193)' },
+                'cursos-concursos': { name: 'Cursos & Concursos', color: 'rgb(40, 167, 69)' },
+                'ferramentas-downloads': { name: 'Ferramentas & Downloads', color: 'rgb(0, 123, 255)' },
+                'compras-produtividade': { name: 'Compras & Produtividade', color: 'rgb(253, 126, 20)' },
+                'design-audio': { name: 'Design & Áudio', color: 'rgb(255, 193, 7)' },
+                'midia-entretenimento': { name: 'Mídia & Entretenimento', color: 'rgb(220, 53, 69)' }
+            },
+        };
 
-        function toggleTheme() {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-                themeToggle.querySelector('span').textContent = 'Claro';
-            } else {
-                localStorage.setItem('theme', 'light');
-                themeToggle.querySelector('span').textContent = 'Escuro';
-            }
-        }
+        const state = { allIcons: [], currentUser: null, searchTerm: '' };
 
-        // --- Funções de Pesquisa e Filtro ---
-        function filterLinks() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-
-            if (searchTerm.length > 0) {
-                // Hide the main content (all categories)
-                body.classList.add('main-content-hidden');
-            } else {
-                // Show the main content (all categories)
-                body.classList.remove('main-content-hidden');
-            }
-
-            allCategoryDivs.forEach(categoryDiv => {
-                let hasVisibleLinksInCategory = false;
-                const linksInThisCategory = categoryDiv.querySelectorAll('.icon-item');
-                
-                linksInThisCategory.forEach(item => {
-                    const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
-                    // Verifica se o termo de pesquisa está contido no rótulo
-                    if (label.includes(searchTerm)) {
-                        item.classList.remove('hidden');
-                        item.classList.add('showing');
-                        hasVisibleLinksInCategory = true;
-                    } else {
-                        item.classList.remove('showing');
-                        item.classList.add('hidden');
-                    }
+        const FirebaseService = {
+            db: null, auth: null,
+            init() {
+                const app = initializeApp(config.firebase);
+                this.db = getFirestore(app);
+                this.auth = getAuth(app);
+            },
+            authenticate(callback) {
+                onAuthStateChanged(this.auth, user => {
+                    if (user) { state.currentUser = user; }
+                    else { signInAnonymously(this.auth); }
+                    callback();
                 });
-                
-                // Keep individual categories visible if they have matching links, regardless of 'main-content-hidden'
-                // This part ensures internal display logic for "showing" vs "hidden" icons works.
-            });
-        }
-        
-        function updateQuickResults(searchTerm) {
-            quickResultsContent.innerHTML = ''; 
+            },
+            onIconsUpdate(callback) {
+                onSnapshot(collection(this.db, "icones"), snapshot => callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
+            },
+            async updateIcon(id, data) { await updateDoc(doc(this.db, "icones", id), data); },
+            async addIcon(data) { await addDoc(collection(this.db, "icones"), { ...data, createdAt: serverTimestamp() }); },
+            async deleteIcon(id) { await deleteDoc(doc(this.db, "icones", id)); }
+        };
 
-            if (searchTerm.length === 0) {
-                quickResultsContainer.style.display = 'none';
-                return;
-            }
-            
-            quickResultsContainer.style.display = 'block';
-
-            let found = false;
-            const allIcons = document.querySelectorAll('#allCategoriesGrid .icon-item');
-
-            allIcons.forEach(item => {
-                const label = item.dataset.label ? item.dataset.label.toLowerCase() : '';
-                if (label.includes(searchTerm)) {
-                    const clone = item.cloneNode(true);
-                    clone.classList.remove('hidden', 'showing');
-                    clone.classList.add('quick-result-item');
-                    quickResultsContent.appendChild(clone);
-                    found = true;
+        const UIManager = {
+            elements: {},
+            init() {
+                this.elements = {
+                    body: document.body, mainContent: document.getElementById('main-content'),
+                    searchInput: document.getElementById('search-input'), themeToggle: document.getElementById('theme-toggle'),
+                    themeIcon: document.getElementById('theme-icon'),
+                    allCategoriesGrid: document.getElementById('all-categories-grid'),
+                    searchResultsContainer: document.getElementById('search-results-container'), modalOverlay: document.getElementById('generator-modal-overlay'),
+                    generatorModal: document.getElementById('generate-icon-code-section'), closeModalBtn: document.getElementById('close-generator-modal-btn'),
+                    iconForm: document.getElementById('icon-form'), formStatusMessage: document.getElementById('form-status-message'),
+                    modalTitle: document.getElementById('modal-title'), openModalBtn: document.getElementById('open-generator-modal-btn'),
+                    submitIconBtn: document.getElementById('submit-icon-button'),
+                };
+                this.populateCategorySelect();
+            },
+            populateCategorySelect() {
+                const select = this.elements.iconForm.elements.iconCategorySelect;
+                select.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
+                for (const id in config.categories) {
+                    select.innerHTML += `<option value="${id}">${config.categories[id].name}</option>`;
                 }
-            });
+            },
+            createIconElement(icon) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'icon-card-wrapper';
+                wrapper.dataset.id = icon.id;
 
-            if (!found) {
-                quickResultsContent.innerHTML = '<p class="no-results-message">Nenhum ícone encontrado.</p>';
-            }
-        }
+                const link = document.createElement('a');
+                link.href = icon.link;
+                link.className = 'icon-link';
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
 
-        function handleSearchFocus() {
-            // When the search field gains focus, always show quick results and hide main categories if typing
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            if (searchTerm.length > 0) {
-                 body.classList.add('main-content-hidden');
-                 updateQuickResults(searchTerm);
-            } else {
-                 body.classList.remove('main-content-hidden');
-                 quickResultsContainer.style.display = 'none';
-            }
-        }
+                const visual = document.createElement('div');
+                visual.className = 'icon-visual';
+                if (icon.colorClass) visual.classList.add(icon.colorClass);
+                else visual.style.backgroundColor = icon.customBgColor || '#ccc';
 
-        // --- Funções do Modal ---
-        function openGeneratorModal() {
-            modalOverlay.classList.add('visible');
-            generatorModal.classList.add('visible');
-            body.classList.add('modal-open');
-        }
+                const textContent = document.createElement('div');
+                textContent.className = 'icon-text-content';
+                const title = document.createElement('span');
+                title.className = 'icon-title';
+                title.textContent = icon.name;
+                textContent.appendChild(title);
 
-        function closeGeneratorModal() {
-            modalOverlay.classList.remove('visible');
-            generatorModal.classList.remove('visible');
-            body.classList.remove('modal-open');
-        }
+                visual.appendChild(textContent);
+                link.appendChild(visual);
+                wrapper.appendChild(link);
 
-        // --- Funções do Gerador de Código ---
-        function generateIconCode() {
-            const name = iconNameInput.value.trim();
-            const link = iconLinkInput.value.trim();
-            const colorClass = iconColorClassInput.value.trim();
-            const customBgColor = iconCustomBgColorInput.value;
-            const category = iconCategorySelect.value;
+                // Action button (lock icon)
+                const actionButton = document.createElement('button');
+                actionButton.className = 'icon-actions-button';
+                actionButton.setAttribute('aria-label', 'Opções do ícone');
+                actionButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+                    </svg>`;
+                actionButton.onclick = (e) => {
+                    e.preventDefault(); // Prevent navigating to the link
+                    e.stopPropagation(); // Prevent category collapse
+                    this.showContextMenu(icon, actionButton);
+                };
+                wrapper.appendChild(actionButton);
 
-            if (!name || !link || !category) {
-                generatedCodeOutput.value = 'Por favor, preencha todos os campos obrigatórios.';
-                return;
-            }
-            
-            let newIconHtml = `                <a href="${link}" class="icon-item`;
-            newIconHtml += colorClass ? ` ${colorClass}"` : ` custom-icon-color"`;
-            newIconHtml += ` data-label="${name}" target="_blank">\n                    <div class="icon-content"`;
-            if (!colorClass) {
-                newIconHtml += ` style="--icon-background-color: ${customBgColor}; background-color: var(--icon-background-color);"`;
-            }
-            newIconHtml += `>\n                        <div class="icon-label">${name}</div>\n                    </div>\n                </a>`;
+                return wrapper;
+            },
+            createCategoryCard(id, name) {
+                const card = document.createElement('section');
+                card.className = 'category-card';
+                card.id = `category-${id}`;
+                card.innerHTML = `
+                    <div class="category-header"><h2>${name}</h2></div>
+                    <div class="icons-grid"></div>`;
+                return card;
+            },
+            render() {
+                const { allCategoriesGrid, searchResultsContainer } = this.elements;
+                [allCategoriesGrid, searchResultsContainer].forEach(el => el.innerHTML = '');
 
-            const targetCategoryGrid = document.querySelector(`.color-category[data-category="${category}"] .links-grid`);
-             if (!targetCategoryGrid) {
-                generatedCodeOutput.value = `Erro: A categoria "${category}" não foi encontrada.`;
-                return;
-            }
+                const pinnedIcons = state.allIcons.filter(i => i.isPinned);
+                const regularIcons = state.allIcons.filter(i => !i.isPinned);
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = newIconHtml;
-            const newIconElement = tempDiv.firstElementChild;
-            
-            // --- INÍCIO DA CORREÇÃO ---
-            // 1. Guarda o estado original da página
-            const originalBodyClasses = body.className;
-            const modalElements = document.querySelectorAll('#generator-modal-overlay, #generate-icon-code-section');
+                if (state.searchTerm) {
+                    searchResultsContainer.style.display = 'flex';
+                    allCategoriesGrid.style.display = 'none';
+                    const matching = state.allIcons.filter(i => i.name.toLowerCase().includes(state.searchTerm));
+                    if (matching.length) {
+                        matching.forEach(i => searchResultsContainer.appendChild(this.createIconElement(i)));
+                    } else {
+                        searchResultsContainer.innerHTML = `<p style="color: var(--text-color);">Nenhum ícone encontrado.</p>`;
+                    }
+                } else {
+                    searchResultsContainer.style.display = 'none';
+                    allCategoriesGrid.style.display = 'block';
 
-            // 2. Prepara o DOM para a captura: remove classes de bloqueio e visibilidade do modal.
-            body.className = originalBodyClasses.replace(/modal-open|no-scroll|search-active/g, '').trim();
-            modalElements.forEach(el => el.classList.remove('visible'));
+                    // Render Pinned Category
+                    if (pinnedIcons.length > 0) {
+                        const pinnedCard = this.createCategoryCard('fixados', 'Fixados!');
+                        const pinnedGrid = pinnedCard.querySelector('.icons-grid');
+                        pinnedIcons.sort((a, b) => a.name.localeCompare(b.name));
+                        pinnedIcons.forEach(i => pinnedGrid.appendChild(this.createIconElement(i)));
+                        allCategoriesGrid.appendChild(pinnedCard);
+                    }
 
-            // 3. Adiciona o novo ícone para que ele faça parte do HTML capturado.
-            targetCategoryGrid.appendChild(newIconElement);
+                    // Render Regular Categories
+                    const byCategory = regularIcons.reduce((acc, i) => {
+                        (acc[i.category] = acc[i.category] || []).push(i);
+                        return acc;
+                    }, {});
 
-            // 4. Captura o código HTML completo da página agora "limpa".
-            const fullPageHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                    for (const id in config.categories) {
+                        const icons = byCategory[id] || [];
+                        if (icons.length > 0) {
+                            const card = this.createCategoryCard(id, config.categories[id].name);
+                            const grid = card.querySelector('.icons-grid');
+                            icons.sort((a, b) => a.name.localeCompare(b.name));
+                            icons.forEach(i => grid.appendChild(this.createIconElement(i)));
+                            allCategoriesGrid.appendChild(card);
+                        }
+                    }
 
-            // 5. Restaura o estado original da página para o usuário não notar a mudança.
-            targetCategoryGrid.removeChild(newIconElement); // Remove o ícone temporário
-            body.className = originalBodyClasses; // Devolve as classes originais ao body
-            modalElements.forEach(el => el.classList.add('visible')); // Garante que o modal continue visível
-            // --- FIM DA CORREÇÃO ---
-
-            generatedCodeOutput.value = fullPageHtml;
-            generatedCodeOutput.focus();
-            generatedCodeOutput.select();
-        }
-
-        function copyGeneratedCode() {
-            if(!generatedCodeOutput.value) return;
-
-            generatedCodeOutput.select();
-            generatedCodeOutput.setSelectionRange(0, 99999);
-            document.execCommand('copy');
-            
-            const messageBox = document.createElement('div');
-            messageBox.textContent = 'Código copiado!';
-            messageBox.style.cssText = `
-                position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-                background-color: #4caf50; color: white; padding: 10px 20px;
-                border-radius: 5px; z-index: 1060; opacity: 0;
-                transition: opacity 0.5s, top 0.5s;
-            `;
-            document.body.appendChild(messageBox);
-
-            setTimeout(() => {
-                messageBox.style.opacity = '1';
-                messageBox.style.top = '30px';
-            }, 10);
-
-            setTimeout(() => {
-                messageBox.style.opacity = '0';
-                messageBox.addEventListener('transitionend', () => messageBox.remove());
-            }, 2000);
-        }
-
-        // --- Event Listeners ---
-        themeToggle.addEventListener('click', toggleTheme);
-        openModalBtn.addEventListener('click', openGeneratorModal);
-        closeModalBtn.addEventListener('click', closeGeneratorModal);
-        modalOverlay.addEventListener('click', closeGeneratorModal);
-        
-        searchInput.addEventListener('input', () => {
-            clearTimeout(typingTimer);
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            typingTimer = setTimeout(() => {
-                filterLinks();
-                updateQuickResults(searchTerm);
-            }, doneTypingInterval);
-        });
-
-        searchInput.addEventListener('focus', handleSearchFocus);
-        
-        searchInput.addEventListener('blur', () => {
-            setTimeout(() => {
-                if(searchInput.value.trim().length === 0) {
-                    quickResultsContainer.style.display = 'none';
-                    body.classList.remove('main-content-hidden'); // Ensure main content is visible again
-                }
-            }, 200); // Pequeno atraso para permitir cliques nos resultados rápidos
-        });
-
-        generateCodeButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            generateIconCode();
-        });
-        copyCodeButton.addEventListener('click', copyGeneratedCode);
-
-        // --- Inicialização ---
-        document.addEventListener('DOMContentLoaded', () => {
-            applyTheme();
-            // Initially ensure main content is visible and quick results are hidden
-            body.classList.remove('main-content-hidden');
-            quickResultsContainer.style.display = 'none';
-
-            // --- NOVO: LÓGICA PARA CATEGORIAS RETRÁTEIS ---
-            const categories = document.querySelectorAll('.color-category');
-
-            categories.forEach((category, index) => {
-                const header = category.querySelector('h2');
-
-                // Por padrão, recolhe todas as categorias, exceto a primeira
-                if (index > 0) {
-                    category.classList.add('collapsed');
-                }
-
-                if (header) {
-                    header.addEventListener('click', () => {
-                        category.classList.toggle('collapsed');
+                    const cards = allCategoriesGrid.querySelectorAll('.category-card');
+                    cards.forEach((card, index) => {
+                        // Collapse all categories except "Fixados!" or the first one if "Fixados!" is not present
+                        if (card.id !== 'category-fixados' && index > (pinnedIcons.length > 0 ? 0 : -1)) {
+                            card.classList.add('collapsed');
+                        }
                     });
                 }
-            });
-        });
+            },
+            toggleTheme(isDark) {
+                this.elements.body.classList.toggle('dark-mode', isDark);
+                const themeText = this.elements.themeToggle.querySelector('span');
+                const themeIcon = this.elements.themeIcon;
+
+                if (isDark) {
+                    themeText.textContent = 'Escuro';
+                    themeIcon.innerHTML = `<path d="M9.59 4.88c-.23-.23-.52-.37-.84-.37-.66 0-1.19.53-1.19 1.19 0 .32.14.61.37.84.45.45.69 1.05.69 1.69 0 .64-.24 1.24-.69 1.69-.23.23-.37.52-.37.84 0 .66.53 1.19 1.19 1.19.32 0 .61-.14.84-.37.45-.45 1.05-.69 1.69-.69.64 0 1.24.24 1.69.69.23.23.52.37.84.37.66 0 1.19-.53 1.19-1.19 0-.32-.14-.61-.37-.84-.45-.45-.69-1.05-.69-1.69 0-.64.24-1.24.69-1.69.23-.23.37-.52.37-.84 0-.66-.53-1.19-1.19-1.19-.32 0-.61.14-.84.37-.45.45-1.05.69-1.69.69-.64 0-1.24-.24-1.69-.69zM12 21c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z"/>`; // Moon icon
+                } else {
+                    themeText.textContent = 'Claro';
+                    themeIcon.innerHTML = `<path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.045 7.045a.75.75 0 0 1 1.06-1.06l1.591 1.59a.75.75 0 0 1-1.06 1.06l-1.59-1.591ZM18.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5h2.25a.75.75 0 0 1 .75.75ZM6.205 17.795a.75.75 0 0 1-1.06-1.06l1.59-1.591a.75.75 0 0 1 1.06 1.06l-1.591 1.59ZM12 15.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5ZM12 9a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V9.75A.75.75 0 0 1 12 9Z" />`; // Sun icon
+                }
+            },
+            openModal(data = null) {
+                const { iconForm, modalTitle, generatorModal, modalOverlay, submitIconBtn } = this.elements;
+                iconForm.reset();
+                this.elements.formStatusMessage.className = '';
+                modalTitle.textContent = data ? 'Editar Ícone' : 'Adicionar Novo Ícone';
+                submitIconBtn.textContent = data ? 'Atualizar Ícone' : 'Salvar Ícone';
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const input = iconForm.elements[`icon${key.charAt(0).toUpperCase() + key.slice(1)}Input`];
+                        if (input) input.value = data[key];
+                    });
+                    iconForm.elements.iconIdInput.value = data.id;
+                    iconForm.elements.iconCategorySelect.value = data.category;
+                    iconForm.elements.iconCustomBgColorInput.value = data.customBgColor || '#cccccc';
+                    iconForm.elements.iconDescriptionInput.value = data.description || '';
+                }
+                generatorModal.classList.add('visible');
+                modalOverlay.classList.add('visible');
+            },
+            closeModal() {
+                this.elements.generatorModal.classList.remove('visible');
+                this.elements.modalOverlay.classList.remove('visible');
+            },
+            showContextMenu(icon, button) {
+                // Remove any existing context menus
+                document.querySelectorAll('.context-menu').forEach(menu => menu.remove());
+
+                const contextMenu = document.createElement('ul');
+                contextMenu.className = 'context-menu';
+                contextMenu.innerHTML = `
+                    <li data-action="edit">Editar</li>
+                    <li data-action="animate">Animar Ícone</li>
+                    <li data-action="toggle-pin">${icon.isPinned ? 'Desafixar' : 'Fixar'}</li>
+                    <li data-action="delete" class="danger-option">Excluir</li>
+                `;
+                button.parentElement.appendChild(contextMenu);
+                button.classList.add('active'); // Keep button highlighted while menu is open
+
+                // Position the menu
+                const buttonRect = button.getBoundingClientRect();
+                contextMenu.style.top = `${buttonRect.height + 5}px`;
+                contextMenu.style.right = `0px`; // Align to the right of the button
+                contextMenu.classList.add('show');
+
+                // Add click listener for menu items
+                contextMenu.addEventListener('click', (e) => {
+                    const action = e.target.dataset.action;
+                    if (action) {
+                        switch (action) {
+                            case 'edit':
+                                UIManager.openModal(icon);
+                                break;
+                            case 'animate':
+                                const iconLink = button.closest('.icon-link');
+                                if (iconLink) {
+                                    iconLink.classList.add('animate-bounce');
+                                    setTimeout(() => {
+                                        iconLink.classList.remove('animate-bounce');
+                                    }, 1000); // Remove animation class after 1 second
+                                }
+                                break;
+                            case 'toggle-pin':
+                                FirebaseService.updateIcon(icon.id, { isPinned: !icon.isPinned });
+                                break;
+                            case 'delete':
+                                if (confirm(`Tem certeza que deseja excluir o ícone "${icon.name}"?`)) {
+                                    FirebaseService.deleteIcon(icon.id);
+                                }
+                                break;
+                        }
+                    }
+                    contextMenu.remove();
+                    button.classList.remove('active');
+                });
+
+                // Close menu when clicking outside
+                const closeMenu = (e) => {
+                    if (!contextMenu.contains(e.target) && e.target !== button) {
+                        contextMenu.remove();
+                        button.classList.remove('active');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                };
+                document.addEventListener('click', closeMenu);
+            }
+        };
+
+        const App = {
+            init() {
+                UIManager.init();
+                this.setupEventListeners();
+                const theme = localStorage.getItem('theme') || 'dark'; // Default to dark mode
+                UIManager.toggleTheme(theme === 'dark');
+                FirebaseService.init();
+                FirebaseService.authenticate(() => {
+                    FirebaseService.onIconsUpdate(icons => {
+                        state.allIcons = icons;
+                        UIManager.render();
+                    });
+                });
+            },
+            setupEventListeners() {
+                UIManager.elements.themeToggle.addEventListener('click', () => {
+                    const isDark = UIManager.elements.body.classList.toggle('dark-mode');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    UIManager.toggleTheme(isDark);
+                });
+                UIManager.elements.searchInput.addEventListener('input', e => {
+                    state.searchTerm = e.target.value.toLowerCase().trim();
+                    UIManager.render();
+                });
+                UIManager.elements.mainContent.addEventListener('click', this.handleMainContentClick);
+                UIManager.elements.openModalBtn.addEventListener('click', () => UIManager.openModal());
+                UIManager.elements.closeModalBtn.addEventListener('click', () => UIManager.closeModal());
+                UIManager.elements.iconForm.addEventListener('submit', this.handleFormSubmit);
+            },
+            handleFormSubmit(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = {
+                    name: form.elements.iconNameInput.value.trim(),
+                    description: form.elements.iconDescriptionInput.value.trim(),
+                    link: form.elements.iconLinkInput.value.trim(),
+                    imageUrl: form.elements.iconImageUrlInput.value.trim(),
+                    colorClass: form.elements.iconColorClassInput.value.trim(),
+                    customBgColor: form.elements.iconCustomBgColorInput.value,
+                    category: form.elements.iconCategorySelect.value,
+                    // Keep existing isPinned status on update, default to false on new icon
+                    isPinned: form.elements.iconIdInput.value ? state.allIcons.find(i => i.id === form.elements.iconIdInput.value)?.isPinned || false : false,
+                };
+
+                // Clear unused color property if one is preferred
+                if (data.colorClass) {
+                    delete data.customBgColor;
+                } else if (data.customBgColor) {
+                    delete data.colorClass;
+                }
+
+                const id = form.elements.iconIdInput.value;
+                const promise = id ? FirebaseService.updateIcon(id, data) : FirebaseService.addIcon(data);
+                promise.then(() => UIManager.closeModal()).catch(err => {
+                    UIManager.elements.formStatusMessage.textContent = `Erro: ${err.message}`;
+                    UIManager.elements.formStatusMessage.classList.add('error');
+                    console.error("Erro ao salvar ícone:", err);
+                });
+            },
+            handleMainContentClick(e) {
+                const header = e.target.closest('.category-header');
+                // Only collapse/expand if not clicking on the action button or inside a context menu
+                if (header && !e.target.closest('.icon-actions-button') && !e.target.closest('.context-menu')) {
+                    header.parentElement.classList.toggle('collapsed');
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
-
-
-
-
-</body></html>
+</body>
+</html>
