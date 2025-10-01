@@ -204,6 +204,10 @@
             border-radius: 8px; box-sizing: border-box; font-size: 1em;
             background-color: var(--input-bg-color); color: var(--text-color);
         }
+        /* ESTILO PARA AVISO DE CAMPO OPCIONAL/OBRIGATÓRIO */
+        .form-group label span.optional { font-weight: normal; font-size: 0.9em; color: #6c757d; }
+        .form-group label span.required { font-weight: normal; font-size: 0.9em; color: #dc3545; }
+
         #submit-icon-button {
             width: 100%; padding: 12px 15px; background-color: var(--primary-color);
             color: white; border: none; border-radius: 8px; font-size: 1.1em;
@@ -268,32 +272,36 @@
         <h2 id="modal-title">Adicionar Novo Ícone</h2>
         <form id="icon-form">
             <input type="hidden" name="iconIdInput">
+            
             <div class="form-group">
-                <label for="iconNameInput">Texto do Ícone:</label>
-                <input type="text" id="iconNameInput" name="iconNameInput" required>
+                <label for="iconNameInput">Texto do Ícone (Título) <span class="optional">(Opcional)</span>:</label>
+                <input type="text" id="iconNameInput" name="iconNameInput"> 
             </div>
-             <div class="form-group">
-                <label for="iconDescriptionInput">Descrição (opcional):</label>
+            
+            <div class="form-group">
+                <label for="iconDescriptionInput">Descrição para Busca <span class="optional">(Opcional)</span>:</label>
                 <textarea id="iconDescriptionInput" name="iconDescriptionInput" rows="2"></textarea>
             </div>
+            
             <div class="form-group">
-                <label for="iconLinkInput">Link do Ícone (URL):</label>
+                <label for="iconLinkInput">Link do Ícone (URL) <span class="required">(Obrigatório)</span>:</label>
                 <input type="url" id="iconLinkInput" name="iconLinkInput" required>
             </div>
+            
             <div class="form-group">
-                <label for="iconImageUrlInput">URL da Imagem (opcional):</label>
+                <label for="iconImageUrlInput">URL da Imagem <span class="optional">(Opcional)</span>:</label>
                 <input type="url" id="iconImageUrlInput" name="iconImageUrlInput">
             </div>
             <div class="form-group">
-                <label for="iconColorClassInput">Classe da Cor (ex: verde, azul2)</label>
+                <label for="iconColorClassInput">Classe da Cor (ex: verde, azul2) <span class="optional">(Opcional)</span>:</label>
                 <input type="text" id="iconColorClassInput" name="iconColorClassInput">
             </div>
             <div class="form-group">
-                <label for="iconCustomBgColorInput">Cor de Fundo (se classe vazia)</label>
+                <label for="iconCustomBgColorInput">Cor de Fundo (se classe vazia) <span class="optional">(Opcional)</span>:</label>
                 <input type="color" id="iconCustomBgColorInput" name="iconCustomBgColorInput" value="#cccccc" style="height: 45px;">
             </div>
             <div class="form-group">
-                <label for="iconCategorySelect">Categoria:</label>
+                <label for="iconCategorySelect">Categoria <span class="required">(Obrigatório)</span>:</label>
                 <select id="iconCategorySelect" name="iconCategorySelect" required></select>
             </div>
             <button type="submit" id="submit-icon-button">Salvar Ícone</button>
@@ -386,34 +394,40 @@
                 const visual = document.createElement('div');
                 visual.className = 'icon-visual';
                 
-                // --- ALTERAÇÃO FEITA AQUI PARA ATENDER AO REQUISITO ---
+                // Adiciona o nome (título) e descrição (se existirem) como data attributes para o filtro de busca
+                // O data-description garante que a descrição esteja acessível para o filtro, mesmo que não seja visível.
+                wrapper.dataset.title = icon.name ? icon.name.toLowerCase() : '';
+                wrapper.dataset.description = icon.description ? icon.description.toLowerCase() : '';
+
                 if (icon.imageUrl) {
                     const img = document.createElement('img');
                     img.src = icon.imageUrl;
-                    img.alt = icon.name;
-                    // Força a imagem a ter 100% da altura do .icon-link (55px) e 100% da largura.
-                    // 'object-fit: fill' garante que a imagem preencha a área, achatando se necessário.
+                    // Usa o nome como alt text, mas se for vazio, usa um fallback genérico
+                    img.alt = icon.name || "Ícone Personalizado";
                     img.style.width = '100%'; 
                     img.style.height = '100%';
                     img.style.objectFit = 'fill'; 
                     visual.appendChild(img);
                 } else {
-                    // Fallback para cor de fundo e letra (o visual agora é o container do img)
                     if (icon.colorClass) visual.classList.add(icon.colorClass);
                     else visual.style.backgroundColor = icon.customBgColor || '#ccc';
 
                     const fallbackLetter = document.createElement('span');
                     fallbackLetter.className = 'icon-visual-fallback';
-                    fallbackLetter.textContent = icon.name.charAt(0).toUpperCase();
+                    fallbackLetter.textContent = (icon.name && icon.name.length > 0) ? icon.name.charAt(0).toUpperCase() : '?';
                     visual.appendChild(fallbackLetter);
                 }
-                // --------------------------------------------------------
 
                 const textContent = document.createElement('div');
                 textContent.className = 'icon-text-content';
                 const title = document.createElement('span');
                 title.className = 'icon-title';
-                title.textContent = icon.name;
+                // ***************************************************************
+                // ** ALTERAÇÃO AQUI: Removemos o fallback para 'Sem Título'.  **
+                // ** Se `icon.name` for string vazia, `title.textContent`    **
+                // ** será vazio, o que esconde o texto.                      **
+                // ***************************************************************
+                title.textContent = icon.name || ''; 
                 textContent.appendChild(title);
 
                 const actionButton = document.createElement('button');
@@ -444,8 +458,14 @@
                 allCategoriesGrid.innerHTML = ''; 
                 searchResultsContainer.innerHTML = '';
 
+                const term = state.searchTerm;
                 const filteredIcons = state.searchTerm
-                    ? state.allIcons.filter(i => i.name.toLowerCase().includes(state.searchTerm))
+                    ? state.allIcons.filter(i => {
+                        const name = (i.name || '').toLowerCase();
+                        const description = (i.description || '').toLowerCase();
+                        // Altera a condição de filtro para incluir a descrição
+                        return name.includes(term) || description.includes(term);
+                    })
                     : state.allIcons;
 
                 if (state.searchTerm) {
@@ -454,7 +474,7 @@
                     if (filteredIcons.length) {
                         filteredIcons.forEach(i => searchResultsContainer.appendChild(this.createIconElement(i)));
                     } else {
-                        searchResultsContainer.innerHTML = `<p style="color: var(--text-color); grid-column: 1 / -1; text-align: center;">Nenhum ícone encontrado.</p>`;
+                        searchResultsContainer.innerHTML = `<p style="color: var(--text-color); grid-column: 1 / -1; text-align: center;">Nenhum ícone encontrado para **"${state.searchTerm}"**.</p>`;
                     }
                 } else {
                     searchResultsContainer.style.display = 'none';
@@ -481,7 +501,7 @@
                         if (icons.length > 0) {
                             const card = this.createCategoryCard(id, config.categories[id].name);
                             const grid = card.querySelector('.icons-grid');
-                            icons.sort((a, b) => a.name.localeCompare(b.name));
+                            icons.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                             icons.forEach(i => grid.appendChild(this.createIconElement(i)));
                             allCategoriesGrid.appendChild(card);
                         }
@@ -559,7 +579,9 @@
                     if (action === 'edit') App.editIcon(icon.id);
                     if (action === 'pin') FirebaseService.updateIcon(icon.id, { isPinned: !icon.isPinned });
                     if (action === 'delete') {
-                        if (confirm(`Tem certeza que deseja excluir o ícone "${icon.name}"?`)) {
+                        // Usa o nome ou 'Sem Título' para o alerta
+                        const nameForAlert = icon.name && icon.name.trim().length > 0 ? icon.name : 'Sem Título';
+                        if (confirm(`Tem certeza que deseja excluir o ícone "${nameForAlert}"?`)) {
                             FirebaseService.deleteIcon(icon.id);
                         }
                     }
@@ -582,13 +604,19 @@
             },
             bindEvents() {
                 const { searchInput, themeToggle, openModalBtn, closeModalBtn, iconForm, allCategoriesGrid, modalOverlay } = UIManager.elements;
+                
+                // NOVO: Adiciona um atraso pequeno para evitar renderização excessiva
+                let searchTimeout;
                 searchInput.addEventListener('input', e => {
-                    state.searchTerm = e.target.value.toLowerCase().trim();
-                    UIManager.render();
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        state.searchTerm = e.target.value.toLowerCase().trim();
+                        UIManager.render();
+                    }, 200); // 200ms de atraso
                 });
+                
                 themeToggle.addEventListener('click', () => {
                     const isDark = !document.body.classList.contains('dark-mode');
-                    // Grava o último tema definido
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                     UIManager.toggleTheme(isDark);
                 });
@@ -602,23 +630,15 @@
                 iconForm.addEventListener('submit', this.handleFormSubmit);
             },
             loadTheme() {
-                // Modificado para priorizar 'light' como padrão de inicialização
                 const savedTheme = localStorage.getItem('theme');
-                let initialTheme = 'light'; // Padrão de inicialização é 'light'
+                let initialTheme = 'light'; 
 
                 if (savedTheme) {
-                    initialTheme = savedTheme; // Se houver tema salvo, usa ele
-                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    // Removendo a checagem de preferência de sistema para garantir "claro" como padrão
-                    // de *primeira* inicialização, conforme solicitado.
+                    initialTheme = savedTheme;
                 }
-
-                // Salva o tema inicial no localStorage se não houver um para garantir
-                // que o clique no botão comece a salvar o estado correto.
                 if (!savedTheme) {
                    localStorage.setItem('theme', initialTheme);
                 }
-
                 UIManager.toggleTheme(initialTheme === 'dark');
             },
             async handleFormSubmit(event) {
@@ -626,14 +646,23 @@
                 const form = event.target;
                 const id = form.elements.iconIdInput.value;
                 const data = {
-                    name: form.elements.iconNameInput.value.trim(),
-                    description: form.elements.iconDescriptionInput.value.trim(),
+                    // Texto do ícone (nome) agora é opcional. Se for vazio, salva como string vazia.
+                    name: form.elements.iconNameInput.value.trim() || '', 
+                    description: form.elements.iconDescriptionInput.value.trim() || '', // Descrição opcional
                     link: form.elements.iconLinkInput.value.trim(),
                     imageUrl: form.elements.iconImageUrlInput.value.trim(),
                     colorClass: form.elements.iconColorClassInput.value.trim(),
                     customBgColor: form.elements.iconCustomBgColorInput.value,
                     category: form.elements.iconCategorySelect.value,
                 };
+
+                // Validação mínima para garantir que pelo menos um campo de nome/descrição/imagem não esteja vazio
+                if (!data.name && !data.description && !data.imageUrl) {
+                    UIManager.elements.formStatusMessage.textContent = 'Adicione pelo menos um Título, Descrição ou URL da Imagem.';
+                    UIManager.elements.formStatusMessage.style.display = 'block';
+                    return;
+                }
+
                 try {
                     if (id) await FirebaseService.updateIcon(id, data);
                     else await FirebaseService.addIcon(data);
