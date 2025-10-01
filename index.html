@@ -3,375 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gratuitos! - Acesso Rápido (Refatorado)</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
-    <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Gratuitos!</title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
     <style>
-        /* ==========================================================================
-           1. CONFIGURAÇÃO GERAL E VARIÁVEIS DE TEMA (MODO CLARO)
-           ========================================================================== */
         :root {
-            --bg-color: #F0F2F5;
-            --text-color: #333333;
-            --text-color-light: #6c757d;
-            --card-bg-color: #FFFFFF;
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --header-bg-color: rgba(255, 255, 255, 0.7);
-            --input-bg-color: #F8F8F8;
-            --input-border-color: #DDDDDD;
-            --button-bg-color: #E0E0E0;
-            --button-text-color: #333333;
-            --separator-color: #EEEEEE;
-            --primary-color: #007BFF;
-            --primary-color-rgb: 0, 123, 255;
-            --primary-color-hover: #0069D9;
-            --danger-color: #DC3545;
-            --context-menu-bg: #FFFFFF;
-            --context-menu-border: #EEEEEE;
-            --context-menu-item-hover: #F0F0F0;
+            --bg-color: #f0f2f5; --text-color: #333; --card-bg-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.08); --border-color: rgba(0, 0, 0, 0.05);
+            --primary-color: #007bff; --primary-hover-color: #0056b3;
+            --header-text-color: #007bff; --input-bg-color: #ffffff;
+            --input-border-color: #ccc; --button-secondary-bg: #e9ecef;
+            /* Nova variável para o container dos ícones no modo escuro */
+            --dark-icon-container-bg: #424242;
         }
-
-        /* ==========================================================================
-           2. MODO NOTURNO REFORMULADO
-           ========================================================================== */
         body.dark-mode {
-            --bg-color: #121212;
-            --text-color: #EAEAEA;
-            --text-color-light: #a0a0a0;
-            --card-bg-color: #1E1E1E;
-            --card-shadow: none;
-            --header-bg-color: rgba(30, 30, 30, 0.7);
-            --input-bg-color: #252525;
-            --input-border-color: #383838;
-            --button-bg-color: #333333;
-            --button-text-color: #EAEAEA;
-            --separator-color: #383838;
-            --context-menu-bg: #252525;
-            --context-menu-border: #383838;
-            --context-menu-item-hover: #383838;
+            --bg-color: #2c2c2c; --text-color: #e0e0e0; --card-bg-color: var(--dark-icon-container-bg);
+            --shadow-color: rgba(0, 0, 0, 0.3); --border-color: rgba(255, 255, 255, 0.1);
+            --header-text-color: #0099ff; --input-bg-color: #3c3c3c;
+            --input-border-color: #555; --button-secondary-bg: #555;
+            --primary-color: #0099ff;
         }
 
-        /* ==========================================================================
-           3. ESTILOS BASE E LAYOUT PRINCIPAL
-           ========================================================================== */
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding-top: 90px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 100px 20px 40px;
+            background-color: var(--bg-color); color: var(--text-color);
             transition: background-color .3s ease, color .3s ease;
-            font-size: 1em;
-            line-height: 1.6;
         }
         body.modal-open { overflow: hidden; }
 
-        main {
-            padding: 25px;
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 1;
+        /* --- Barra de Pesquisa Fixa --- */
+        #top-search-bar-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background-color: var(--bg-color); box-shadow: 0 2px 10px var(--shadow-color);
+            padding: 10px 20px; box-sizing: border-box; display: flex;
+            justify-content: center; transition: background-color .3s ease;
         }
-
-        /* ==========================================================================
-           4. CABEÇALHO COM EFEITO "GLASSMORPHISM"
-           ========================================================================== */
-        #page-header {
-            position: fixed; top: 0; left: 0; width: 100%; padding: 18px 25px;
-            background-color: var(--header-bg-color);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            z-index: 1000; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box; display: flex; justify-content: center; align-items: center;
-            border-bottom: 1px solid var(--separator-color);
-        }
-        .header-content {
-            width: 100%; max-width: 1400px;
-            display: flex; gap: 10px; align-items: center;
+        #search-container {
+            width: 100%; max-width: 600px; display: flex; align-items: center;
+            padding: 8px; background-color: var(--card-bg-color);
+            border-radius: 50px; box-shadow: 0 4px 15px var(--shadow-color);
         }
         #search-input {
-            flex-grow: 1; padding: 12px 18px; border: 1px solid var(--input-border-color);
-            border-radius: 9999px; font-size: 1.05em; background-color: var(--input-bg-color);
-            color: var(--text-color); outline: none; transition: all .2s ease;
+            flex-grow: 1; border: none; font-size: 1.1em;
+            background-color: transparent; color: var(--text-color); outline: none; padding: 12px 15px;
         }
-        #search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2); }
-        .header-button {
-            flex-shrink: 0; background-color: var(--button-bg-color); color: var(--button-text-color);
-            border: none; border-radius: 50%; width: 48px; height: 48px; cursor: pointer;
-            font-size: 1rem; transition: all .2s ease; display: flex; justify-content: center;
-            align-items: center; padding: 0;
+        .action-button {
+            flex-shrink: 0; margin-left: 8px; background-color: var(--button-secondary-bg);
+            color: var(--text-color); border: none; border-radius: 50%;
+            width: 40px; height: 40px; cursor: pointer; display: flex;
+            justify-content: center; align-items: center; padding: 0;
+            transition: background-color .3s ease, transform .2s ease;
         }
-        .header-button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-        #theme-toggle {
-            display: flex; align-items: center; gap: 8px; border-radius: 25px; padding: 0 15px;
-            width: auto; min-width: 100px;
-        }
-        #theme-toggle span { font-size: 0.75em; font-weight: 600; }
+        .action-button:hover { transform: scale(1.1); }
+        .action-button svg { width: 22px; height: 22px; }
+        #theme-toggle span { font-size: 0.7em; font-weight: bold; }
 
-        /* ==========================================================================
-           5. CARDS DE CATEGORIA E LISTA DE ÍCONES (LAYOUT NOVO)
-           ========================================================================== */
-        .category-grid { display: block; }
-        .category-card {
-            background-color: var(--card-bg-color); box-shadow: var(--card-shadow);
-            margin-bottom: 25px; border-radius: 12px; overflow: hidden;
-            transition: box-shadow .3s ease;
+        /* --- Conteúdo Principal e Categorias (NOVO ESTILO) --- */
+        #all-categories-grid, #search-results-container {
+            max-width: 1200px; width: 100%; margin: 0 auto;
         }
-        body.dark-mode .category-card { border: 1px solid var(--separator-color); }
+        .category-card {
+            background: none; box-shadow: none; padding: 0;
+            margin-bottom: 40px; transition: all 0.3s ease; overflow: hidden;
+        }
         .category-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px; cursor: pointer;
+            cursor: pointer; user-select: none;
+            border: 2px solid var(--primary-color);
+            border-radius: 50px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
         }
         .category-header h2 {
-            margin: 0; font-size: 1.2em; color: var(--text-color); font-weight: 600;
+            text-align: center; margin: 0; font-size: 1.3em;
+            color: var(--primary-color); font-weight: 600;
         }
-        .category-header::after {
-            content: '−'; font-size: 1.8em; font-weight: bold; color: var(--text-color);
-            transition: transform 0.3s ease-out;
-        }
-        .category-card.collapsed .category-header::after {
-            transform: rotate(-90deg); content: '+';
-        }
-
+        .category-card.collapsed .icons-grid { max-height: 0; padding: 0; margin-top: 0; opacity: 0; }
+        
+        /* --- Contêiner dos Ícones (NOVO ESTILO) --- */
         .icons-grid, #search-results-container {
-            /* NOVO: Alterado para layout de lista vertical */
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Espaçamento entre os itens da lista */
-            padding: 20px;
-            border-top: 1px solid var(--separator-color);
-            max-height: 2000px;
-            overflow: hidden;
-            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, border-color 0.4s ease;
-        }
-        .category-card.collapsed .icons-grid {
-            max-height: 0; padding-top: 0; padding-bottom: 0; border-top-color: transparent;
-        }
-
-        #search-results-container {
-            display: none; /* Gerenciado por JS */
-            background-color: var(--card-bg-color); border-radius: 12px;
-            border: 1px solid var(--separator-color);
-        }
-
-        /* ==========================================================================
-           6. ESTILO DOS ÍCONES INDIVIDUAIS (FORMATO DE LISTA)
-           ========================================================================== */
-        .icon-card-wrapper { position: relative; }
-
-        .icon-link {
-            /* NOVO: Estilo de item de lista, parecido com a barra de pesquisa */
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 9999px; /* Forma de pílula */
-            background-color: var(--input-bg-color);
-            border: 1px solid var(--input-border-color);
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .icon-link:hover {
-            border-color: var(--primary-color);
+            gap: 15px;
             background-color: var(--card-bg-color);
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            max-height: 4000px; /* Altura grande para permitir transição */
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out, opacity 0.5s ease-in-out;
         }
+        #search-results-container { 
+            display: none; /* JS controla a visibilidade */
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        /* --- Ícones (NOVO ESTILO) --- */
+        .icon-card-wrapper { position: relative; width: 100%; }
+        .icon-link {
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+            border-radius: 50px;
+            overflow: hidden;
+            height: 55px;
+            box-sizing: border-box;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .icon-link:hover { transform: translateY(-2px); }
 
         .icon-visual {
-            /* NOVO: se torna um círculo de cor à esquerda */
-            flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            margin-right: 15px;
+            position: absolute;
+            inset: 0; /* Cobre todo o .icon-link */
+            z-index: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.1em;
         }
-        .icon-visual-fallback {
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-        .icon-text-content {
-            /* NOVO: Ocupa o espaço restante */
-            flex-grow: 1;
-            color: var(--text-color) !important;
-            text-shadow: none;
-            padding: 0;
+        
+        .icon-text-content, .icon-actions-button {
+            position: relative;
+            z-index: 2; /* Fica na frente do fundo */
         }
         .icon-title {
-            font-size: 1em;
-            font-weight: 500;
-            text-align: left;
-            text-transform: none; /* Título com capitalização normal */
-            line-height: 1.3;
-            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
         }
+        .icon-visual-fallback { display: none; } /* Não precisamos mais da letra */
 
         .icon-actions-button {
-            /* NOVO: Reposicionado para o final do item da lista */
-            position: static;
-            opacity: 1;
-            margin-left: 15px;
-            flex-shrink: 0;
-            background-color: transparent;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.15);
             border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s ease;
+            opacity: 0.8;
+            transition: opacity 0.2s, background-color 0.2s;
         }
-        .icon-actions-button svg {
-            fill: var(--text-color-light);
-            width: 20px;
-            height: 20px;
-            transition: fill 0.2s ease;
-        }
-        .icon-link:hover .icon-actions-button {
-            background-color: var(--button-bg-color);
-        }
-        .icon-link:hover .icon-actions-button svg {
-            fill: var(--text-color);
-        }
+        .icon-link:hover .icon-actions-button { opacity: 1; }
+        .icon-actions-button:hover { background-color: rgba(255, 255, 255, 0.3); }
+        .icon-actions-button svg { width: 20px; height: 20px; }
 
-        /* Menu de Contexto */
+        /* --- Cores dos Ícones (Classes) --- */
+        .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; } .mercadolivre .icon-title { color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; } .primecursos .icon-title { color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; } .linkcorreios .icon-title { color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; } .azarado .icon-title { color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
+
+        /* --- Menu de Contexto --- */
         .context-menu {
-            position: absolute; top: 100%; right: 0; margin-top: 5px;
-            background-color: var(--context-menu-bg);
-            border: 1px solid var(--context-menu-border); border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); list-style: none;
-            padding: 8px 0; z-index: 100; min-width: 150px; display: none;
+            position: absolute; right: 10px; top: 50px; background-color: var(--card-bg-color);
+            border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); list-style: none;
+            margin: 0; padding: 5px 0; z-index: 1010; min-width: 150px;
         }
-        .context-menu.show { display: block; }
-        .context-menu li {
-            padding: 10px 15px; cursor: pointer; color: var(--text-color);
-            font-size: 0.9em; transition: background-color 0.2s ease;
+        .context-menu li { padding: 8px 15px; cursor: pointer; transition: background-color 0.2s; }
+        .context-menu li:hover { background-color: var(--border-color); }
+        .context-menu li.danger-option { color: #dc3545; }
+
+        /* --- Modal (sem alterações de estilo) --- */
+        #generator-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            z-index: 1040; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
         }
-        .context-menu li:hover { background-color: var(--context-menu-item-hover); }
-        .context-menu li.danger-option:hover { background-color: var(--danger-color); color: white; }
-
-        /* Cores dos Ícones (mantido como no original) */
-        .verde { background-color: #89C623; } .AZUL { background-color: #2D9BFF; } .tsunami { background-color: #1F73B7; } .academia { background-color: #10559A; } .whatsapp { background-color: #40C351; } .vpn { background-color: #DF337A; } .bloqueador { background-color: #EE3433; } .feriados { background-color: #F84F39; } .codepen { background-color: #424242; } .coelba { background-color: #00a99d; } .embasa { background-color: #03a9f4; } .govbr { background-color: #01A78B; } .icon-visual.mercadolivre, .icon-visual.primecursos, .icon-visual.linkcorreios, .icon-visual.azarado { color: #FFFFFF; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .gov-curso { background-color: #006400; } .plutotv { background-color: #121212; } .copilot-icon { background-image: linear-gradient(to bottom right, #2196F3, #4CAF50, #FFEB3B, #FF9800, #9C27B0); }
-
-        /* ==========================================================================
-           7. ESTILOS DO MODAL (mantidos intactos)
-           ========================================================================== */
-        #generator-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1040; display: none; opacity: 0; transition: opacity 0.2s ease; }
-        #generator-modal-overlay.visible { display: block; opacity: 1; }
-        #generate-icon-code-section { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; z-index: 1050; padding: 30px; background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); border-top: 4px solid var(--primary-color); display: none; opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; }
-        #generate-icon-code-section.visible { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        #generate-icon-code-section h2 { text-align: center; color: var(--primary-color); margin: 0 0 25px 0; font-size: 1.8em; border-bottom: 1px solid var(--separator-color); padding-bottom: 12px; font-weight: 600; }
-        #close-generator-modal-btn { position: absolute; top: 15px; right: 15px; background: var(--button-bg-color); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem; font-weight: bold; color: var(--button-text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0; transition: background-color .2s, color .2s; }
-        #close-generator-modal-btn:hover { background-color: var(--danger-color); color: white; }
+        #generator-modal-overlay.visible { opacity: 1; pointer-events: auto; }
+        #generate-icon-code-section {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+            z-index: 1050; padding: 25px; background-color: var(--bg-color);
+            border-radius: 12px; border-top: 5px solid var(--primary-color);
+            opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;
+        }
+        #generate-icon-code-section.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        #modal-title {
+            text-align: center; color: var(--header-text-color); margin-top: 0; margin-bottom: 25px;
+            font-size: 1.8em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
+        }
+        #close-generator-modal-btn {
+            position: absolute; top: 15px; right: 15px; background: var(--button-secondary-bg);
+            border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem;
+            color: var(--text-color); cursor: pointer; display: flex; align-items: center;
+            justify-content: center; transition: background-color .2s, color .2s;
+        }
+        #close-generator-modal-btn:hover { background-color: #dc3545; color: white; }
         .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-color); font-size: 0.95em; }
-        .form-group input[type="text"], .form-group input[type="url"], .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; font-size: 1em; font-family: 'Inter', sans-serif; background-color: var(--input-bg-color); color: var(--text-color); transition: border-color 0.2s, box-shadow 0.2s; }
-        .form-group input[type="text"]:focus, .form-group input[type="url"]:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); outline: none; }
-        .form-group input[type="color"] { width: 100%; padding: 6px; height: 40px; border: 1px solid var(--input-border-color); border-radius: 8px; box-sizing: border-box; cursor: pointer; background-color: var(--input-bg-color); }
-        #submit-icon-button { width: 100%; padding: 12px 18px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color .2s ease, transform .1s ease; font-weight: 500; margin-top: 15px; }
-        #submit-icon-button:hover { background-color: var(--primary-color-hover); transform: translateY(-1px); }
-        .label-hint { font-size: 0.8em; color: #A0A0A0; font-weight: 400; }
-        #form-status-message { margin-top: 15px; padding: 10px; border-radius: 6px; text-align: center; display: none; font-size: 0.95em; }
-        #form-status-message.success { background-color: #D4EDDA; color: #155724; display: block; }
-        #form-status-message.error { background-color: #F8D7DA; color: #721C24; display: block; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--input-border-color);
+            border-radius: 8px; box-sizing: border-box; font-size: 1em;
+            background-color: var(--input-bg-color); color: var(--text-color);
+        }
+        #submit-icon-button {
+            width: 100%; padding: 12px 15px; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 1.1em;
+            cursor: pointer; transition: background-color .3s ease; margin-top: 10px;
+        }
+        #submit-icon-button:hover { background-color: var(--primary-hover-color); }
 
-        /* ==========================================================================
-           8. MEDIA QUERIES PARA DISPOSITIVOS MENORES
-           ========================================================================== */
-        @media (max-width: 768px) {
-            body { padding-top: 80px; font-size: 0.95em;}
-            main { padding: 15px; }
-            #page-header { padding: 12px 15px; }
-            .category-header h2 { font-size: 1.1em; }
-            .icons-grid, #search-results-container { padding: 15px; gap: 8px; }
-            .icon-link { padding: 8px 12px; }
-            .icon-visual { width: 32px; height: 32px; margin-right: 12px; }
-            .icon-title { font-size: 0.95em; }
-            #generate-icon-code-section { padding: 20px; }
-            #generate-icon-code-section h2 { font-size: 1.5em; }
-            #search-input { font-size: 1em; padding: 10px 15px; }
-            .header-button { width: 42px; height: 42px; }
-            .header-button svg { width: 22px; height: 22px; }
+        /* --- Media Queries --- */
+        @media (min-width: 768px) {
+            #search-results-container {
+                 /* Em telas maiores, a busca pode voltar a ser um grid */
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+            /* O estilo de ícone dentro da busca precisa voltar ao normal em telas grandes */
+             #search-results-container .icon-link {
+                 justify-content: flex-start;
+                 height: 70px;
+                 border-radius: 12px;
+             }
+             #search-results-container .icon-visual {
+                 position: static;
+                 width: 50px;
+                 height: 50px;
+                 margin-right: 15px;
+                 border-radius: 8px;
+                 flex-shrink: 0;
+             }
+             #search-results-container .icon-text-content { text-align: left; }
+             #search-results-container .icon-title { color: var(--text-color); text-shadow: none; }
+             #search-results-container .icon-actions-button { 
+                 position: static; 
+                 transform: none; 
+                 color: var(--text-color);
+                 background: transparent;
+             }
         }
     </style>
 </head>
 <body>
 
-    <header id="page-header">
-        <div class="header-content">
-            <input type="text" id="search-input" placeholder="Pesquisar..." aria-label="Pesquisar ícones">
-            <button id="open-generator-modal-btn" class="header-button" title="Adicionar novo Ícone" aria-label="Adicionar novo Ícone">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    <div id="top-search-bar-wrapper">
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="Pesquise Aqui...">
+            <button id="open-generator-modal-btn" class="action-button" title="Adicionar Novo Ícone">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
-            <button id="theme-toggle" class="header-button" title="Alternar Tema" aria-label="Alternar Tema">
-                <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 3a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 3zM18.66 6.34a.75.75 0 010 1.06l-1.06 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zM21 12a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0121 12zM17.6 16.54a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 011.06-1.06l1.06 1.06zM12 18a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 18zM7.46 17.6a.75.75 0 010-1.06l-1.06-1.06a.75.75 0 01-1.06 1.06l1.06 1.06a.75.75 0 011.06 0zM6 12a.75.75 0 01-.75-.75H3.75a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM6.4 7.4a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 111.06 1.06L6.4 7.4zM12 9a3 3 0 100 6 3 3 0 000-6z"/>
-                </svg>
-                <span>Claro</span>
+            <button id="theme-toggle" class="action-button" title="Alternar Modo">
+                <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"></svg>
+                <span style="display:none;"></span>
             </button>
         </div>
-    </header>
+    </div>
 
     <main id="main-content">
-        <div class="category-grid" id="all-categories-grid"></div>
+        <div id="all-categories-grid"></div>
         <div id="search-results-container"></div>
     </main>
 
     <div id="generator-modal-overlay"></div>
-    <div id="generate-icon-code-section" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <button id="close-generator-modal-btn" aria-label="Fechar modal">×</button>
+    <div id="generate-icon-code-section">
+        <button id="close-generator-modal-btn">×</button>
         <h2 id="modal-title">Adicionar Novo Ícone</h2>
-        <form id="icon-form" novalidate>
-            <input type="hidden" id="iconIdInput">
+        <form id="icon-form">
+            <input type="hidden" name="iconIdInput">
             <div class="form-group">
-                <label for="iconNameInput">Título do Ícone:</label>
-                <input type="text" id="iconNameInput" required>
+                <label for="iconNameInput">Texto do Ícone:</label>
+                <input type="text" id="iconNameInput" name="iconNameInput" required>
             </div>
-            <div class="form-group">
-                <label for="iconDescriptionInput">Descrição (Opcional):</label>
-                <textarea id="iconDescriptionInput" rows="2" placeholder="Um texto curto sobre o ícone..."></textarea>
+             <div class="form-group">
+                <label for="iconDescriptionInput">Descrição (opcional):</label>
+                <textarea id="iconDescriptionInput" name="iconDescriptionInput" rows="2"></textarea>
             </div>
             <div class="form-group">
                 <label for="iconLinkInput">Link do Ícone (URL):</label>
-                <input type="url" id="iconLinkInput" required>
+                <input type="url" id="iconLinkInput" name="iconLinkInput" required>
             </div>
             <div class="form-group">
-                <label for="iconImageUrlInput">URL da Imagem do Ícone <span class="label-hint">(Opcional)</span></label>
-                <input type="url" id="iconImageUrlInput" placeholder="https://example.com/icon.png">
+                <label for="iconImageUrlInput">URL da Imagem (opcional):</label>
+                <input type="url" id="iconImageUrlInput" name="iconImageUrlInput">
             </div>
             <div class="form-group">
-                <label for="iconColorClassInput">Classe da Cor <span class="label-hint">(ex: verde, azul2, vpn)</span></label>
-                <input type="text" id="iconColorClassInput">
+                <label for="iconColorClassInput">Classe da Cor (ex: verde, azul2)</label>
+                <input type="text" id="iconColorClassInput" name="iconColorClassInput">
             </div>
             <div class="form-group">
-                <label for="iconCustomBgColorInput">Cor de Fundo Customizada <span class="label-hint">(se classe de cor estiver em branco)</span></label>
-                <input type="color" id="iconCustomBgColorInput" value="#cccccc">
+                <label for="iconCustomBgColorInput">Cor de Fundo (se classe vazia)</label>
+                <input type="color" id="iconCustomBgColorInput" name="iconCustomBgColorInput" value="#cccccc" style="height: 45px;">
             </div>
             <div class="form-group">
                 <label for="iconCategorySelect">Categoria:</label>
-                <select id="iconCategorySelect" required>
-                    <option value="" disabled selected>Selecione uma categoria</option>
-                    </select>
+                <select id="iconCategorySelect" name="iconCategorySelect" required></select>
             </div>
             <button type="submit" id="submit-icon-button">Salvar Ícone</button>
+            <div id="form-status-message"></div>
         </form>
-        <div id="form-status-message"></div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, getDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const config = {
             firebase: {
@@ -454,11 +387,17 @@
                 visual.className = 'icon-visual';
                 if (icon.colorClass) visual.classList.add(icon.colorClass);
                 else visual.style.backgroundColor = icon.customBgColor || '#ccc';
-
-                const fallbackLetter = document.createElement('span');
-                fallbackLetter.className = 'icon-visual-fallback';
-                fallbackLetter.textContent = icon.name.charAt(0).toUpperCase();
-                visual.appendChild(fallbackLetter);
+                
+                if (icon.imageUrl) {
+                    visual.style.backgroundImage = `url(${icon.imageUrl})`;
+                    visual.style.backgroundSize = 'cover';
+                    visual.style.backgroundPosition = 'center';
+                } else {
+                    const fallbackLetter = document.createElement('span');
+                    fallbackLetter.className = 'icon-visual-fallback';
+                    fallbackLetter.textContent = icon.name.charAt(0).toUpperCase();
+                    visual.appendChild(fallbackLetter);
+                }
 
                 const textContent = document.createElement('div');
                 textContent.className = 'icon-text-content';
@@ -470,51 +409,49 @@
                 const actionButton = document.createElement('button');
                 actionButton.className = 'icon-actions-button';
                 actionButton.setAttribute('aria-label', 'Opções do ícone');
-                actionButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                    </svg>`;
+                actionButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
+                
                 actionButton.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    e.preventDefault(); e.stopPropagation();
                     this.showContextMenu(icon, wrapper);
                 };
-
+                
                 link.appendChild(visual);
                 link.appendChild(textContent);
                 link.appendChild(actionButton);
                 wrapper.appendChild(link);
-
                 return wrapper;
             },
             createCategoryCard(id, name) {
                 const card = document.createElement('section');
                 card.className = 'category-card';
                 card.id = `category-${id}`;
-                card.innerHTML = `
-                    <div class="category-header"><h2>${name}</h2></div>
-                    <div class="icons-grid"></div>`;
+                card.innerHTML = `<div class="category-header"><h2>${name}</h2></div><div class="icons-grid"></div>`;
                 return card;
             },
             render() {
                 const { allCategoriesGrid, searchResultsContainer } = this.elements;
-                [allCategoriesGrid, searchResultsContainer].forEach(el => el.innerHTML = '');
+                allCategoriesGrid.innerHTML = ''; 
+                searchResultsContainer.innerHTML = '';
 
-                const pinnedIcons = state.allIcons.filter(i => i.isPinned);
-                const regularIcons = state.allIcons.filter(i => !i.isPinned);
+                const filteredIcons = state.searchTerm
+                    ? state.allIcons.filter(i => i.name.toLowerCase().includes(state.searchTerm))
+                    : state.allIcons;
 
                 if (state.searchTerm) {
-                    searchResultsContainer.style.display = 'flex';
+                    searchResultsContainer.style.display = 'grid';
                     allCategoriesGrid.style.display = 'none';
-                    const matching = state.allIcons.filter(i => i.name.toLowerCase().includes(state.searchTerm));
-                    if (matching.length) {
-                        matching.forEach(i => searchResultsContainer.appendChild(this.createIconElement(i)));
+                    if (filteredIcons.length) {
+                        filteredIcons.forEach(i => searchResultsContainer.appendChild(this.createIconElement(i)));
                     } else {
-                        searchResultsContainer.innerHTML = `<p style="color: var(--text-color); width: 100%; text-align: center;">Nenhum ícone encontrado.</p>`;
+                        searchResultsContainer.innerHTML = `<p style="color: var(--text-color); grid-column: 1 / -1; text-align: center;">Nenhum ícone encontrado.</p>`;
                     }
                 } else {
                     searchResultsContainer.style.display = 'none';
                     allCategoriesGrid.style.display = 'block';
+
+                    const pinnedIcons = filteredIcons.filter(i => i.isPinned);
+                    const regularIcons = filteredIcons.filter(i => !i.isPinned);
 
                     if (pinnedIcons.length > 0) {
                         const pinnedCard = this.createCategoryCard('fixados', 'Fixados!');
@@ -529,7 +466,7 @@
                         return acc;
                     }, {});
 
-                    for (const id in config.categories) {
+                    Object.keys(config.categories).forEach(id => {
                         const icons = byCategory[id] || [];
                         if (icons.length > 0) {
                             const card = this.createCategoryCard(id, config.categories[id].name);
@@ -538,10 +475,12 @@
                             icons.forEach(i => grid.appendChild(this.createIconElement(i)));
                             allCategoriesGrid.appendChild(card);
                         }
-                    }
+                    });
+                    
                     const cards = allCategoriesGrid.querySelectorAll('.category-card');
                     cards.forEach((card, index) => {
-                        if (card.id !== 'category-fixados' && index > (pinnedIcons.length > 0 ? 0 : -1)) {
+                        const isPinnedCardPresent = pinnedIcons.length > 0;
+                        if (card.id !== 'category-fixados' && index > (isPinnedCardPresent ? 0 : -1)) {
                             card.classList.add('collapsed');
                         }
                     });
@@ -554,10 +493,10 @@
 
                 if (isDark) {
                     themeText.textContent = 'Escuro';
-                    themeIcon.innerHTML = `<path fill-rule="evenodd" clip-rule="evenodd" d="M12.25 2.002a.75.75 0 01.352.934 9.002 9.002 0 005.898 5.898.75.75 0 011.23.636 10.502 10.502 0 01-10.5 10.5.75.75 0 01-.636-1.23 9.002 9.002 0 00-5.898-5.898.75.75 0 01-.934-.352A10.502 10.502 0 0112.25 2.002z"/>`;
+                    themeIcon.innerHTML = `<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.803 17.803a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.59 1.59a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V21a.75.75 0 01-.75.75zM4.197 17.803a.75.75 0 010-1.06l1.59-1.591a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 4.197a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/>`;
                 } else {
                     themeText.textContent = 'Claro';
-                    themeIcon.innerHTML = `<path d="M12 3a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 3zM18.66 6.34a.75.75 0 010 1.06l-1.06 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zM21 12a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0121 12zM17.6 16.54a.75.75 0 11-1.06 1.06l-1.06-1.06a.75.75 0 011.06-1.06l1.06 1.06zM12 18a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0112 18zM7.46 17.6a.75.75 0 010-1.06l-1.06-1.06a.75.75 0 01-1.06 1.06l1.06 1.06a.75.75 0 011.06 0zM6 12a.75.75 0 01-.75-.75H3.75a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM6.4 7.4a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 111.06 1.06L6.4 7.4zM12 9a3 3 0 100 6 3 3 0 000-6z"/>`;
+                    themeIcon.innerHTML = `<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.992.75.75 0 01.972.972A10.5 10.5 0 119.528 1.718z" clip-rule="evenodd"/>`;
                 }
             },
             openModal(data = null) {
@@ -567,13 +506,16 @@
                 if (data) {
                     modalTitle.textContent = "Editar Ícone";
                     submitIconBtn.textContent = "Atualizar Ícone";
-                    for (const key in data) {
-                        if (iconForm.elements[`icon${key.charAt(0).toUpperCase() + key.slice(1)}Input`]) {
-                            iconForm.elements[`icon${key.charAt(0).toUpperCase() + key.slice(1)}Input`].value = data[key];
-                        }
-                    }
-                    if (data.category) iconForm.elements.iconCategorySelect.value = data.category;
-                    if (data.id) iconForm.elements.iconIdInput.value = data.id;
+                    
+                    iconForm.elements.iconNameInput.value = data.name || '';
+                    iconForm.elements.iconDescriptionInput.value = data.description || '';
+                    iconForm.elements.iconLinkInput.value = data.link || '';
+                    iconForm.elements.iconImageUrlInput.value = data.imageUrl || '';
+                    iconForm.elements.iconColorClassInput.value = data.colorClass || '';
+                    iconForm.elements.iconCustomBgColorInput.value = data.customBgColor || '#cccccc';
+                    iconForm.elements.iconCategorySelect.value = data.category || '';
+                    iconForm.elements.iconIdInput.value = data.id || '';
+
                 } else {
                     modalTitle.textContent = "Adicionar Novo Ícone";
                     submitIconBtn.textContent = "Salvar Ícone";
@@ -591,14 +533,16 @@
             showContextMenu(icon, wrapper) {
                 document.querySelectorAll('.context-menu').forEach(menu => menu.remove());
                 const menu = document.createElement('ul');
-                menu.className = 'context-menu show';
+                menu.className = 'context-menu';
                 menu.innerHTML = `
                     <li data-action="edit">Editar Ícone</li>
                     <li data-action="pin">${icon.isPinned ? 'Desafixar' : 'Fixar no Topo'}</li>
                     <li data-action="delete" class="danger-option">Excluir Ícone</li>`;
                 wrapper.appendChild(menu);
 
-                const closeMenu = () => menu.remove();
+                const closeMenu = (e) => {
+                    if (!menu.contains(e.target)) menu.remove();
+                };
 
                 menu.addEventListener('click', e => {
                     const action = e.target.dataset.action;
@@ -609,7 +553,7 @@
                             FirebaseService.deleteIcon(icon.id);
                         }
                     }
-                    closeMenu();
+                    menu.remove();
                 });
                 setTimeout(() => document.addEventListener('click', closeMenu, { once: true }), 0);
             }
@@ -627,7 +571,7 @@
                 this.loadTheme();
             },
             bindEvents() {
-                const { searchInput, themeToggle, openModalBtn, closeModalBtn, iconForm } = UIManager.elements;
+                const { searchInput, themeToggle, openModalBtn, closeModalBtn, iconForm, allCategoriesGrid, modalOverlay } = UIManager.elements;
                 searchInput.addEventListener('input', e => {
                     state.searchTerm = e.target.value.toLowerCase().trim();
                     UIManager.render();
@@ -637,13 +581,13 @@
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                     UIManager.toggleTheme(isDark);
                 });
-                document.getElementById('all-categories-grid').addEventListener('click', e => {
+                allCategoriesGrid.addEventListener('click', e => {
                     const header = e.target.closest('.category-header');
                     if (header) header.parentElement.classList.toggle('collapsed');
                 });
                 openModalBtn.addEventListener('click', () => UIManager.openModal());
                 closeModalBtn.addEventListener('click', () => UIManager.closeModal());
-                UIManager.elements.modalOverlay.addEventListener('click', () => UIManager.closeModal());
+                modalOverlay.addEventListener('click', () => UIManager.closeModal());
                 iconForm.addEventListener('submit', this.handleFormSubmit);
             },
             loadTheme() {
@@ -670,7 +614,7 @@
                 } catch (error) {
                     console.error("Erro ao salvar:", error);
                     UIManager.elements.formStatusMessage.textContent = 'Erro ao salvar o ícone.';
-                    UIManager.elements.formStatusMessage.className = 'error';
+                    UIManager.elements.formStatusMessage.style.display = 'block';
                 }
             },
             editIcon(id) {
