@@ -578,6 +578,7 @@
                 });
                 themeToggle.addEventListener('click', () => {
                     const isDark = !document.body.classList.contains('dark-mode');
+                    // Grava o último tema definido
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                     UIManager.toggleTheme(isDark);
                 });
@@ -591,8 +592,32 @@
                 iconForm.addEventListener('submit', this.handleFormSubmit);
             },
             loadTheme() {
-                const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                UIManager.toggleTheme(savedTheme === 'dark');
+                // Modificado para priorizar 'light' como padrão de inicialização
+                const savedTheme = localStorage.getItem('theme');
+                let initialTheme = 'light'; // Padrão de inicialização é 'light'
+
+                if (savedTheme) {
+                    initialTheme = savedTheme; // Se houver tema salvo, usa ele
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    // Se não houver tema salvo, respeita a preferência do sistema *apenas*
+                    // se a preferência for dark, se for light o 'light' padrão já está definido.
+                    // ATENÇÃO: Se você deseja que a primeira inicialização seja SEMPRE light, 
+                    // remova esta parte. Mantenho para caso o usuário queira um primeiro uso
+                    // mais adaptativo, mas o requisito era *modo claro como padrão*.
+                    // Mantendo o `initialTheme = 'light'` e não verificando `prefers-color-scheme`
+                    // é o mais estrito.
+                    
+                    // Removendo a checagem de preferência de sistema para garantir "claro" como padrão
+                    // de *primeira* inicialização, conforme solicitado.
+                }
+
+                // Salva o tema inicial no localStorage se não houver um para garantir
+                // que o clique no botão comece a salvar o estado correto.
+                if (!savedTheme) {
+                   localStorage.setItem('theme', initialTheme);
+                }
+
+                UIManager.toggleTheme(initialTheme === 'dark');
             },
             async handleFormSubmit(event) {
                 event.preventDefault();
