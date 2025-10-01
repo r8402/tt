@@ -385,19 +385,29 @@
 
                 const visual = document.createElement('div');
                 visual.className = 'icon-visual';
-                if (icon.colorClass) visual.classList.add(icon.colorClass);
-                else visual.style.backgroundColor = icon.customBgColor || '#ccc';
                 
+                // --- ALTERAÇÃO FEITA AQUI PARA ATENDER AO REQUISITO ---
                 if (icon.imageUrl) {
-                    visual.style.backgroundImage = `url(${icon.imageUrl})`;
-                    visual.style.backgroundSize = 'cover';
-                    visual.style.backgroundPosition = 'center';
+                    const img = document.createElement('img');
+                    img.src = icon.imageUrl;
+                    img.alt = icon.name;
+                    // Força a imagem a ter 100% da altura do .icon-link (55px) e 100% da largura.
+                    // 'object-fit: fill' garante que a imagem preencha a área, achatando se necessário.
+                    img.style.width = '100%'; 
+                    img.style.height = '100%';
+                    img.style.objectFit = 'fill'; 
+                    visual.appendChild(img);
                 } else {
+                    // Fallback para cor de fundo e letra (o visual agora é o container do img)
+                    if (icon.colorClass) visual.classList.add(icon.colorClass);
+                    else visual.style.backgroundColor = icon.customBgColor || '#ccc';
+
                     const fallbackLetter = document.createElement('span');
                     fallbackLetter.className = 'icon-visual-fallback';
                     fallbackLetter.textContent = icon.name.charAt(0).toUpperCase();
                     visual.appendChild(fallbackLetter);
                 }
+                // --------------------------------------------------------
 
                 const textContent = document.createElement('div');
                 textContent.className = 'icon-text-content';
@@ -599,14 +609,6 @@
                 if (savedTheme) {
                     initialTheme = savedTheme; // Se houver tema salvo, usa ele
                 } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    // Se não houver tema salvo, respeita a preferência do sistema *apenas*
-                    // se a preferência for dark, se for light o 'light' padrão já está definido.
-                    // ATENÇÃO: Se você deseja que a primeira inicialização seja SEMPRE light, 
-                    // remova esta parte. Mantenho para caso o usuário queira um primeiro uso
-                    // mais adaptativo, mas o requisito era *modo claro como padrão*.
-                    // Mantendo o `initialTheme = 'light'` e não verificando `prefers-color-scheme`
-                    // é o mais estrito.
-                    
                     // Removendo a checagem de preferência de sistema para garantir "claro" como padrão
                     // de *primeira* inicialização, conforme solicitado.
                 }
