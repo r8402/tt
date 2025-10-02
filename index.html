@@ -61,7 +61,30 @@
         .action-button svg { width: 22px; height: 22px; }
         #theme-toggle span { font-size: 0.7em; font-weight: bold; }
 
-        /* --- Conteúdo Principal e Categorias (NOVO ESTILO) --- */
+        /* --- NOVO: Botão Cadeado --- */
+        #lock-button {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+        #lock-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+        body.dark-mode #lock-button {
+            background-color: transparent;
+            color: var(--header-text-color);
+            border: 2px solid var(--header-text-color);
+        }
+        body.dark-mode #lock-button:hover {
+            background-color: var(--header-text-color);
+            color: var(--dark-icon-container-bg);
+        }
+        
+        /* --- Conteúdo Principal e Categorias (MANTIDO) --- */
         #all-categories-grid, #search-results-container {
             max-width: 1200px; width: 100%; margin: 0 auto;
         }
@@ -82,7 +105,7 @@
         }
         .category-card.collapsed .icons-grid { max-height: 0; padding: 0; margin-top: 0; opacity: 0; }
         
-        /* --- Contêiner dos Ícones (NOVO ESTILO) --- */
+        /* --- Contêiner dos Ícones (MANTIDO) --- */
         .icons-grid, #search-results-container {
             display: flex;
             flex-direction: column;
@@ -100,7 +123,7 @@
             flex-wrap: wrap;
         }
 
-        /* --- Ícones (NOVO ESTILO) --- */
+        /* --- Ícones (MANTIDO) --- */
         .icon-card-wrapper { position: relative; width: 100%; }
         .icon-link {
             display: flex; align-items: center; justify-content: center;
@@ -158,10 +181,10 @@
         .icon-actions-button:hover { background-color: rgba(255, 255, 255, 0.3); }
         .icon-actions-button svg { width: 20px; height: 20px; }
 
-        /* --- Cores dos Ícones (Classes) --- */
+        /* --- Cores dos Ícones (Classes) - MANTIDO --- */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; } .mercadolivre .icon-title { color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; } .primecursos .icon-title { color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; } .linkcorreios .icon-title { color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; } .azarado .icon-title { color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
 
-        /* --- Menu de Contexto --- */
+        /* --- Menu de Contexto (MANTIDO) --- */
         .context-menu {
             position: absolute; right: 10px; top: 50px; background-color: var(--card-bg-color);
             border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); list-style: none;
@@ -171,7 +194,7 @@
         .context-menu li:hover { background-color: var(--border-color); }
         .context-menu li.danger-option { color: #dc3545; }
 
-        /* --- Modal (sem alterações de estilo) --- */
+        /* --- Modal (MANTIDO) --- */
         #generator-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
@@ -215,7 +238,129 @@
         }
         #submit-icon-button:hover { background-color: var(--primary-hover-color); }
 
-        /* --- Media Queries --- */
+        /* --- NOVO: Modal de Login (Cadeado) --- */
+        #lock-modal {
+            position: fixed; top: 100px; right: 20px;
+            width: 300px;
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 15px;
+            z-index: 1060;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #lock-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        #lock-modal p {
+            margin: 5px 0 15px;
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+        #lock-password-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1.2em;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            outline: none;
+        }
+        #login-button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #login-button:hover { background-color: var(--primary-hover-color); }
+        #login-status {
+            color: #dc3545;
+            margin-top: 10px;
+            font-size: 0.85em;
+            display: none;
+        }
+
+        /* --- NOVO: Área Restrita --- */
+        #restricted-area-wrapper {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto 40px;
+            padding: 20px;
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            display: none; /* Inicia oculto */
+        }
+        #restricted-area-wrapper.visible { display: block; }
+        #restricted-area-wrapper h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .text-entry {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: var(--input-bg-color);
+            position: relative;
+        }
+        .text-content { white-space: pre-wrap; word-wrap: break-word; }
+        .text-actions { margin-top: 10px; text-align: right; }
+        .text-actions button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+        .text-actions button.delete { color: #dc3545; }
+        
+        /* Formulário de Novo Texto */
+        #new-text-form {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+        }
+        #new-text-form textarea {
+            min-height: 150px;
+            margin-bottom: 10px;
+        }
+        #new-text-form input[type="text"] {
+            margin-bottom: 10px;
+        }
+        .file-upload-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9em;
+        }
+        .file-upload-section label { margin-right: 10px; }
+        .file-upload-section input[type="file"] { border: none; padding: 0; background: none; }
+
+
+        /* --- Media Queries (MANTIDO) --- */
         @media (min-width: 768px) {
             #search-results-container {
                  /* Em telas maiores, a busca pode voltar a ser um grid */
@@ -251,6 +396,9 @@
     <div id="top-search-bar-wrapper">
         <div id="search-container">
             <input type="text" id="search-input" placeholder="Pesquise Aqui...">
+            <button id="lock-button" class="action-button" title="Área Restrita">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a.75.75 0 00-1.5 0V3h-1.375a.75.75 0 00-.75.75c0 .327.143.62.385.82L10.5 7.5l-3.25 3.25a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 10.5l4.414 4.414a.75.75 0 001.06-1.06L13.06 9.56a.75.75 0 00-1.06 0L10.5 11.06l-1.97-1.97a.75.75 0 00-1.06 0L5.276 12.23A.75.75 0 004.5 13.06v5.69a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25v-5.69c0-.284-.114-.555-.316-.757l-1.97-1.97a.75.75 0 00-1.06 0L13.5 10.5l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06l-1.97-1.97a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06zM9.75 3h4.5v1.5h-4.5V3zM6.75 6.75A.75.75 0 017.5 6h9c.414 0 .75.336.75.75v5.25a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75V6.75zM12 21.75a.75.75 0 00-1.5 0V24h1.5v-2.25z"/></svg>
+            </button>
             <button id="open-generator-modal-btn" class="action-button" title="Adicionar Novo Ícone">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
@@ -260,8 +408,38 @@
             </button>
         </div>
     </div>
+    
+    <div id="lock-modal">
+        <p>Área Restrita - Digite a Senha:</p>
+        <input type="password" id="lock-password-input" maxlength="4" placeholder="****">
+        <button id="login-button">Entrar</button>
+        <span id="login-status">Senha Incorreta.</span>
+    </div>
 
     <main id="main-content">
+        <section id="restricted-area-wrapper">
+            <h2>Área Restrita de Textos e Arquivos</h2>
+            <form id="new-text-form">
+                <input type="hidden" id="restrictedTextIdInput" value="">
+                <div class="form-group">
+                    <input type="text" id="restrictedTextTitleInput" placeholder="Título (Opcional)">
+                </div>
+                <div class="form-group">
+                    <textarea id="restrictedTextContentInput" placeholder="Cole seu texto aqui..." required></textarea>
+                </div>
+                <div class="file-upload-section">
+                    <label for="restrictedTextFileInput">Anexar Arquivo (Max: 5MB):</label>
+                    <input type="file" id="restrictedTextFileInput" accept="*/*" disabled title="Funcionalidade de anexo com Firebase Storage será implementada posteriormente.">
+                </div>
+                <button type="submit" id="save-restricted-text-btn" class="action-button" style="width: 100%; border-radius: 8px; margin-top: 15px;">Salvar Texto</button>
+            </form>
+
+            <h3>Textos Salvos:</h3>
+            <div id="restricted-texts-list">
+                <p>Nenhum texto salvo ainda.</p>
+            </div>
+        </section>
+
         <div id="all-categories-grid"></div>
         <div id="search-results-container"></div>
     </main>
@@ -312,7 +490,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Importa o Storage (não usado imediatamente, mas pronto para anexos)
+        // import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         const config = {
             firebase: {
@@ -331,9 +511,18 @@
                 'design-audio': { name: 'Design & Áudio' },
                 'midia-entretenimento': { name: 'Mídia & Entretenimento' }
             },
+            restricted: {
+                password: "11", // Senha de login para a área restrita
+            }
         };
 
-        const state = { allIcons: [], currentUser: null, searchTerm: '' };
+        const state = { 
+            allIcons: [], 
+            currentUser: null, 
+            searchTerm: '',
+            isRestrictedAreaOpen: false, // NOVO: Estado da área restrita
+            restrictedTexts: [], // NOVO: Textos da área restrita
+        };
 
         const FirebaseService = {
             db: null, auth: null,
@@ -341,6 +530,7 @@
                 const app = initializeApp(config.firebase);
                 this.db = getFirestore(app);
                 this.auth = getAuth(app);
+                // this.storage = getStorage(app); // Não implementado para anexos ainda
             },
             authenticate(callback) {
                 onAuthStateChanged(this.auth, user => {
@@ -354,7 +544,16 @@
             },
             async updateIcon(id, data) { await updateDoc(doc(this.db, "icones", id), data); },
             async addIcon(data) { await addDoc(collection(this.db, "icones"), { ...data, createdAt: serverTimestamp() }); },
-            async deleteIcon(id) { await deleteDoc(doc(this.db, "icones", id)); }
+            async deleteIcon(id) { await deleteDoc(doc(this.db, "icones", id)); },
+
+            // NOVAS FUNÇÕES PARA ÁREA RESTRITA
+            onRestrictedTextsUpdate(callback) {
+                const q = query(collection(this.db, "restricted_texts"), orderBy("createdAt", "desc"));
+                onSnapshot(q, snapshot => callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
+            },
+            async addRestrictedText(data) { await addDoc(collection(this.db, "restricted_texts"), { ...data, createdAt: serverTimestamp() }); },
+            async updateRestrictedText(id, data) { await updateDoc(doc(this.db, "restricted_texts", id), data); },
+            async deleteRestrictedText(id) { await deleteDoc(doc(this.db, "restricted_texts", id)); },
         };
 
         const UIManager = {
@@ -370,90 +569,111 @@
                     iconForm: document.getElementById('icon-form'), formStatusMessage: document.getElementById('form-status-message'),
                     modalTitle: document.getElementById('modal-title'), openModalBtn: document.getElementById('open-generator-modal-btn'),
                     submitIconBtn: document.getElementById('submit-icon-button'),
+                    
+                    // NOVO: Elementos da Área Restrita
+                    lockButton: document.getElementById('lock-button'),
+                    lockModal: document.getElementById('lock-modal'),
+                    lockPasswordInput: document.getElementById('lock-password-input'),
+                    loginButton: document.getElementById('login-button'),
+                    loginStatus: document.getElementById('login-status'),
+                    restrictedAreaWrapper: document.getElementById('restricted-area-wrapper'),
+                    restrictedTextsList: document.getElementById('restricted-texts-list'),
+                    newTextForm: document.getElementById('new-text-form'),
+                    restrictedTextIdInput: document.getElementById('restrictedTextIdInput'),
+                    restrictedTextTitleInput: document.getElementById('restrictedTextTitleInput'),
+                    restrictedTextContentInput: document.getElementById('restrictedTextContentInput'),
+                    saveRestrictedTextBtn: document.getElementById('save-restricted-text-btn'),
+                    
                 };
                 this.populateCategorySelect();
             },
-            populateCategorySelect() {
-                const select = this.elements.iconForm.elements.iconCategorySelect;
-                select.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
-                for (const id in config.categories) {
-                    select.innerHTML += `<option value="${id}">${config.categories[id].name}</option>`;
-                }
-            },
-            createIconElement(icon) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'icon-card-wrapper';
-                wrapper.dataset.id = icon.id;
+            // ... (Funções createIconElement, createCategoryCard, showContextMenu, loadTheme, etc. mantidas) ...
 
-                const link = document.createElement('a');
-                link.href = icon.link;
-                link.className = 'icon-link';
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
+            // Funções de UI para a área restrita
+            toggleRestrictedArea(show) {
+                state.isRestrictedAreaOpen = show;
+                this.elements.restrictedAreaWrapper.classList.toggle('visible', show);
+                this.elements.allCategoriesGrid.style.display = show ? 'none' : 'block';
+                this.elements.searchResultsContainer.style.display = 'none';
 
-                const visual = document.createElement('div');
-                visual.className = 'icon-visual';
-                
-                // Adiciona o nome (título) e descrição (se existirem) como data attributes para o filtro de busca
-                // O data-description garante que a descrição esteja acessível para o filtro, mesmo que não seja visível.
-                wrapper.dataset.title = icon.name ? icon.name.toLowerCase() : '';
-                wrapper.dataset.description = icon.description ? icon.description.toLowerCase() : '';
-
-                if (icon.imageUrl) {
-                    const img = document.createElement('img');
-                    img.src = icon.imageUrl;
-                    // Usa o nome como alt text, mas se for vazio, usa um fallback genérico
-                    img.alt = icon.name || "Ícone Personalizado";
-                    img.style.width = '100%'; 
-                    img.style.height = '100%';
-                    img.style.objectFit = 'fill'; 
-                    visual.appendChild(img);
+                if (show) {
+                    // Rola para o topo da área restrita
+                    this.elements.restrictedAreaWrapper.scrollIntoView({ behavior: 'smooth' });
+                    // Garante que o modal de login está fechado
+                    this.closeLockModal(); 
                 } else {
-                    if (icon.colorClass) visual.classList.add(icon.colorClass);
-                    else visual.style.backgroundColor = icon.customBgColor || '#ccc';
+                    // Limpa o formulário quando fecha
+                    this.clearRestrictedTextForm();
+                    // Renderiza a grade de ícones novamente (caso tenha pesquisa ativa, ela será resolvida no UIManager.render)
+                    this.render(); 
+                }
+            },
+            openLockModal() {
+                this.elements.lockModal.classList.add('visible');
+                this.elements.lockPasswordInput.focus();
+            },
+            closeLockModal() {
+                this.elements.lockModal.classList.remove('visible');
+                this.elements.loginStatus.style.display = 'none';
+                this.elements.lockPasswordInput.value = '';
+            },
+            
+            // Renderiza a lista de textos
+            renderRestrictedTexts() {
+                const list = this.elements.restrictedTextsList;
+                list.innerHTML = '';
 
-                    const fallbackLetter = document.createElement('span');
-                    fallbackLetter.className = 'icon-visual-fallback';
-                    fallbackLetter.textContent = (icon.name && icon.name.length > 0) ? icon.name.charAt(0).toUpperCase() : '?';
-                    visual.appendChild(fallbackLetter);
+                if (state.restrictedTexts.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; opacity: 0.7;">Nenhum texto salvo ainda.</p>';
+                    return;
                 }
 
-                const textContent = document.createElement('div');
-                textContent.className = 'icon-text-content';
-                const title = document.createElement('span');
-                title.className = 'icon-title';
-                // ***************************************************************
-                // ** ALTERAÇÃO AQUI: Removemos o fallback para 'Sem Título'.  **
-                // ** Se `icon.name` for string vazia, `title.textContent`    **
-                // ** será vazio, o que esconde o texto.                      **
-                // ***************************************************************
-                title.textContent = icon.name || ''; 
-                textContent.appendChild(title);
+                state.restrictedTexts.forEach(text => {
+                    const entry = document.createElement('div');
+                    entry.className = 'text-entry';
+                    entry.dataset.id = text.id;
+                    entry.innerHTML = `
+                        ${text.title ? `<h4>${text.title}</h4>` : ''}
+                        <div class="text-content">${text.content}</div>
+                        <div class="text-actions">
+                            <button class="edit-text-btn">Editar</button>
+                            <button class="delete-text-btn delete">Excluir</button>
+                        </div>
+                    `;
+                    list.appendChild(entry);
+                });
+            },
 
-                const actionButton = document.createElement('button');
-                actionButton.className = 'icon-actions-button';
-                actionButton.setAttribute('aria-label', 'Opções do ícone');
-                actionButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
-                
-                actionButton.onclick = (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    this.showContextMenu(icon, wrapper);
-                };
-                
-                link.appendChild(visual);
-                link.appendChild(textContent);
-                link.appendChild(actionButton);
-                wrapper.appendChild(link);
-                return wrapper;
+            clearRestrictedTextForm() {
+                const { restrictedTextIdInput, restrictedTextTitleInput, restrictedTextContentInput, saveRestrictedTextBtn } = this.elements;
+                restrictedTextIdInput.value = '';
+                restrictedTextTitleInput.value = '';
+                restrictedTextContentInput.value = '';
+                saveRestrictedTextBtn.textContent = 'Salvar Texto';
             },
-            createCategoryCard(id, name) {
-                const card = document.createElement('section');
-                card.className = 'category-card';
-                card.id = `category-${id}`;
-                card.innerHTML = `<div class="category-header"><h2>${name}</h2></div><div class="icons-grid"></div>`;
-                return card;
+
+            loadRestrictedTextForEdit(text) {
+                const { restrictedTextIdInput, restrictedTextTitleInput, restrictedTextContentInput, saveRestrictedTextBtn } = this.elements;
+                restrictedTextIdInput.value = text.id;
+                restrictedTextTitleInput.value = text.title || '';
+                restrictedTextContentInput.value = text.content;
+                saveRestrictedTextBtn.textContent = 'Atualizar Texto';
+                this.elements.restrictedAreaWrapper.scrollIntoView({ behavior: 'smooth' });
             },
+
+            // CÓDIGO DO UIManager.render ORIGINAL (modificado para suportar a nova área)
             render() {
+                if (state.isRestrictedAreaOpen) {
+                    // Se a área restrita estiver aberta, não renderiza ícones
+                    this.elements.allCategoriesGrid.style.display = 'none';
+                    this.elements.searchResultsContainer.style.display = 'none';
+                    this.elements.restrictedAreaWrapper.classList.add('visible');
+                    return; 
+                }
+                
+                // Se a área restrita estiver fechada, esconde
+                this.elements.restrictedAreaWrapper.classList.remove('visible');
+                
                 const { allCategoriesGrid, searchResultsContainer } = this.elements;
                 allCategoriesGrid.innerHTML = ''; 
                 searchResultsContainer.innerHTML = '';
@@ -463,7 +683,6 @@
                     ? state.allIcons.filter(i => {
                         const name = (i.name || '').toLowerCase();
                         const description = (i.description || '').toLowerCase();
-                        // Altera a condição de filtro para incluir a descrição
                         return name.includes(term) || description.includes(term);
                     })
                     : state.allIcons;
@@ -516,17 +735,14 @@
                     });
                 }
             },
-            toggleTheme(isDark) {
-                this.elements.body.classList.toggle('dark-mode', isDark);
-                const themeText = this.elements.themeToggle.querySelector('span');
-                const themeIcon = this.elements.themeIcon;
-
-                if (isDark) {
-                    themeText.textContent = 'Escuro';
-                    themeIcon.innerHTML = `<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.803 17.803a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.59 1.59a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V21a.75.75 0 01-.75.75zM4.197 17.803a.75.75 0 010-1.06l1.59-1.591a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 4.197a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/>`;
-                } else {
-                    themeText.textContent = 'Claro';
-                    themeIcon.innerHTML = `<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.992.75.75 0 01.972.972A10.5 10.5 0 119.528 1.718z" clip-rule="evenodd"/>`;
+            // Função toggleTheme e as relacionadas ao Modal de Ícones omitidas por brevidade, mas intactas.
+            
+            // ... (Restante das funções de UI mantidas)
+            populateCategorySelect() {
+                const select = this.elements.iconForm.elements.iconCategorySelect;
+                select.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
+                for (const id in config.categories) {
+                    select.innerHTML += `<option value="${id}">${config.categories[id].name}</option>`;
                 }
             },
             openModal(data = null) {
@@ -560,7 +776,20 @@
                 document.body.classList.remove('modal-open');
                 this.elements.formStatusMessage.style.display = 'none';
             },
-            showContextMenu(icon, wrapper) {
+            toggleTheme(isDark) {
+                this.elements.body.classList.toggle('dark-mode', isDark);
+                const themeText = this.elements.themeToggle.querySelector('span');
+                const themeIcon = this.elements.themeIcon;
+
+                if (isDark) {
+                    themeText.textContent = 'Escuro';
+                    themeIcon.innerHTML = `<path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.803 17.803a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.59 1.59a.75.75 0 010 1.06zM12 21.75a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V21a.75.75 0 01-.75.75zM4.197 17.803a.75.75 0 010-1.06l1.59-1.591a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 4.197a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/>`;
+                } else {
+                    themeText.textContent = 'Claro';
+                    themeIcon.innerHTML = `<path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.992.75.75 0 01.972.972A10.5 10.5 0 119.528 1.718z" clip-rule="evenodd"/>`;
+                }
+            },
+             showContextMenu(icon, wrapper) {
                 document.querySelectorAll('.context-menu').forEach(menu => menu.remove());
                 const menu = document.createElement('ul');
                 menu.className = 'context-menu';
@@ -588,7 +817,72 @@
                     menu.remove();
                 });
                 setTimeout(() => document.addEventListener('click', closeMenu, { once: true }), 0);
-            }
+            },
+            createIconElement(icon) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'icon-card-wrapper';
+                wrapper.dataset.id = icon.id;
+
+                const link = document.createElement('a');
+                link.href = icon.link;
+                link.className = 'icon-link';
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+
+                const visual = document.createElement('div');
+                visual.className = 'icon-visual';
+                
+                wrapper.dataset.title = icon.name ? icon.name.toLowerCase() : '';
+                wrapper.dataset.description = icon.description ? icon.description.toLowerCase() : '';
+
+                if (icon.imageUrl) {
+                    const img = document.createElement('img');
+                    img.src = icon.imageUrl;
+                    img.alt = icon.name || "Ícone Personalizado";
+                    img.style.width = '100%'; 
+                    img.style.height = '100%';
+                    img.style.objectFit = 'fill'; 
+                    visual.appendChild(img);
+                } else {
+                    if (icon.colorClass) visual.classList.add(icon.colorClass);
+                    else visual.style.backgroundColor = icon.customBgColor || '#ccc';
+
+                    const fallbackLetter = document.createElement('span');
+                    fallbackLetter.className = 'icon-visual-fallback';
+                    fallbackLetter.textContent = (icon.name && icon.name.length > 0) ? icon.name.charAt(0).toUpperCase() : '?';
+                    visual.appendChild(fallbackLetter);
+                }
+
+                const textContent = document.createElement('div');
+                textContent.className = 'icon-text-content';
+                const title = document.createElement('span');
+                title.className = 'icon-title';
+                title.textContent = icon.name || ''; 
+                textContent.appendChild(title);
+
+                const actionButton = document.createElement('button');
+                actionButton.className = 'icon-actions-button';
+                actionButton.setAttribute('aria-label', 'Opções do ícone');
+                actionButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
+                
+                actionButton.onclick = (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    this.showContextMenu(icon, wrapper);
+                };
+                
+                link.appendChild(visual);
+                link.appendChild(textContent);
+                link.appendChild(actionButton);
+                wrapper.appendChild(link);
+                return wrapper;
+            },
+            createCategoryCard(id, name) {
+                const card = document.createElement('section');
+                card.className = 'category-card';
+                card.id = `category-${id}`;
+                card.innerHTML = `<div class="category-header"><h2>${name}</h2></div><div class="icons-grid"></div>`;
+                return card;
+            },
         };
 
         const App = {
@@ -596,23 +890,37 @@
                 FirebaseService.init();
                 UIManager.init();
                 this.bindEvents();
+                
+                // Autenticação e Listeners de Ícones (Original)
                 FirebaseService.authenticate(() => FirebaseService.onIconsUpdate(icons => {
                     state.allIcons = icons;
                     UIManager.render();
                 }));
+
+                // NOVO: Listener para Textos Restritos
+                FirebaseService.onRestrictedTextsUpdate(texts => {
+                    state.restrictedTexts = texts;
+                    UIManager.renderRestrictedTexts();
+                });
+
                 this.loadTheme();
             },
             bindEvents() {
-                const { searchInput, themeToggle, openModalBtn, closeModalBtn, iconForm, allCategoriesGrid, modalOverlay } = UIManager.elements;
+                const { 
+                    searchInput, themeToggle, openModalBtn, closeModalBtn, iconForm, allCategoriesGrid, modalOverlay,
+                    lockButton, lockPasswordInput, loginButton, restrictedTextsList, newTextForm
+                } = UIManager.elements;
                 
-                // NOVO: Adiciona um atraso pequeno para evitar renderização excessiva
+                // Eventos de Busca e Tema (MANTIDOS)
                 let searchTimeout;
                 searchInput.addEventListener('input', e => {
                     clearTimeout(searchTimeout);
                     searchTimeout = setTimeout(() => {
                         state.searchTerm = e.target.value.toLowerCase().trim();
+                        // Garante que a área restrita fecha ao pesquisar
+                        if(state.isRestrictedAreaOpen) UIManager.toggleRestrictedArea(false); 
                         UIManager.render();
-                    }, 200); // 200ms de atraso
+                    }, 200); 
                 });
                 
                 themeToggle.addEventListener('click', () => {
@@ -628,7 +936,91 @@
                 closeModalBtn.addEventListener('click', () => UIManager.closeModal());
                 modalOverlay.addEventListener('click', () => UIManager.closeModal());
                 iconForm.addEventListener('submit', this.handleFormSubmit);
+
+                // NOVOS Eventos da Área Restrita
+                lockButton.addEventListener('click', this.handleLockButtonClick);
+                loginButton.addEventListener('click', this.handleLoginAttempt);
+                lockPasswordInput.addEventListener('keypress', e => {
+                    if (e.key === 'Enter') this.handleLoginAttempt(e);
+                });
+                
+                newTextForm.addEventListener('submit', this.handleRestrictedTextFormSubmit);
+                restrictedTextsList.addEventListener('click', this.handleRestrictedTextActions);
             },
+            
+            // NOVO: Lógica do Cadeado
+            handleLockButtonClick() {
+                if (state.isRestrictedAreaOpen) {
+                    UIManager.toggleRestrictedArea(false); // Fecha se estiver aberto
+                } else {
+                    UIManager.openLockModal(); // Abre o modal para login
+                }
+            },
+            
+            handleLoginAttempt(event) {
+                event.preventDefault();
+                const input = UIManager.elements.lockPasswordInput;
+                const status = UIManager.elements.loginStatus;
+                
+                if (input.value === config.restricted.password) {
+                    status.style.display = 'none';
+                    UIManager.toggleRestrictedArea(true); // Abre a área restrita
+                    UIManager.closeLockModal();
+                } else {
+                    status.textContent = 'Senha Incorreta.';
+                    status.style.display = 'block';
+                    input.value = '';
+                    input.focus();
+                }
+            },
+            
+            // NOVO: Lógica do CRUD de Textos Restritos
+            async handleRestrictedTextFormSubmit(event) {
+                event.preventDefault();
+                const { restrictedTextIdInput, restrictedTextTitleInput, restrictedTextContentInput } = UIManager.elements;
+                
+                const id = restrictedTextIdInput.value;
+                const data = {
+                    title: restrictedTextTitleInput.value.trim(),
+                    content: restrictedTextContentInput.value.trim(),
+                    // arquivo: '' // Adicionar lógica de URL de arquivo aqui
+                };
+
+                if (!data.content) return; // Não salva texto vazio
+
+                try {
+                    if (id) await FirebaseService.updateRestrictedText(id, data);
+                    else await FirebaseService.addRestrictedText(data);
+                    
+                    UIManager.clearRestrictedTextForm();
+                } catch (error) {
+                    console.error("Erro ao salvar o texto restrito:", error);
+                    alert("Erro ao salvar o texto.");
+                }
+            },
+            
+            handleRestrictedTextActions(event) {
+                const target = event.target;
+                const entry = target.closest('.text-entry');
+                if (!entry) return;
+                
+                const id = entry.dataset.id;
+                const textData = state.restrictedTexts.find(t => t.id === id);
+
+                if (target.classList.contains('edit-text-btn')) {
+                    UIManager.loadRestrictedTextForEdit(textData);
+                } else if (target.classList.contains('delete-text-btn')) {
+                    const title = textData.title || textData.content.substring(0, 30) + '...';
+                    if (confirm(`Tem certeza que deseja excluir o texto "${title}"?`)) {
+                        FirebaseService.deleteRestrictedText(id).catch(err => {
+                            console.error("Erro ao excluir o texto:", err);
+                            alert("Erro ao excluir o texto.");
+                        });
+                    }
+                }
+            },
+
+            // Funções de Ícones (MANTIDAS)
             loadTheme() {
                 const savedTheme = localStorage.getItem('theme');
                 let initialTheme = 'light'; 
@@ -646,9 +1038,8 @@
                 const form = event.target;
                 const id = form.elements.iconIdInput.value;
                 const data = {
-                    // Texto do ícone (nome) agora é opcional. Se for vazio, salva como string vazia.
                     name: form.elements.iconNameInput.value.trim() || '', 
-                    description: form.elements.iconDescriptionInput.value.trim() || '', // Descrição opcional
+                    description: form.elements.iconDescriptionInput.value.trim() || '', 
                     link: form.elements.iconLinkInput.value.trim(),
                     imageUrl: form.elements.iconImageUrlInput.value.trim(),
                     colorClass: form.elements.iconColorClassInput.value.trim(),
@@ -656,7 +1047,6 @@
                     category: form.elements.iconCategorySelect.value,
                 };
 
-                // Validação mínima para garantir que pelo menos um campo de nome/descrição/imagem não esteja vazio
                 if (!data.name && !data.description && !data.imageUrl) {
                     UIManager.elements.formStatusMessage.textContent = 'Adicione pelo menos um Título, Descrição ou URL da Imagem.';
                     UIManager.elements.formStatusMessage.style.display = 'block';
