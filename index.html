@@ -73,33 +73,56 @@
         /* --- FIM Estilos do Popup de Instalação --- */
 
 
-        /* --- NOVO: Botões Fixos NOVO POSICIONAMENTO --- */
+        /* --- NOVO: Botões Fixos POSICIONAMENTO ALTERADO PARA VERTICAL C/ DIREITA INFERIOR --- */
         #floating-actions-container {
-            /* Posição Anterior: top: 15px; right: 15px; */
             position: fixed; 
             bottom: 20px; /* Distância da parte inferior */
-            left: 50%; /* Centraliza o início */
-            transform: translateX(-50%); /* Ajusta para centralizar totalmente */
+            right: 20px; /* Distância da parte direita */
+            left: auto; /* Remove a configuração de 'left' anterior */
+            transform: none; /* Remove a centralização horizontal anterior */
             z-index: 1000;
-            display: flex; gap: 10px;
-            padding: 8px;
+            
+            /* ALTERADO: Para empilhar os botões verticalmente */
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            
+            padding: 10px; /* Aumenta um pouco o padding para o contêiner vertical */
             background-color: var(--floating-bg-color);
-            border-radius: 50px;
+            border-radius: 12px; /* Muda para um retângulo mais discreto para a coluna */
             box-shadow: 0 4px 15px var(--shadow-color);
-            transition: background-color .3s ease, box-shadow .3s ease;
+            
+            /* ADICIONADO: Transição suave para a lógica de aparecer/desaparecer */
+            transition: background-color .3s ease, box-shadow .3s ease, opacity 0.3s ease, transform 0.3s ease;
+            
+            /* >>>>>>>>>>>>> ALTERAÇÃO SOLICITADA: Opacidade 50% <<<<<<<<<<< */
+            opacity: 0.5;
         }
+        
+        /* NOVO ESTILO: Classe para esconder o botão flutuante */
+        #floating-actions-container.hidden {
+            opacity: 0;
+            /* Move o contêiner ligeiramente para baixo ao esconder */
+            transform: translateY(100%); 
+            pointer-events: none; /* Impede cliques quando invisível */
+        }
+        
         .action-button {
             flex-shrink: 0; background-color: transparent;
             color: var(--text-color); border: none; border-radius: 50%;
-            width: 40px; height: 40px; cursor: pointer; display: flex;
+            width: 45px; /* Ajuste o tamanho do botão para a coluna */
+            height: 45px;
+            cursor: pointer; display: flex;
             justify-content: center; align-items: center; padding: 0;
-            transition: color .3s ease, transform .2s ease;
+            transition: color .3s ease, transform .2s ease, background-color .3s ease;
         }
         .action-button:hover { 
             transform: scale(1.1); 
             color: var(--primary-color);
+            /* Aumenta a opacidade para 1 (100%) ao passar o mouse */
+            opacity: 1.0; 
         }
-        .action-button svg { width: 22px; height: 22px; }
+        .action-button svg { width: 24px; height: 24px; } /* Ajusta o tamanho do ícone */
 
         /* Estilo específico para o botão de Pesquisa (Lupa) */
         #search-toggle-button {
@@ -109,7 +132,9 @@
             transition: background-color 0.3s ease;
         }
         #search-toggle-button.active {
-            background-color: var(--button-secondary-bg);
+            /* Fica com um pequeno destaque quando ativo */
+            background-color: var(--button-secondary-bg); 
+            border-radius: 50%;
         }
 
         /* Estilo específico para o botão Cadeado */
@@ -314,8 +339,11 @@
 
         /* --- NOVO: Modal de Login (Cadeado) --- */
         #lock-modal {
-            /* Posição ajustada para quando o botão está embaixo: */
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); 
+            /* Posição ajustada para aparecer logo acima do container flutuante */
+            position: fixed; 
+            bottom: 80px; 
+            right: 20px; 
+            left: auto;
             width: 300px;
             background-color: var(--card-bg-color);
             border-radius: 8px;
@@ -326,7 +354,7 @@
             pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease;
             /* O transform será ajustado pelo JS para aparecer, mas mantendo a centralização */
-            transform: translate(-50%, 20px); 
+            transform: translateY(20px); 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -334,7 +362,7 @@
         #lock-modal.visible {
             opacity: 1;
             pointer-events: auto;
-            transform: translate(-50%, 0);
+            transform: translateY(0);
         }
         #lock-modal p {
             margin: 5px 0 15px; font-size: 0.9em; color: var(--text-color);
@@ -416,6 +444,15 @@
                  position: static; transform: none; color: var(--text-color);
                  background: transparent;
              }
+             /* Ajusta a posição do Menu de Opções do Cadeado (Lock Menu) para a nova posição do container */
+             #lock-options-menu {
+                 left: auto !important;
+                 right: 75px !important; /* Ajuste para que fique ao lado do container */
+                 bottom: 20px !important;
+                 transform: none !important;
+                 /* Garante que o menu abra para a esquerda no PC para não sair da tela */
+                 transform-origin: bottom right; 
+             }
         }
     </style>
 </head>
@@ -444,7 +481,7 @@
         </div>
     </div>
     
-    <div id="lock-options-menu" class="context-menu" style="bottom: 80px; left: 50%; transform: translateX(-50%); display: none; min-width: 180px; z-index: 1070;">
+    <div id="lock-options-menu" class="context-menu" style="bottom: 80px; right: 20px; left: auto; transform: none; display: none; min-width: 180px; z-index: 1070;">
         <li data-action="open-restricted">Área Restrita 🔒</li>
         <li data-action="open-add-icon">Adicionar Novo Botão +</li>
     </div>
@@ -609,6 +646,43 @@
         // FIM NOVO: Lógica do Prompt de Instalação (PWA)
 
     </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const floatingContainer = document.getElementById('floating-actions-container');
+            let lastScrollTop = 0;
+            const scrollThreshold = 50; // Distância mínima para considerar rolagem
+
+            function handleScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                // 1. Rolagem para o topo (mostrar)
+                if (scrollTop === 0) {
+                    floatingContainer.classList.remove('hidden');
+                } 
+                // 2. Rolagem para baixo (esconder)
+                else if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                    floatingContainer.classList.add('hidden');
+                } 
+                // 3. Rolagem para cima (mostrar, mas só se tiver saído do topo e a rolagem for significativa)
+                else if (scrollTop < lastScrollTop && floatingContainer.classList.contains('hidden')) {
+                    // Não é o topo, mas está voltando. Opcional: Se você quiser que ele reapareça ao rolar para cima,
+                    // mas seu requisito era APENAS ao rolar para o topo (scrollTop === 0).
+                    // Se você QUISER que ele reapareça ao rolar para cima ANTES do topo, descomente a linha abaixo:
+                    // floatingContainer.classList.remove('hidden'); 
+                }
+
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Garante que não é negativo
+            }
+            
+            // Adiciona o listener de scroll ao objeto window
+            window.addEventListener('scroll', handleScroll);
+            
+            // Verifica a posição inicial no carregamento
+            handleScroll();
+        });
+    </script>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -1085,7 +1159,7 @@
                     const isDark = !document.body.classList.contains('dark-mode');
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                     UIManager.toggleTheme(isDark);
-                    UIManager.closeLockModal(); // Fecha o modal de login
+                    UIManager.closeLockModal(); // Feche o modal de login
                     UIManager.toggleLockMenu(false); // Fecha o menu de opções do cadeado
                 });
                 allCategoriesGrid.addEventListener('click', e => {
