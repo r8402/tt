@@ -7,6 +7,8 @@
     <link rel="icon" type="image/png" href="logo1.png">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
+    <meta name="theme-color" content="#f0f2f5"/>
+    <link rel="manifest" href="/manifest.json">
     <style>
         :root {
             --bg-color: #f0f2f5; --text-color: #333; --card-bg-color: #ffffff;
@@ -33,6 +35,57 @@
             transition: background-color .3s ease, color .3s ease;
         }
         body.modal-open { overflow: hidden; }
+
+        /* --- Estilos do Popup de Instalação (PWA) --- */
+        #install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            padding: 15px 20px;
+            box-shadow: 0 -4px 12px var(--shadow-color);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            box-sizing: border-box;
+            gap: 10px;
+        }
+        #install-prompt.visible {
+            transform: translateY(0);
+        }
+        #install-prompt p {
+            margin: 0;
+            flex-grow: 1;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        #install-prompt button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        #install-prompt #install-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        #install-prompt #install-btn:hover {
+            background-color: var(--primary-hover-color);
+        }
+        #install-prompt #close-install-btn {
+            background-color: var(--button-secondary-bg);
+            color: var(--text-color);
+        }
+        /* --- FIM Estilos do Popup de Instalação --- */
+
 
         /* --- Barra de Pesquisa Fixa --- */
         #top-search-bar-wrapper {
@@ -397,7 +450,7 @@
         <div id="search-container">
             <input type="text" id="search-input" placeholder="Pesquise Aqui...">
             <button id="lock-button" class="action-button" title="Área Restrita">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a.75.75 0 00-1.5 0V3h-1.375a.75.75 0 00-.75.75c0 .327.143.62.385.82L10.5 7.5l-3.25 3.25a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 10.5l4.414 4.414a.75.75 0 001.06-1.06L13.06 9.56a.75.75 0 00-1.06 0L10.5 11.06l-1.97-1.97a.75.75 0 00-1.06 0L5.276 12.23A.75.75 0 004.5 13.06v5.69a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25v-5.69c0-.284-.114-.555-.316-.757l-1.97-1.97a.75.75 0 00-1.06 0L13.5 10.5l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06l-1.97-1.97a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06zM9.75 3h4.5v1.5h-4.5V3zM6.75 6.75A.75.75 0 017.5 6h9c.414 0 .75.336.75.75v5.25a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75V6.75zM12 21.75a.75.75 0 00-1.5 0V24h1.5v-2.25z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a.75.75 0 00-1.5 0V3h-1.375a.75.75 0 00-.75.75c0 .327.143.62.385.82L10.5 7.5l-3.25 3.25a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 10.5l4.414 4.414a.75.75 0 001.06-1.06L13.06 9.56a.75.75 0 00-1.06 0L10.5 11.06l-1.97-1.97a.75.75 0 00-1.06 0L5.276 12.23A.75.75 0 004.5 13.06v5.69a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25v-5.69c0-.284-.114-.555-.316-.757l-1.97-1.97a.75.75 0 00-1.06 0L13.5 10.5l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06l3.47 3.47a.75.75 0 001.06 0l1.22-1.22a.75.75 0 000-1.06L17.56 9.56a.75.75 0 00-1.06 0L12 11.06l-1.97-1.97a.75.75 0 00-1.06 0L7.5 12.06l-1.22 1.22a.75.75 0 000 1.06l1.22 1.22a.75.75 0 001.06 0L12 11.06zM9.75 3h4.5v1.5h-4.5V3zM6.75 6.75A.75.75 0 017.5 6h9c.414 0 .75.336.75.75v5.25a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75V6.75zM12 21.75a.75.75 0 00-1.5 0V24h1.5v-2.25z"/></svg>
             </button>
             <button id="open-generator-modal-btn" class="action-button" title="Adicionar Novo Ícone">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -443,7 +496,12 @@
         <div id="all-categories-grid"></div>
         <div id="search-results-container"></div>
     </main>
-
+    
+    <div id="install-prompt">
+        <p>✨ Instale este site como um aplicativo no seu celular!</p>
+        <button id="install-btn">Instalar</button>
+        <button id="close-install-btn">X</button>
+    </div>
     <div id="generator-modal-overlay"></div>
     <div id="generate-icon-code-section">
         <button id="close-generator-modal-btn">×</button>
@@ -487,6 +545,81 @@
         </form>
     </div>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => {
+                        console.log('Service Worker registrado com sucesso:', reg);
+                    })
+                    .catch(err => {
+                        console.error('Falha no registro do Service Worker:', err);
+                    });
+            });
+        }
+
+        // NOVO: Lógica do Prompt de Instalação (PWA)
+        let deferredPrompt;
+        const installPrompt = document.getElementById('install-prompt');
+        const installBtn = document.getElementById('install-btn');
+        const closeInstallBtn = document.getElementById('close-install-btn');
+
+        // 1. Captura o evento do navegador que permite a instalação
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previne que o mini-infobar padrão do Chrome apareça
+            e.preventDefault();
+            // Armazena o evento para que possa ser acionado mais tarde
+            deferredPrompt = e;
+            // Mostra o seu popup personalizado, a menos que o usuário já tenha recusado
+            if (localStorage.getItem('installPromptDismissed') !== 'true' && 
+                window.matchMedia('(display-mode: standalone)').matches === false) {
+                installPrompt.classList.add('visible');
+            }
+        });
+
+        // 2. Aciona o prompt nativo quando o usuário clica no botão "Instalar"
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Esconde o seu popup antes de mostrar o nativo
+                installPrompt.classList.remove('visible');
+                
+                // Mostra o prompt de instalação nativo
+                deferredPrompt.prompt();
+                
+                // Espera o usuário responder ao prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('O usuário aceitou o prompt de instalação.');
+                } else {
+                    console.log('O usuário recusou o prompt de instalação.');
+                }
+                
+                // O evento só pode ser usado uma vez
+                deferredPrompt = null;
+            }
+        });
+
+        // 3. Fecha (dispensa) o seu popup de sugestão
+        closeInstallBtn.addEventListener('click', () => {
+            installPrompt.classList.remove('visible');
+            // Opcional: Armazena a preferência para não mostrar novamente
+            localStorage.setItem('installPromptDismissed', 'true');
+        });
+
+        // 4. Se o app já estiver instalado (standalone), esconde o popup
+        window.addEventListener('appinstalled', () => {
+            installPrompt.classList.remove('visible');
+            deferredPrompt = null;
+        });
+
+        // Verifica o modo de exibição ao carregar (se já está instalado)
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installPrompt.style.display = 'none';
+        }
+        // FIM NOVO: Lógica do Prompt de Instalação (PWA)
+
+    </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
