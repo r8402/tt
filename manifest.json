@@ -3,7 +3,7 @@
   "dir": "auto",
   "display": "standalone",
   "name": "Robson",
-  "orientation": "natural",
+  "orientation": "portrait",
   "scope": "/",
   "short_name": "Robson",
   "start_url": "https://r8402.github.io/tt/",
