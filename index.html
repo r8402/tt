@@ -16,10 +16,15 @@
             --primary-color: #007bff; --primary-hover-color: #0056b3;
             --header-text-color: #007bff; --input-bg-color: #ffffff;
             --input-border-color: #ccc; --button-secondary-bg: #e9ecef;
-            /* Nova variável para o container dos ícones no modo escuro */
             --dark-icon-container-bg: #424242;
-            /* NOVO: Cor de fundo para os botões fixos */
             --floating-bg-color: #ffffff;
+            /* NOVO: Variáveis para o FAB */
+            /* ALTERADO: 56px * 0.7 = 39.2px */
+            --fab-size: 39.2px; 
+            --fab-main-bg: var(--primary-color);
+            --fab-main-color: #ffffff;
+            --fab-item-bg: var(--card-bg-color);
+            --fab-item-color: var(--text-color);
         }
         body.dark-mode {
             --bg-color: #2c2c2c; --text-color: #e0e0e0; --card-bg-color: var(--dark-icon-container-bg);
@@ -28,40 +33,30 @@
             --input-border-color: #555; --button-secondary-bg: #555;
             --primary-color: #0099ff;
             --floating-bg-color: #3c3c3c;
+            --fab-main-bg: var(--primary-color);
+            --fab-item-bg: var(--card-bg-color);
+            --fab-item-color: var(--text-color);
         }
 
         html { scroll-behavior: smooth; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Padding ajustado para o novo layout sem barra fixa */
             margin: 0; padding: 20px 20px 40px; 
             background-color: var(--bg-color); color: var(--text-color);
             transition: background-color .3s ease, color .3s ease;
         }
         body.modal-open { overflow: hidden; }
 
-        /* --- Estilos do Popup de Instalação (PWA) --- (MANTIDO) */
+        /* --- Estilos do Popup de Instalação (PWA) --- */
         #install-prompt {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--card-bg-color);
-            color: var(--text-color);
-            padding: 15px 20px;
-            box-shadow: 0 -4px 12px var(--shadow-color);
-            z-index: 1050;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transform: translateY(100%);
-            transition: transform 0.3s ease-out;
-            box-sizing: border-box;
-            gap: 10px;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background-color: var(--card-bg-color); color: var(--text-color);
+            padding: 15px 20px; box-shadow: 0 -4px 12px var(--shadow-color);
+            z-index: 1050; display: flex; align-items: center;
+            justify-content: space-between; transform: translateY(100%);
+            transition: transform 0.3s ease-out; box-sizing: border-box; gap: 10px;
         }
-        #install-prompt.visible {
-            transform: translateY(0);
-        }
+        #install-prompt.visible { transform: translateY(0); }
         #install-prompt p { margin: 0; flex-grow: 1; font-size: 1em; font-weight: 500; }
         #install-prompt button {
             padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer;
@@ -73,116 +68,287 @@
         /* --- FIM Estilos do Popup de Instalação --- */
 
 
-        /* --- NOVO: Botões Fixos POSICIONAMENTO ALTERADO PARA VERTICAL C/ DIREITA INFERIOR --- */
-        #floating-actions-container {
+        /* ========================================= */
+        /* 🎨 ALTERADO: Floating Action Button (FAB) */
+        /* ========================================= */
+        #fab-container {
+            /* Posição padrão Fixed (bottom-right) */
             position: fixed; 
-            bottom: 20px; /* Distância da parte inferior */
-            right: 20px; /* Distância da parte direita */
-            left: auto; /* Remove a configuração de 'left' anterior */
-            transform: none; /* Remove a centralização horizontal anterior */
+            bottom: 20px; 
+            right: 20px; 
             z-index: 1000;
-            
-            /* ALTERADO: Para empilhar os botões verticalmente */
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            
-            padding: 10px; /* Aumenta um pouco o padding para o contêiner vertical */
-            background-color: var(--floating-bg-color);
-            border-radius: 12px; /* Muda para um retângulo mais discreto para a coluna */
-            box-shadow: 0 4px 15px var(--shadow-color);
-            
-            /* ADICIONADO: Transição suave para a lógica de aparecer/desaparecer */
-            transition: background-color .3s ease, box-shadow .3s ease, opacity 0.3s ease, transform 0.3s ease;
-            
-            /* >>>>>>>>>>>>> ALTERAÇÃO SOLICITADA: Opacidade 50% <<<<<<<<<<< */
-            opacity: 0.5;
+            display: flex;
+            flex-direction: column-reverse; 
+            align-items: flex-end;
+            gap: 10px;
+            opacity: 1; 
+            /* Transição também para 'right', 'top', 'bottom' */
+            transition: opacity 0.3s ease, transform 0.3s ease, right 0s, top 0s, bottom 0s;
         }
         
-        /* NOVO ESTILO: Classe para esconder o botão flutuante */
-        #floating-actions-container.hidden {
+        /* Oculta o container principal ao rolar (mesma lógica anterior) */
+        #fab-container.hidden {
             opacity: 0;
-            /* Move o contêiner ligeiramente para baixo ao esconder */
             transform: translateY(100%); 
-            pointer-events: none; /* Impede cliques quando invisível */
+            pointer-events: none; 
         }
         
-        .action-button {
-            flex-shrink: 0; background-color: transparent;
-            color: var(--text-color); border: none; border-radius: 50%;
-            width: 45px; /* Ajuste o tamanho do botão para a coluna */
-            height: 45px;
-            cursor: pointer; display: flex;
-            justify-content: center; align-items: center; padding: 0;
-            transition: color .3s ease, transform .2s ease, background-color .3s ease;
+        /* NOVO: Classe para posicionamento flutuante em cima do balão 'Fixados!' */
+        #fab-container.pinned-position {
+            /* Mudar para position: absolute para que o JS possa posicionar em relação ao conteúdo */
+            position: absolute !important;
+            /* Garante que o menu suspenso (lock options) fique por cima também */
+            z-index: 1005; 
+            /* Remove a transição de 'right' e 'top' para o FAB não piscar ao trocar de fixed para absolute */
+            transition: opacity 0.3s ease, transform 0.3s ease; 
+            /* Adicionado: Alinha o FAB à esquerda para posicionamento por JS */
+            left: auto;
         }
-        .action-button:hover { 
-            transform: scale(1.1); 
-            color: var(--primary-color);
-            /* Aumenta a opacidade para 1 (100%) ao passar o mouse */
-            opacity: 1.0; 
-        }
-        .action-button svg { width: 24px; height: 24px; } /* Ajusta o tamanho do ícone */
 
-        /* Estilo específico para o botão de Pesquisa (Lupa) */
-        #search-toggle-button {
-            color: var(--primary-color);
-            /* Faz o toggle da cor de fundo para indicar que está ativo */
-            background-color: transparent; 
-            transition: background-color 0.3s ease;
-        }
-        #search-toggle-button.active {
-            /* Fica com um pequeno destaque quando ativo */
-            background-color: var(--button-secondary-bg); 
+
+        /* Botão Principal (o redondo que agrupa tudo) */
+        #main-fab-button {
+            /* Tamanho de 70% da variável --fab-size (39.2px) */
+            width: var(--fab-size);
+            height: var(--fab-size);
             border-radius: 50%;
+            background-color: var(--fab-main-bg);
+            color: var(--fab-main-color);
+            box-shadow: 0 4px 10px var(--shadow-color);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            flex-shrink: 0;
+            /* NOVO: Aplica a transparência de 70% (0.7) */
+            opacity: 0.7; 
         }
 
-        /* Estilo específico para o botão Cadeado */
-        #lock-toggle-button {
-            color: #dc3545; /* Cor de destaque para o cadeado */
+        /* Animação do ícone do botão principal (Rodar) */
+        #main-fab-button.open svg {
+            transform: rotate(45deg); /* Gira 45 graus (de '...+' para 'X' */
         }
-        #lock-toggle-button:hover {
+        #main-fab-button svg {
+            /* Reduzido o tamanho do ícone para se ajustar ao botão menor (70%) */
+            width: 22px; 
+            height: 22px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Botões Filhos (Itens do menu) */
+        #fab-items-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            /* Começa invisível e empilhado */
+            transition: opacity 0.3s ease;
+        }
+        #fab-items-wrapper.closed {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fab-item-button {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: var(--fab-item-bg);
+            color: var(--fab-item-color);
+            box-shadow: 0 2px 5px var(--shadow-color);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            text-decoration: none;
+        }
+        .fab-item-button:hover {
+            transform: translateX(-3px);
+            background-color: var(--button-secondary-bg);
+        }
+        .fab-item-button span {
+            font-weight: 500;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+        .fab-item-button svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
             color: var(--primary-color);
         }
 
-        /* --- Barra de Pesquisa Deslizante --- */
+        /* Cor de destaque para o cadeado (🔒 Área Restrita) */
+        #fab-item-lock svg { color: #dc3545; }
+        
+        /* Cor de destaque para o tema (💡 Sol/Lua) */
+        #fab-item-theme svg { color: #ffc107; }
+
+        /* Remove o container antigo de ações flutuantes */
+        #floating-actions-container, #lock-toggle-button, #search-toggle-button, #theme-toggle {
+            display: none !important;
+        }
+        /* ========================================= */
+        /* --- FIM NOVO: Floating Action Button (FAB) --- */
+        /* ========================================= */
+
+        /* --- Barra de Pesquisa Deslizante (MANTIDO) --- */
         #top-search-bar-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 990; /* Abaixo dos botões */
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 990; 
             background-color: var(--bg-color); box-shadow: 0 2px 10px var(--shadow-color);
-            padding: 10px 20px; box-sizing: border-box; display: none; /* Inicia Oculta */
+            padding: 10px 20px; box-sizing: border-box; display: none; 
             justify-content: center; transition: background-color .3s ease;
             transform: translateY(-100%);
         }
         #top-search-bar-wrapper.visible {
-            display: flex;
-            transform: translateY(0);
+            display: flex; transform: translateY(0);
         }
         #search-container {
             width: 100%; max-width: 600px; display: flex; align-items: center;
-            padding: 0 8px; /* Reduz o padding para a barra interna */
-            background-color: var(--card-bg-color);
+            padding: 0 8px; background-color: var(--card-bg-color);
             border-radius: 50px; 
-            box-shadow: 0 2px 5px var(--shadow-color); /* Sombra mais suave */
+            box-shadow: 0 2px 5px var(--shadow-color); 
         }
         #search-input {
             flex-grow: 1; border: none; font-size: 1.1em;
             background-color: transparent; color: var(--text-color); outline: none; padding: 12px 15px;
         }
-        
-        /* Ajusta o padding do body quando a barra de pesquisa aparece */
         body.search-open {
-            padding-top: 80px; /* Espaço para a barra de pesquisa */
-        }
-        
-        /* Remove o botão Adicionar Novo Ícone daqui (agora está no #floating-actions-container) */
-        #open-generator-modal-btn {
-            display: none !important;
+            padding-top: 80px; 
         }
 
-        /* --- NOVO: Botão Cadeado (REMOVIDO da barra, agora é #lock-toggle-button) --- */
-        #lock-button { display: none !important; }
+        /* --- Modal (MANTIDO) --- */
+        #generator-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            z-index: 1040; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        #generator-modal-overlay.visible { opacity: 1; pointer-events: auto; }
+        #generate-icon-code-section {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
+            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+            z-index: 1050; padding: 25px; background-color: var(--bg-color);
+            border-radius: 12px; border-top: 5px solid var(--primary-color);
+            opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;
+        }
+        #generate-icon-code-section.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+        #modal-title {
+            text-align: center; color: var(--header-text-color); margin-top: 0; margin-bottom: 25px;
+            font-size: 1.8em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
+        }
+        #close-generator-modal-btn {
+            position: absolute; top: 15px; right: 15px; background: var(--button-secondary-bg);
+            border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem;
+            color: var(--text-color); cursor: pointer; display: flex; align-items: center;
+            justify-content: center; transition: background-color .2s, color .2s;
+        }
+        #close-generator-modal-btn:hover { background-color: #dc3545; color: white; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--input-border-color);
+            border-radius: 8px; box-sizing: border-box; font-size: 1em;
+            background-color: var(--input-bg-color); color: var(--text-color);
+        }
+        .form-group label span.optional { font-weight: normal; font-size: 0.9em; color: #6c757d; }
+        .form-group label span.required { font-weight: normal; font-size: 0.9em; color: #dc3545; }
+        #submit-icon-button {
+            width: 100%; padding: 12px 15px; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 1.1em;
+            cursor: pointer; transition: background-color .3s ease; margin-top: 10px;
+        }
+        #submit-icon-button:hover { background-color: var(--primary-hover-color); }
 
+        /* --- NOVO: Modal de Login (Cadeado) --- */
+        #lock-modal {
+            /* Posição ajustada para aparecer logo acima do FAB */
+            bottom: calc(var(--fab-size) + 30px + 10px); /* Tamanho do FAB + bottom + gap */
+            right: 20px; 
+            position: fixed; 
+            left: auto;
+            width: 300px;
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            padding: 15px;
+            z-index: 1060;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(20px); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #lock-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        #lock-modal p {
+            margin: 5px 0 15px; font-size: 0.9em; color: var(--text-color);
+        }
+        #lock-password-input {
+            width: 100%; padding: 10px; margin-bottom: 10px;
+            border: 1px solid var(--input-border-color); border-radius: 6px;
+            text-align: center; font-size: 1.2em; background-color: var(--input-bg-color);
+            color: var(--text-color); outline: none;
+        }
+        #login-button {
+            width: 100%; padding: 10px; background-color: var(--primary-color);
+            color: white; border: none; border-radius: 6px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #login-button:hover { background-color: var(--primary-hover-color); }
+        #login-status {
+            color: #dc3545; margin-top: 10px; font-size: 0.85em; display: none;
+        }
+
+        /* --- NOVO: Área Restrita (MANTIDO) --- */
+        #restricted-area-wrapper {
+            max-width: 800px; width: 100%; margin: 0 auto 40px; padding: 20px;
+            background-color: var(--card-bg-color); border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            display: none; 
+        }
+        #restricted-area-wrapper.visible { display: block; }
+        #restricted-area-wrapper h2 {
+            color: var(--primary-color); border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px; margin-top: 0;
+        }
+        .text-entry {
+            border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 15px; margin-bottom: 15px; background-color: var(--input-bg-color);
+            position: relative;
+        }
+        .text-content { white-space: pre-wrap; word-wrap: break-word; }
+        .text-actions { margin-top: 10px; text-align: right; }
+        .text-actions button {
+            background: none; border: none; color: var(--primary-color);
+            cursor: pointer; margin-left: 10px; font-weight: 500;
+        }
+        .text-actions button.delete { color: #dc3545; }
         
+        /* Formulário de Novo Texto */
+        #new-text-form {
+            margin-bottom: 30px; padding: 15px; border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+        }
+        #new-text-form textarea { min-height: 150px; margin-bottom: 10px; }
+        #new-text-form input[type="text"] { margin-bottom: 10px; }
+        .file-upload-section {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);
+            font-size: 0.9em;
+        }
+        .file-upload-section label { margin-right: 10px; }
+        .file-upload-section input[type="file"] { border: none; padding: 0; background: none; }
+
+
         /* --- Conteúdo Principal e Categorias (MANTIDO) --- */
         #all-categories-grid, #search-results-container {
             max-width: 1200px; width: 100%; margin: 0 auto;
@@ -213,11 +379,11 @@
             border-radius: 30px;
             padding: 20px;
             box-shadow: 0 4px 12px var(--shadow-color);
-            max-height: 4000px; /* Altura grande para permitir transição */
+            max-height: 4000px; 
             transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out, opacity 0.5s ease-in-out;
         }
         #search-results-container { 
-            display: none; /* JS controla a visibilidade */
+            display: none; 
             flex-direction: row;
             flex-wrap: wrap;
         }
@@ -238,7 +404,7 @@
 
         .icon-visual {
             position: absolute;
-            inset: 0; /* Cobre todo o .icon-link */
+            inset: 0; 
             z-index: 1;
             display: flex;
             align-items: center;
@@ -247,7 +413,7 @@
         
         .icon-text-content, .icon-actions-button {
             position: relative;
-            z-index: 2; /* Fica na frente do fundo */
+            z-index: 2; 
         }
         .icon-title {
             font-weight: 600;
@@ -256,7 +422,7 @@
             color: #fff;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
         }
-        .icon-visual-fallback { display: none; } /* Não precisamos mais da letra */
+        .icon-visual-fallback { display: none; } 
 
         .icon-actions-button {
             position: absolute;
@@ -293,144 +459,11 @@
         .context-menu li:hover { background-color: var(--border-color); }
         .context-menu li.danger-option { color: #dc3545; }
 
-        /* --- Modal (MANTIDO) --- */
-        #generator-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
-            z-index: 1040; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
-        }
-        #generator-modal-overlay.visible { opacity: 1; pointer-events: auto; }
-        #generate-icon-code-section {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
-            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
-            z-index: 1050; padding: 25px; background-color: var(--bg-color);
-            border-radius: 12px; border-top: 5px solid var(--primary-color);
-            opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;
-        }
-        #generate-icon-code-section.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-        #modal-title {
-            text-align: center; color: var(--header-text-color); margin-top: 0; margin-bottom: 25px;
-            font-size: 1.8em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
-        }
-        #close-generator-modal-btn {
-            position: absolute; top: 15px; right: 15px; background: var(--button-secondary-bg);
-            border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 1.2rem;
-            color: var(--text-color); cursor: pointer; display: flex; align-items: center;
-            justify-content: center; transition: background-color .2s, color .2s;
-        }
-        #close-generator-modal-btn:hover { background-color: #dc3545; color: white; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 12px 15px; border: 1px solid var(--input-border-color);
-            border-radius: 8px; box-sizing: border-box; font-size: 1em;
-            background-color: var(--input-bg-color); color: var(--text-color);
-        }
-        /* ESTILO PARA AVISO DE CAMPO OPCIONAL/OBRIGATÓRIO */
-        .form-group label span.optional { font-weight: normal; font-size: 0.9em; color: #6c757d; }
-        .form-group label span.required { font-weight: normal; font-size: 0.9em; color: #dc3545; }
-
-        #submit-icon-button {
-            width: 100%; padding: 12px 15px; background-color: var(--primary-color);
-            color: white; border: none; border-radius: 8px; font-size: 1.1em;
-            cursor: pointer; transition: background-color .3s ease; margin-top: 10px;
-        }
-        #submit-icon-button:hover { background-color: var(--primary-hover-color); }
-
-        /* --- NOVO: Modal de Login (Cadeado) --- */
-        #lock-modal {
-            /* Posição ajustada para aparecer logo acima do container flutuante */
-            position: fixed; 
-            bottom: 80px; 
-            right: 20px; 
-            left: auto;
-            width: 300px;
-            background-color: var(--card-bg-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 20px var(--shadow-color);
-            padding: 15px;
-            z-index: 1060;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            /* O transform será ajustado pelo JS para aparecer, mas mantendo a centralização */
-            transform: translateY(20px); 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #lock-modal.visible {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-        #lock-modal p {
-            margin: 5px 0 15px; font-size: 0.9em; color: var(--text-color);
-        }
-        #lock-password-input {
-            width: 100%; padding: 10px; margin-bottom: 10px;
-            border: 1px solid var(--input-border-color); border-radius: 6px;
-            text-align: center; font-size: 1.2em; background-color: var(--input-bg-color);
-            color: var(--text-color); outline: none;
-        }
-        #login-button {
-            width: 100%; padding: 10px; background-color: var(--primary-color);
-            color: white; border: none; border-radius: 6px; cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #login-button:hover { background-color: var(--primary-hover-color); }
-        #login-status {
-            color: #dc3545; margin-top: 10px; font-size: 0.85em; display: none;
-        }
-
-        /* --- NOVO: Área Restrita --- */
-        #restricted-area-wrapper {
-            max-width: 800px; width: 100%; margin: 0 auto 40px; padding: 20px;
-            background-color: var(--card-bg-color); border-radius: 12px;
-            box-shadow: 0 4px 12px var(--shadow-color);
-            display: none; /* Inicia oculto */
-        }
-        #restricted-area-wrapper.visible { display: block; }
-        #restricted-area-wrapper h2 {
-            color: var(--primary-color); border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px; margin-top: 0;
-        }
-        .text-entry {
-            border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 15px; margin-bottom: 15px; background-color: var(--input-bg-color);
-            position: relative;
-        }
-        .text-content { white-space: pre-wrap; word-wrap: break-word; }
-        .text-actions { margin-top: 10px; text-align: right; }
-        .text-actions button {
-            background: none; border: none; color: var(--primary-color);
-            cursor: pointer; margin-left: 10px; font-weight: 500;
-        }
-        .text-actions button.delete { color: #dc3545; }
-        
-        /* Formulário de Novo Texto */
-        #new-text-form {
-            margin-bottom: 30px; padding: 15px; border: 2px dashed var(--primary-color);
-            border-radius: 10px;
-        }
-        #new-text-form textarea { min-height: 150px; margin-bottom: 10px; }
-        #new-text-form input[type="text"] { margin-bottom: 10px; }
-        .file-upload-section {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);
-            font-size: 0.9em;
-        }
-        .file-upload-section label { margin-right: 10px; }
-        .file-upload-section input[type="file"] { border: none; padding: 0; background: none; }
-
-
         /* --- Media Queries (MANTIDO) --- */
         @media (min-width: 768px) {
             #search-results-container {
-                 /* Em telas maiores, a busca pode voltar a ser um grid */
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             }
-            /* O estilo de ícone dentro da busca precisa voltar ao normal em telas grandes */
              #search-results-container .icon-link {
                  justify-content: flex-start; height: 70px; border-radius: 12px;
              }
@@ -444,44 +477,48 @@
                  position: static; transform: none; color: var(--text-color);
                  background: transparent;
              }
-             /* Ajusta a posição do Menu de Opções do Cadeado (Lock Menu) para a nova posição do container */
-             #lock-options-menu {
-                 left: auto !important;
-                 right: 75px !important; /* Ajuste para que fique ao lado do container */
-                 bottom: 20px !important;
-                 transform: none !important;
-                 /* Garante que o menu abra para a esquerda no PC para não sair da tela */
-                 transform-origin: bottom right; 
-             }
+             /* O modal de login pode continuar no canto, próximo ao FAB */
         }
     </style>
 </head>
 <body>
-    <div id="floating-actions-container">
-        <button id="search-toggle-button" class="action-button" title="Pesquisar">
+    
+    <div id="fab-container">
+        <div id="fab-items-wrapper" class="closed">
+            
+            <button id="fab-item-search" class="fab-item-button" title="Pesquisar / Fechar Busca">
+                <span>Pesquisar</span>
+                <svg id="fab-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.64 4.64a.75.75 0 11-1.06 1.06l-4.64-4.64A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            
+            <button id="fab-item-lock-menu" class="fab-item-button" title="Área Restrita / Adicionar Ícone">
+                <span>Ações +</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 01-.377 1.299l-1.452.364a.75.75 0 01-.734-.376.75.75 0 01.376-.735l1.452-.364a.75.75 0 01.377.735zm12.748 0a.75.75 0 01.377-.735l1.452-.364a.75.75 0 01.734.376.75.75 0 01-.376.735l-1.452.364a.75.75 0 01-.377-.735zM4.5 9A7.5 7.5 0 0112 1.5h.75a.75.75 0 010 1.5H12A6 6 0 006 9v3.75c0 1.348.835 2.584 2.118 3.056l1.325.495a3 3 0 001.292.052l1.325-.495C15.165 15.334 16 14.098 16 12.75V9.75c0-1.512.266-2.983.75-4.363V4.5A7.5 7.5 0 004.5 9v3.75zM12 18.75a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            
+            <button id="fab-item-theme" class="fab-item-button" title="Alternar Modo Escuro/Claro">
+                <span>Alternar Tema</span>
+                <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"></svg>
+            </button>
+        </div>
+
+        <button id="main-fab-button" title="Opções">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5zM2.25 10.5a8.25 8.25 0 1114.59 5.28l4.64 4.64a.75.75 0 11-1.06 1.06l-4.64-4.64A8.25 8.25 0 012.25 10.5z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clip-rule="evenodd" />
             </svg>
-        </button>
-        
-        <button id="lock-toggle-button" class="action-button" title="Área Restrita / Adicionar Ícone">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                <path fill-rule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25a.75.75 0 01.75-.75zM5.626 4.31a.75.75 0 01-.377 1.299l-1.452.364a.75.75 0 01-.734-.376.75.75 0 01.376-.735l1.452-.364a.75.75 0 01.377.735zm12.748 0a.75.75 0 01.377-.735l1.452-.364a.75.75 0 01.734.376.75.75 0 01-.376.735l-1.452.364a.75.75 0 01-.377-.735zM4.5 9A7.5 7.5 0 0112 1.5h.75a.75.75 0 010 1.5H12A6 6 0 006 9v3.75c0 1.348.835 2.584 2.118 3.056l1.325.495a3 3 0 001.292.052l1.325-.495C15.165 15.334 16 14.098 16 12.75V9.75c0-1.512.266-2.983.75-4.363V4.5A7.5 7.5 0 004.5 9v3.75zM12 18.75a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clip-rule="evenodd" />
-            </svg>
-        </button>
-        
-        <button id="theme-toggle" class="action-button" title="Alternar Modo">
-            <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"></svg>
         </button>
     </div>
-    
     <div id="top-search-bar-wrapper">
         <div id="search-container">
             <input type="text" id="search-input" placeholder="Pesquise Aqui...">
         </div>
     </div>
     
-    <div id="lock-options-menu" class="context-menu" style="bottom: 80px; right: 20px; left: auto; transform: none; display: none; min-width: 180px; z-index: 1070;">
+    <div id="lock-options-menu" class="context-menu" style="bottom: 70px; right: 20px; left: auto; transform: none; display: none; min-width: 180px; z-index: 1070;">
         <li data-action="open-restricted">Área Restrita 🔒</li>
         <li data-action="open-add-icon">Adicionar Novo Botão +</li>
     </div>
@@ -584,102 +621,129 @@
             });
         }
 
-        // NOVO: Lógica do Prompt de Instalação (PWA)
+        // Lógica do Prompt de Instalação (PWA) (MANTIDA)
         let deferredPrompt;
         const installPrompt = document.getElementById('install-prompt');
         const installBtn = document.getElementById('install-btn');
         const closeInstallBtn = document.getElementById('close-install-btn');
 
-        // 1. Captura o evento do navegador que permite a instalação
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Previne que o mini-infobar padrão do Chrome apareça
             e.preventDefault();
-            // Armazena o evento para que possa ser acionado mais tarde
             deferredPrompt = e;
-            // Mostra o seu popup personalizado, a menos que o usuário já tenha recusado
             if (localStorage.getItem('installPromptDismissed') !== 'true' && 
                 window.matchMedia('(display-mode: standalone)').matches === false) {
                 installPrompt.classList.add('visible');
             }
         });
 
-        // 2. Aciona o prompt nativo quando o usuário clica no botão "Instalar"
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                // Esconde o seu popup antes de mostrar o nativo
                 installPrompt.classList.remove('visible');
-                
-                // Mostra o prompt de instalação nativo
                 deferredPrompt.prompt();
-                
-                // Espera o usuário responder ao prompt
                 const { outcome } = await deferredPrompt.userChoice;
-                
                 if (outcome === 'accepted') {
                     console.log('O usuário aceitou o prompt de instalação.');
                 } else {
                     console.log('O usuário recusou o prompt de instalação.');
                 }
-                
-                // O evento só pode ser usado uma vez
                 deferredPrompt = null;
             }
         });
 
-        // 3. Fecha (dispensa) o seu popup de sugestão
         closeInstallBtn.addEventListener('click', () => {
             installPrompt.classList.remove('visible');
-            // Opcional: Armazena a preferência para não mostrar novamente
             localStorage.setItem('installPromptDismissed', 'true');
         });
 
-        // 4. Se o app já estiver instalado (standalone), esconde o popup
         window.addEventListener('appinstalled', () => {
             installPrompt.classList.remove('visible');
             deferredPrompt = null;
         });
 
-        // Verifica o modo de exibição ao carregar (se já está instalado)
         if (window.matchMedia('(display-mode: standalone)').matches) {
             installPrompt.style.display = 'none';
         }
-        // FIM NOVO: Lógica do Prompt de Instalação (PWA)
+        // FIM Lógica do Prompt de Instalação (PWA)
 
     </script>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const floatingContainer = document.getElementById('floating-actions-container');
+            // Alterado para o novo ID do container flutuante
+            const floatingContainer = document.getElementById('fab-container'); 
             let lastScrollTop = 0;
-            const scrollThreshold = 50; // Distância mínima para considerar rolagem
+            const scrollThreshold = 50; 
+            // VARIÁVEL ADICIONADA: Armazena o elemento da categoria "Fixados!"
+            let pinnedCategory = null; 
 
             function handleScroll() {
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-                // 1. Rolagem para o topo (mostrar)
+                // 1. Lógica de aparecer/desaparecer ao rolar (Implementação do requisito)
                 if (scrollTop === 0) {
+                    // Retorna ao topo, o botão surge
                     floatingContainer.classList.remove('hidden');
-                } 
-                // 2. Rolagem para baixo (esconder)
-                else if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                } else if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+                    // Rolando para baixo após o threshold, o botão desaparece
                     floatingContainer.classList.add('hidden');
-                } 
-                // 3. Rolagem para cima (mostrar, mas só se tiver saído do topo e a rolagem for significativa)
-                else if (scrollTop < lastScrollTop && floatingContainer.classList.contains('hidden')) {
-                    // Não é o topo, mas está voltando. Opcional: Se você quiser que ele reapareça ao rolar para cima,
-                    // mas seu requisito era APENAS ao rolar para o topo (scrollTop === 0).
-                    // Se você QUISER que ele reapareça ao rolar para cima ANTES do topo, descomente a linha abaixo:
-                    // floatingContainer.classList.remove('hidden'); 
+                } else if (scrollTop < lastScrollTop) {
+                    // Rolando para cima (mas não no topo), o botão surge
+                    floatingContainer.classList.remove('hidden');
+                }
+                
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+                
+                // 2. NOVO: Lógica de Posicionamento Acima de 'Fixados!' 
+                
+                if (!pinnedCategory) {
+                    // Tenta encontrar o elemento se ainda não foi encontrado
+                    pinnedCategory = document.getElementById('category-fixados');
                 }
 
-                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Garante que não é negativo
+                if (pinnedCategory) {
+                    const rect = pinnedCategory.getBoundingClientRect();
+                    // O valor de --fab-size é a largura/altura do FAB
+                    const fabSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fab-size'));
+                    
+                    // Condição: A categoria 'Fixados!' está na área visível da tela?
+                    const isPinnedVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+
+                    if (isPinnedVisible) {
+                        const categoryHeader = pinnedCategory.querySelector('.category-header');
+                        
+                        if (categoryHeader) {
+                            const headerRect = categoryHeader.getBoundingClientRect();
+                            
+                            // ⭐️⭐️⭐️ ALTERAÇÃO AQUI ⭐️⭐️⭐️
+                            // Posição TOP: Usa a borda inferior do Header, mais o scroll
+                            // Calcula a posição Y para que a parte inferior do FAB fique sobreposta e ligeiramente acima da borda inferior do header.
+                            const newTop = (headerRect.top + scrollTop) + headerRect.height - fabSize - 5; // -5px de margem
+                            
+                            // Calcula a posição 'right' para que a borda direita do FAB fique com uma margem (ex: 10px) da borda direita do Header
+                            const newRight = window.innerWidth - headerRect.right + 10; // +10px de margem
+                            
+                            // Aplica a posição absolute e os cálculos
+                            floatingContainer.classList.add('pinned-position');
+                            floatingContainer.style.top = `${newTop}px`;
+                            floatingContainer.style.right = `${newRight}px`;
+                            floatingContainer.style.bottom = 'auto'; 
+                        }
+
+                    } else {
+                        // Se a categoria não estiver na área visível, retorna à posição fixa padrão
+                        floatingContainer.classList.remove('pinned-position');
+                        floatingContainer.style.top = 'auto'; 
+                        floatingContainer.style.right = '20px';
+                        floatingContainer.style.bottom = '20px';
+                    }
+                }
             }
             
-            // Adiciona o listener de scroll ao objeto window
             window.addEventListener('scroll', handleScroll);
-            
-            // Verifica a posição inicial no carregamento
-            handleScroll();
+            // Chama uma vez para posicionamento inicial se a categoria já estiver visível
+            setTimeout(handleScroll, 100); 
+            // Adiciona listener para resize (útil em telas responsivas ou rotação)
+            window.addEventListener('resize', handleScroll);
         });
     </script>
     
@@ -687,8 +751,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        // Importa o Storage (não usado imediatamente, mas pronto para anexos)
-        // import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
         const config = {
             firebase: {
@@ -708,7 +770,7 @@
                 'midia-entretenimento': { name: 'Mídia & Entretenimento' }
             },
             restricted: {
-                password: "11", // Senha de login para a área restrita
+                password: "11", 
             }
         };
 
@@ -716,10 +778,10 @@
             allIcons: [], 
             currentUser: null, 
             searchTerm: '',
-            isRestrictedAreaOpen: false, // NOVO: Estado da área restrita
-            restrictedTexts: [], // NOVO: Textos da área restrita
-            isSearchBarOpen: false, // NOVO: Estado da barra de pesquisa
-            isLockMenuOpen: false, // NOVO: Estado do menu de opções do cadeado
+            isRestrictedAreaOpen: false, 
+            restrictedTexts: [], 
+            isSearchBarOpen: false, 
+            isFabOpen: false, // NOVO: Estado do menu FAB
         };
 
         const FirebaseService = {
@@ -728,7 +790,6 @@
                 const app = initializeApp(config.firebase);
                 this.db = getFirestore(app);
                 this.auth = getAuth(app);
-                // this.storage = getStorage(app); // Não implementado para anexos ainda
             },
             authenticate(callback) {
                 onAuthStateChanged(this.auth, user => {
@@ -743,8 +804,6 @@
             async updateIcon(id, data) { await updateDoc(doc(this.db, "icones", id), data); },
             async addIcon(data) { await addDoc(collection(this.db, "icones"), { ...data, createdAt: serverTimestamp() }); },
             async deleteIcon(id) { await deleteDoc(doc(this.db, "icones", id)); },
-
-            // NOVAS FUNÇÕES PARA ÁREA RESTRITA
             onRestrictedTextsUpdate(callback) {
                 const q = query(collection(this.db, "restricted_texts"), orderBy("createdAt", "desc"));
                 onSnapshot(q, snapshot => callback(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
@@ -759,10 +818,8 @@
             init() {
                 this.elements = {
                     body: document.body, mainContent: document.getElementById('main-content'),
-                    topSearchBarWrapper: document.getElementById('top-search-bar-wrapper'), // NOVO
+                    topSearchBarWrapper: document.getElementById('top-search-bar-wrapper'), 
                     searchInput: document.getElementById('search-input'), 
-                    themeToggle: document.getElementById('theme-toggle'),
-                    themeIcon: document.getElementById('theme-icon'),
                     allCategoriesGrid: document.getElementById('all-categories-grid'),
                     searchResultsContainer: document.getElementById('search-results-container'), 
                     modalOverlay: document.getElementById('generator-modal-overlay'),
@@ -771,11 +828,16 @@
                     iconForm: document.getElementById('icon-form'), formStatusMessage: document.getElementById('form-status-message'),
                     modalTitle: document.getElementById('modal-title'), 
                     submitIconBtn: document.getElementById('submit-icon-button'),
-                    searchToggleButton: document.getElementById('search-toggle-button'), // NOVO
                     
+                    // NOVO: Elementos do FAB
+                    mainFabButton: document.getElementById('main-fab-button'),
+                    fabItemsWrapper: document.getElementById('fab-items-wrapper'),
+                    fabItemSearch: document.getElementById('fab-item-search'),
+                    fabItemTheme: document.getElementById('fab-item-theme'),
+                    fabItemLockMenu: document.getElementById('fab-item-lock-menu'),
+
                     // Elementos da Área Restrita
-                    lockToggleButton: document.getElementById('lock-toggle-button'), // NOVO
-                    lockOptionsMenu: document.getElementById('lock-options-menu'), // NOVO
+                    lockOptionsMenu: document.getElementById('lock-options-menu'), 
                     lockModal: document.getElementById('lock-modal'),
                     lockPasswordInput: document.getElementById('lock-password-input'),
                     loginButton: document.getElementById('login-button'),
@@ -787,30 +849,46 @@
                     restrictedTextTitleInput: document.getElementById('restrictedTextTitleInput'),
                     restrictedTextContentInput: document.getElementById('restrictedTextContentInput'),
                     saveRestrictedTextBtn: document.getElementById('save-restricted-text-btn'),
-                    
+                    themeIcon: document.getElementById('theme-icon'),
                 };
                 this.populateCategorySelect();
             },
             
-            // NOVO: Função para o toggle da barra de pesquisa
+            // NOVO: Toggle do Menu FAB
+            toggleFabMenu(show) {
+                state.isFabOpen = show;
+                this.elements.mainFabButton.classList.toggle('open', show);
+                this.elements.fabItemsWrapper.classList.toggle('closed', !show);
+
+                if (show) {
+                    // Garante que o modal de login está fechado ao abrir o FAB
+                    this.closeLockModal();
+                    // Garante que o menu de opções do cadeado está fechado
+                    this.toggleLockMenu(false);
+                }
+            },
+
+            // Função para o toggle da barra de pesquisa
             toggleSearchBar(show) {
                 state.isSearchBarOpen = show;
                 this.elements.topSearchBarWrapper.classList.toggle('visible', show);
                 this.elements.body.classList.toggle('search-open', show);
-                this.elements.searchToggleButton.classList.toggle('active', show);
+                // Altera o texto do botão de pesquisa no FAB
+                this.elements.fabItemSearch.querySelector('span').textContent = show ? 'Fechar Busca' : 'Pesquisar';
+
 
                 if (show) {
                     this.elements.searchInput.focus();
+                    this.toggleFabMenu(false); // Fecha o FAB ao abrir a busca
                 } else {
                     this.elements.searchInput.value = '';
                     state.searchTerm = '';
-                    this.render(); // Renderiza com a pesquisa vazia
+                    this.render(); 
                 }
             },
 
-            // NOVO: Função para o toggle do menu de opções do cadeado
+            // Função para o toggle do menu de opções do cadeado
             toggleLockMenu(show) {
-                state.isLockMenuOpen = show;
                 this.elements.lockOptionsMenu.style.display = show ? 'block' : 'none';
             },
 
@@ -822,16 +900,11 @@
                 this.elements.searchResultsContainer.style.display = 'none';
 
                 if (show) {
-                    // Rola para o topo da área restrita
                     this.elements.restrictedAreaWrapper.scrollIntoView({ behavior: 'smooth' });
-                    // Garante que o modal de login está fechado
                     this.closeLockModal(); 
-                    // Garante que a barra de pesquisa fecha
                     this.toggleSearchBar(false);
                 } else {
-                    // Limpa o formulário quando fecha
                     this.clearRestrictedTextForm();
-                    // Renderiza a grade de ícones novamente
                     this.render(); 
                 }
             },
@@ -845,7 +918,6 @@
                 this.elements.lockPasswordInput.value = '';
             },
             
-            // Renderiza a lista de textos
             renderRestrictedTexts() {
                 const list = this.elements.restrictedTextsList;
                 list.innerHTML = '';
@@ -888,17 +960,14 @@
                 this.elements.restrictedAreaWrapper.scrollIntoView({ behavior: 'smooth' });
             },
 
-            // CÓDIGO DO UIManager.render ORIGINAL (modificado para suportar a nova área)
             render() {
                 if (state.isRestrictedAreaOpen) {
-                    // Se a área restrita estiver aberta, não renderiza ícones
                     this.elements.allCategoriesGrid.style.display = 'none';
                     this.elements.searchResultsContainer.style.display = 'none';
                     this.elements.restrictedAreaWrapper.classList.add('visible');
                     return; 
                 }
                 
-                // Se a área restrita estiver fechada, esconde
                 this.elements.restrictedAreaWrapper.classList.remove('visible');
                 
                 const { allCategoriesGrid, searchResultsContainer } = this.elements;
@@ -961,9 +1030,11 @@
                         }
                     });
                 }
+                
+                // Dispara o evento de scroll para garantir o reposicionamento do FAB após a renderização
+                window.dispatchEvent(new Event('scroll'));
             },
             
-            // ... (Restante das funções de UI mantidas)
             populateCategorySelect() {
                 const select = this.elements.iconForm.elements.iconCategorySelect;
                 select.innerHTML = '<option value="" disabled selected>Selecione uma categoria</option>';
@@ -972,7 +1043,7 @@
                 }
             },
             openModal(data = null) {
-                this.toggleLockMenu(false); // Fecha o menu de opções do cadeado
+                this.toggleFabMenu(false); // Fe
                 const { iconForm, modalTitle, generatorModal, modalOverlay, submitIconBtn } = this.elements;
                 iconForm.reset();
                 iconForm.elements.iconIdInput.value = '';
@@ -1017,6 +1088,10 @@
                 document.querySelectorAll('.context-menu').forEach(menu => menu.remove());
                 const menu = document.createElement('ul');
                 menu.className = 'context-menu';
+                // Posição ajustada para ícones.
+                menu.style.right = '10px';
+                menu.style.top = '50px';
+                
                 menu.innerHTML = `
                     <li data-action="edit">Editar Ícone</li>
                     <li data-action="pin">${icon.isPinned ? 'Desafixar' : 'Fixar no Topo'}</li>
@@ -1032,7 +1107,6 @@
                     if (action === 'edit') App.editIcon(icon.id);
                     if (action === 'pin') FirebaseService.updateIcon(icon.id, { isPinned: !icon.isPinned });
                     if (action === 'delete') {
-                        // Usa o nome ou 'Sem Título' para o alerta
                         const nameForAlert = icon.name && icon.name.trim().length > 0 ? icon.name : 'Sem Título';
                         if (confirm(`Tem certeza que deseja excluir o ícone "${nameForAlert}"?`)) {
                             FirebaseService.deleteIcon(icon.id);
@@ -1115,13 +1189,11 @@
                 UIManager.init();
                 this.bindEvents();
                 
-                // Autenticação e Listeners de Ícones (Original)
                 FirebaseService.authenticate(() => FirebaseService.onIconsUpdate(icons => {
                     state.allIcons = icons;
                     UIManager.render();
                 }));
 
-                // NOVO: Listener para Textos Restritos
                 FirebaseService.onRestrictedTextsUpdate(texts => {
                     state.restrictedTexts = texts;
                     UIManager.renderRestrictedTexts();
@@ -1131,17 +1203,37 @@
             },
             bindEvents() {
                 const { 
-                    searchInput, themeToggle, closeModalBtn, iconForm, allCategoriesGrid, modalOverlay,
-                    lockToggleButton, lockPasswordInput, loginButton, restrictedTextsList, newTextForm,
-                    searchToggleButton, lockOptionsMenu
+                    searchInput, closeModalBtn, iconForm, allCategoriesGrid, modalOverlay,
+                    lockPasswordInput, loginButton, restrictedTextsList, newTextForm,
+                    mainFabButton, fabItemSearch, fabItemTheme, fabItemLockMenu, lockOptionsMenu, lockModal
                 } = UIManager.elements;
                 
-                // NOVO: Evento do Botão Lupa (Pesquisa)
-                searchToggleButton.addEventListener('click', () => {
-                    UIManager.toggleSearchBar(!state.isSearchBarOpen);
-                    UIManager.closeLockModal(); // Fecha o modal de login
-                    UIManager.toggleLockMenu(false); // Fecha o menu de opções do cadeado
+                // NOVO: Evento do Botão FAB Principal
+                mainFabButton.addEventListener('click', () => {
+                    UIManager.toggleFabMenu(!state.isFabOpen);
+                    UIManager.closeLockModal(); // Garante o fechamento do modal de login
+                    UIManager.toggleLockMenu(false); // Garante o fechamento do menu de opções do cadeado
                 });
+
+                // NOVO: Evento dos Itens do FAB
+                fabItemSearch.addEventListener('click', () => {
+                    UIManager.toggleSearchBar(!state.isSearchBarOpen);
+                    UIManager.toggleFabMenu(false); // Fe
+                });
+
+                fabItemTheme.addEventListener('click', () => {
+                    const isDark = !document.body.classList.contains('dark-mode');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                    UIManager.toggleTheme(isDark);
+                    UIManager.toggleFabMenu(false); // Fecha o FAB
+                });
+
+                fabItemLockMenu.addEventListener('click', () => {
+                    UIManager.toggleLockMenu(true); // Abre o menu de opções (Área Restrita / Add Ícone)
+                    UIManager.toggleFabMenu(false); // Fecha o FAB
+                    UIManager.toggleSearchBar(false); // Fe
+                });
+
 
                 // Eventos de Busca e Tema (MANTIDOS)
                 let searchTimeout;
@@ -1149,19 +1241,11 @@
                     clearTimeout(searchTimeout);
                     searchTimeout = setTimeout(() => {
                         state.searchTerm = e.target.value.toLowerCase().trim();
-                        // Garante que a área restrita fecha ao pesquisar
                         if(state.isRestrictedAreaOpen) UIManager.toggleRestrictedArea(false); 
                         UIManager.render();
                     }, 200); 
                 });
                 
-                themeToggle.addEventListener('click', () => {
-                    const isDark = !document.body.classList.contains('dark-mode');
-                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                    UIManager.toggleTheme(isDark);
-                    UIManager.closeLockModal(); // Feche o modal de login
-                    UIManager.toggleLockMenu(false); // Fecha o menu de opções do cadeado
-                });
                 allCategoriesGrid.addEventListener('click', e => {
                     const header = e.target.closest('.category-header');
                     if (header) header.parentElement.classList.toggle('collapsed');
@@ -1170,41 +1254,30 @@
                 modalOverlay.addEventListener('click', () => UIManager.closeModal());
                 iconForm.addEventListener('submit', this.handleFormSubmit);
 
-                // NOVOS Eventos do Cadeado
-                lockToggleButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (state.isRestrictedAreaOpen) {
-                        UIManager.toggleRestrictedArea(false); // Fecha se estiver na área restrita
-                        UIManager.closeLockModal();
-                        UIManager.toggleLockMenu(false);
-                    } else if (state.isLockMenuOpen) {
-                        UIManager.toggleLockMenu(false);
-                    } else {
-                         // Abre o menu de opções
-                        UIManager.toggleLockMenu(true);
-                        UIManager.closeLockModal();
-                        UIManager.toggleSearchBar(false);
-                    }
-                });
-                
-                // Tratamento do menu de opções do cadeado
+                // Tratamento do menu de opções do cadeado (lockOptionsMenu)
                 lockOptionsMenu.addEventListener('click', (e) => {
                     const action = e.target.dataset.action;
-                    UIManager.toggleLockMenu(false); // Fecha o menu após clicar
+                    UIManager.toggleLockMenu(false); 
 
                     if (action === 'open-restricted') {
-                        UIManager.openLockModal(); // Abre o modal para login
+                        UIManager.openLockModal(); 
                     } else if (action === 'open-add-icon') {
-                        UIManager.openModal(); // Abre o modal de adicionar ícone
+                        UIManager.openModal(); 
                     }
                 });
 
                 // Fechar modais/menus ao clicar fora
                 document.addEventListener('click', (e) => {
-                    if (state.isLockMenuOpen && !lockToggleButton.contains(e.target) && !lockOptionsMenu.contains(e.target)) {
-                        UIManager.toggleLockMenu(false);
+                    // Fecha o FAB ao clicar fora
+                    if (state.isFabOpen && !mainFabButton.contains(e.target) && !fabItemSearch.contains(e.target) && !fabItemTheme.contains(e.target) && !fabItemLockMenu.contains(e.target) && !lockOptionsMenu.contains(e.target)) {
+                        UIManager.toggleFabMenu(false);
                     }
-                    if (UIManager.elements.lockModal.classList.contains('visible') && !lockToggleButton.contains(e.target) && !UIManager.elements.lockModal.contains(e.target)) {
+                    // Fecha o menu de opções do cadeado ao clicar fora
+                    if (lockOptionsMenu.style.display === 'block' && !fabItemLockMenu.contains(e.target) && !lockOptionsMenu.contains(e.target)) {
+                         UIManager.toggleLockMenu(false);
+                    }
+                    // Fecha o modal de login ao clicar fora
+                    if (lockModal.classList.contains('visible') && !lockModal.contains(e.target) && !fabItemLockMenu.contains(e.target)) {
                         UIManager.closeLockModal();
                     }
                 });
@@ -1218,7 +1291,6 @@
                 restrictedTextsList.addEventListener('click', this.handleRestrictedTextActions);
             },
             
-            // NOVO: Lógica do Login (Área Restrita)
             handleLoginAttempt(event) {
                 event.preventDefault();
                 const input = UIManager.elements.lockPasswordInput;
@@ -1226,7 +1298,7 @@
                 
                 if (input.value === config.restricted.password) {
                     status.style.display = 'none';
-                    UIManager.toggleRestrictedArea(true); // Abre a área restrita
+                    UIManager.toggleRestrictedArea(true); 
                     UIManager.closeLockModal();
                 } else {
                     status.textContent = 'Senha Incorreta.';
@@ -1236,7 +1308,6 @@
                 }
             },
             
-            // NOVO: Lógica do CRUD de Textos Restritos (MANTIDA)
             async handleRestrictedTextFormSubmit(event) {
                 event.preventDefault();
                 const { restrictedTextIdInput, restrictedTextTitleInput, restrictedTextContentInput } = UIManager.elements;
@@ -1245,10 +1316,9 @@
                 const data = {
                     title: restrictedTextTitleInput.value.trim(),
                     content: restrictedTextContentInput.value.trim(),
-                    // arquivo: '' // Adicionar lógica de URL de arquivo aqui
                 };
 
-                if (!data.content) return; // Não salva texto vazio
+                if (!data.content) return; 
 
                 try {
                     if (id) await FirebaseService.updateRestrictedText(id, data);
@@ -1282,7 +1352,6 @@
                 }
             },
 
-            // Funções de Ícones (MANTIDAS)
             loadTheme() {
                 const savedTheme = localStorage.getItem('theme');
                 let initialTheme = 'light'; 
