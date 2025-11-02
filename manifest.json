@@ -2,10 +2,10 @@
   "background_color": "#ffffff",
   "dir": "auto",
   "display": "standalone",
-  "name": "Robson utilidades!",
+  "name": "Robson",
   "orientation": "any",
   "scope": "/",
-  "short_name": "Robson utilidades!",
+  "short_name": "Robson",
   "start_url": "https://r8402.github.io/tt/",
   "theme_color": "#ffffff",
   "icons": [
