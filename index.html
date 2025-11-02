@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gratuitos!</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-
+    
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firebaseapp.com" crossorigin>
+    
     <meta name="theme-color" content="#f0f2f5"/>
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
     <style>
         :root {
             --bg-color: #f0f2f5; --text-color: #333; --card-bg-color: #ffffff;
@@ -18,8 +21,6 @@
             --input-border-color: #ccc; --button-secondary-bg: #e9ecef;
             --dark-icon-container-bg: #424242;
             --floating-bg-color: #ffffff;
-            /* NOVO: Variáveis para o FAB */
-            /* ALTERADO: 56px * 0.7 = 39.2px */
             --fab-size: 39.2px; 
             --fab-main-bg: var(--primary-color);
             --fab-main-color: #ffffff;
@@ -65,14 +66,11 @@
         #install-prompt #install-btn { background-color: var(--primary-color); color: white; }
         #install-prompt #install-btn:hover { background-color: var(--primary-hover-color); }
         #install-prompt #close-install-btn { background-color: var(--button-secondary-bg); color: var(--text-color); }
-        /* --- FIM Estilos do Popup de Instalação --- */
-
 
         /* ========================================= */
-        /* 🎨 ALTERADO: Floating Action Button (FAB) */
+        /* 🎨 Floating Action Button (FAB) */
         /* ========================================= */
         #fab-container {
-            /* Posição padrão Fixed (bottom-right) */
             position: fixed; 
             bottom: 20px; 
             right: 20px; 
@@ -82,33 +80,24 @@
             align-items: flex-end;
             gap: 10px;
             opacity: 1; 
-            /* Transição também para 'right', 'top', 'bottom' */
             transition: opacity 0.3s ease, transform 0.3s ease, right 0s, top 0s, bottom 0s;
         }
         
-        /* Oculta o container principal ao rolar (mesma lógica anterior) */
         #fab-container.hidden {
             opacity: 0;
             transform: translateY(100%); 
             pointer-events: none; 
         }
         
-        /* NOVO: Classe para posicionamento flutuante em cima do balão 'Fixados!' */
         #fab-container.pinned-position {
-            /* Mudar para position: absolute para que o JS possa posicionar em relação ao conteúdo */
             position: absolute !important;
-            /* Garante que o menu suspenso (lock options) fique por cima também */
             z-index: 1005; 
-            /* Remove a transição de 'right' e 'top' para o FAB não piscar ao trocar de fixed para absolute */
             transition: opacity 0.3s ease, transform 0.3s ease; 
-            /* Adicionado: Alinha o FAB à esquerda para posicionamento por JS */
             left: auto;
         }
 
 
-        /* Botão Principal (o redondo que agrupa tudo) */
         #main-fab-button {
-            /* Tamanho de 70% da variável --fab-size (39.2px) */
             width: var(--fab-size);
             height: var(--fab-size);
             border-radius: 50%;
@@ -122,28 +111,23 @@
             justify-content: center;
             transition: transform 0.3s ease, background-color 0.3s ease;
             flex-shrink: 0;
-            /* NOVO: Aplica a transparência de 70% (0.7) */
             opacity: 0.7; 
         }
 
-        /* Animação do ícone do botão principal (Rodar) */
         #main-fab-button.open svg {
-            transform: rotate(45deg); /* Gira 45 graus (de '...+' para 'X' */
+            transform: rotate(45deg); 
         }
         #main-fab-button svg {
-            /* Reduzido o tamanho do ícone para se ajustar ao botão menor (70%) */
             width: 22px; 
             height: 22px;
             transition: transform 0.3s ease;
         }
 
-        /* Botões Filhos (Itens do menu) */
         #fab-items-wrapper {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             gap: 10px;
-            /* Começa invisível e empilhado */
             transition: opacity 0.3s ease;
         }
         #fab-items-wrapper.closed {
@@ -182,21 +166,17 @@
             color: var(--primary-color);
         }
 
-        /* Cor de destaque para o cadeado (🔒 Área Restrita) */
         #fab-item-lock svg { color: #dc3545; }
-        
-        /* Cor de destaque para o tema (💡 Sol/Lua) */
         #fab-item-theme svg { color: #ffc107; }
 
-        /* Remove o container antigo de ações flutuantes */
         #floating-actions-container, #lock-toggle-button, #search-toggle-button, #theme-toggle {
             display: none !important;
         }
         /* ========================================= */
-        /* --- FIM NOVO: Floating Action Button (FAB) --- */
+        /* --- FIM FAB --- */
         /* ========================================= */
 
-        /* --- Barra de Pesquisa Deslizante (MANTIDO) --- */
+        /* --- Barra de Pesquisa Deslizante --- */
         #top-search-bar-wrapper {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 990; 
             background-color: var(--bg-color); box-shadow: 0 2px 10px var(--shadow-color);
@@ -221,7 +201,7 @@
             padding-top: 80px; 
         }
 
-        /* --- Modal (MANTIDO) --- */
+        /* --- Modal --- */
         #generator-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
@@ -263,10 +243,9 @@
         }
         #submit-icon-button:hover { background-color: var(--primary-hover-color); }
 
-        /* --- NOVO: Modal de Login (Cadeado) --- */
+        /* --- Modal de Login (Cadeado) --- */
         #lock-modal {
-            /* Posição ajustada para aparecer logo acima do FAB */
-            bottom: calc(var(--fab-size) + 30px + 10px); /* Tamanho do FAB + bottom + gap */
+            bottom: calc(var(--fab-size) + 30px + 10px); 
             right: 20px; 
             position: fixed; 
             left: auto;
@@ -308,7 +287,7 @@
             color: #dc3545; margin-top: 10px; font-size: 0.85em; display: none;
         }
 
-        /* --- NOVO: Área Restrita (MANTIDO) --- */
+        /* --- Área Restrita --- */
         #restricted-area-wrapper {
             max-width: 800px; width: 100%; margin: 0 auto 40px; padding: 20px;
             background-color: var(--card-bg-color); border-radius: 12px;
@@ -349,7 +328,7 @@
         .file-upload-section input[type="file"] { border: none; padding: 0; background: none; }
 
 
-        /* --- Conteúdo Principal e Categorias (MANTIDO) --- */
+        /* --- Conteúdo Principal e Categorias --- */
         #all-categories-grid, #search-results-container {
             max-width: 1200px; width: 100%; margin: 0 auto;
         }
@@ -370,7 +349,7 @@
         }
         .category-card.collapsed .icons-grid { max-height: 0; padding: 0; margin-top: 0; opacity: 0; }
         
-        /* --- Contêiner dos Ícones (MANTIDO) --- */
+        /* --- Contêiner dos Ícones --- */
         .icons-grid, #search-results-container {
             display: flex;
             flex-direction: column;
@@ -388,7 +367,7 @@
             flex-wrap: wrap;
         }
 
-        /* --- Ícones (MANTIDO) --- */
+        /* --- Ícones --- */
         .icon-card-wrapper { position: relative; width: 100%; }
         .icon-link {
             display: flex; align-items: center; justify-content: center;
@@ -446,10 +425,10 @@
         .icon-actions-button:hover { background-color: rgba(255, 255, 255, 0.3); }
         .icon-actions-button svg { width: 20px; height: 20px; }
 
-        /* --- Cores dos Ícones (Classes) - MANTIDO --- */
+        /* --- Cores dos Ícones (Classes) --- */
         .verde { background-color: #4caf50; } .AZUL { background-color: #2d8cff; } .azul2 { background-color: #007bff; } .verde2 { background-color: #00995d; } .codepen { background-color: #000; } .utilit { background-color: #4285f4; } .wordpress { background-color: #21759b; } .mercadolivre { background-color: #ffe600; } .mercadolivre .icon-title { color: #000; } .mega { background-color: #d90000; } .zoom { background-color: #2d8cff; } .cuponomia { background-color: #f26522; } .bradesco { background-color: #ee1c23; } .senai { background-color: #004a8f; } .primecursos { background-color: #f9a825; } .primecursos .icon-title { color: #000; } .baixar { background-color: #4caf50; } .canais { background-color: #f44336; } .canva { background-color: #1e1e1e; } .coelba { background-color: #00a99d; } .concursos { background-color: #673ab7; } .drive { background-color: #4285f4; } .clideo { background-color: #593993; } .embasa { background-color: #03a9f4; } .multicanaislc { background-color: #29abe2; } .onedrive { background-color: #0078d4; } .globfone { background-color: #00bcd4; } .youtube0, .youtube1 { background-color: #ff0000; } .cartacapital { background-color: #c62828; } .iconicons { background-color: #3f51b5; } .pinterest { background-color: #e60023; } .logodownload { background-color: #000; } .icons8 { background-color: #00a4e5; } .gratispng { background-color: #8bc34a; } .linkcorreios { background-color: #fdd835; } .linkcorreios .icon-title { color: #000; } .photoroom { background-color: #6c63ff; } .topflix { background-color: #212121; } .tsunami { background-color: #0078d4; } .meuguia { background-color: #9c27b0; } .unopar { background-color: #0070c0; } .clideoaudio { background-color: #593993; } .azarado { background-color: #ff9800; } .azarado .icon-title { color: #000; } .feriados { background-color: #f44336; } .mercadopago { background-color: #00aee4; } .musclewiki { background-color: #004a8f; } .buscape { background-color: #673ab7; } .bloqueador { background-color: #d90000; } .vpn { background-color: #D81B60; } .gov-curso { background-color: #006400; } .whatsapp { background-color: #25d366; } .plutotv { background-color: #121212; }
 
-        /* --- Menu de Contexto (MANTIDO) --- */
+        /* --- Menu de Contexto --- */
         .context-menu {
             position: absolute; right: 10px; top: 50px; background-color: var(--card-bg-color);
             border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); list-style: none;
@@ -459,7 +438,7 @@
         .context-menu li:hover { background-color: var(--border-color); }
         .context-menu li.danger-option { color: #dc3545; }
 
-        /* --- Media Queries (MANTIDO) --- */
+        /* --- Media Queries --- */
         @media (min-width: 768px) {
             #search-results-container {
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -477,7 +456,6 @@
                  position: static; transform: none; color: var(--text-color);
                  background: transparent;
              }
-             /* O modal de login pode continuar no canto, próximo ao FAB */
         }
     </style>
 </head>
@@ -621,7 +599,6 @@
             });
         }
 
-        // Lógica do Prompt de Instalação (PWA) (MANTIDA)
         let deferredPrompt;
         const installPrompt = document.getElementById('install-prompt');
         const installBtn = document.getElementById('install-btn');
@@ -663,49 +640,40 @@
         if (window.matchMedia('(display-mode: standalone)').matches) {
             installPrompt.style.display = 'none';
         }
-        // FIM Lógica do Prompt de Instalação (PWA)
 
     </script>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Alterado para o novo ID do container flutuante
             const floatingContainer = document.getElementById('fab-container'); 
             let lastScrollTop = 0;
             const scrollThreshold = 50; 
-            // VARIÁVEL ADICIONADA: Armazena o elemento da categoria "Fixados!"
             let pinnedCategory = null; 
 
             function handleScroll() {
                 const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-                // 1. Lógica de aparecer/desaparecer ao rolar (Implementação do requisito)
+                // 1. Lógica de aparecer/desaparecer ao rolar
                 if (scrollTop === 0) {
-                    // Retorna ao topo, o botão surge
                     floatingContainer.classList.remove('hidden');
                 } else if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
-                    // Rolando para baixo após o threshold, o botão desaparece
                     floatingContainer.classList.add('hidden');
                 } else if (scrollTop < lastScrollTop) {
-                    // Rolando para cima (mas não no topo), o botão surge
                     floatingContainer.classList.remove('hidden');
                 }
                 
                 lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
                 
-                // 2. NOVO: Lógica de Posicionamento Acima de 'Fixados!' 
+                // 2. Lógica de Posicionamento Acima de 'Fixados!' 
                 
                 if (!pinnedCategory) {
-                    // Tenta encontrar o elemento se ainda não foi encontrado
                     pinnedCategory = document.getElementById('category-fixados');
                 }
 
                 if (pinnedCategory) {
                     const rect = pinnedCategory.getBoundingClientRect();
-                    // O valor de --fab-size é a largura/altura do FAB
                     const fabSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fab-size'));
                     
-                    // Condição: A categoria 'Fixados!' está na área visível da tela?
                     const isPinnedVisible = rect.bottom > 0 && rect.top < window.innerHeight;
 
                     if (isPinnedVisible) {
@@ -714,15 +682,9 @@
                         if (categoryHeader) {
                             const headerRect = categoryHeader.getBoundingClientRect();
                             
-                            // ⭐️⭐️⭐️ ALTERAÇÃO AQUI ⭐️⭐️⭐️
-                            // Posição TOP: Usa a borda inferior do Header, mais o scroll
-                            // Calcula a posição Y para que a parte inferior do FAB fique sobreposta e ligeiramente acima da borda inferior do header.
-                            const newTop = (headerRect.top + scrollTop) + headerRect.height - fabSize - 5; // -5px de margem
+                            const newTop = (headerRect.top + scrollTop) + headerRect.height - fabSize - 5; 
+                            const newRight = window.innerWidth - headerRect.right + 10; 
                             
-                            // Calcula a posição 'right' para que a borda direita do FAB fique com uma margem (ex: 10px) da borda direita do Header
-                            const newRight = window.innerWidth - headerRect.right + 10; // +10px de margem
-                            
-                            // Aplica a posição absolute e os cálculos
                             floatingContainer.classList.add('pinned-position');
                             floatingContainer.style.top = `${newTop}px`;
                             floatingContainer.style.right = `${newRight}px`;
@@ -730,7 +692,6 @@
                         }
 
                     } else {
-                        // Se a categoria não estiver na área visível, retorna à posição fixa padrão
                         floatingContainer.classList.remove('pinned-position');
                         floatingContainer.style.top = 'auto'; 
                         floatingContainer.style.right = '20px';
@@ -740,9 +701,7 @@
             }
             
             window.addEventListener('scroll', handleScroll);
-            // Chama uma vez para posicionamento inicial se a categoria já estiver visível
             setTimeout(handleScroll, 100); 
-            // Adiciona listener para resize (útil em telas responsivas ou rotação)
             window.addEventListener('resize', handleScroll);
         });
     </script>
@@ -781,7 +740,7 @@
             isRestrictedAreaOpen: false, 
             restrictedTexts: [], 
             isSearchBarOpen: false, 
-            isFabOpen: false, // NOVO: Estado do menu FAB
+            isFabOpen: false, 
         };
 
         const FirebaseService = {
@@ -829,14 +788,12 @@
                     modalTitle: document.getElementById('modal-title'), 
                     submitIconBtn: document.getElementById('submit-icon-button'),
                     
-                    // NOVO: Elementos do FAB
                     mainFabButton: document.getElementById('main-fab-button'),
                     fabItemsWrapper: document.getElementById('fab-items-wrapper'),
                     fabItemSearch: document.getElementById('fab-item-search'),
                     fabItemTheme: document.getElementById('fab-item-theme'),
                     fabItemLockMenu: document.getElementById('fab-item-lock-menu'),
 
-                    // Elementos da Área Restrita
                     lockOptionsMenu: document.getElementById('lock-options-menu'), 
                     lockModal: document.getElementById('lock-modal'),
                     lockPasswordInput: document.getElementById('lock-password-input'),
@@ -854,32 +811,27 @@
                 this.populateCategorySelect();
             },
             
-            // NOVO: Toggle do Menu FAB
             toggleFabMenu(show) {
                 state.isFabOpen = show;
                 this.elements.mainFabButton.classList.toggle('open', show);
                 this.elements.fabItemsWrapper.classList.toggle('closed', !show);
 
                 if (show) {
-                    // Garante que o modal de login está fechado ao abrir o FAB
                     this.closeLockModal();
-                    // Garante que o menu de opções do cadeado está fechado
                     this.toggleLockMenu(false);
                 }
             },
 
-            // Função para o toggle da barra de pesquisa
             toggleSearchBar(show) {
                 state.isSearchBarOpen = show;
                 this.elements.topSearchBarWrapper.classList.toggle('visible', show);
                 this.elements.body.classList.toggle('search-open', show);
-                // Altera o texto do botão de pesquisa no FAB
                 this.elements.fabItemSearch.querySelector('span').textContent = show ? 'Fechar Busca' : 'Pesquisar';
 
 
                 if (show) {
                     this.elements.searchInput.focus();
-                    this.toggleFabMenu(false); // Fecha o FAB ao abrir a busca
+                    this.toggleFabMenu(false); 
                 } else {
                     this.elements.searchInput.value = '';
                     state.searchTerm = '';
@@ -887,12 +839,10 @@
                 }
             },
 
-            // Função para o toggle do menu de opções do cadeado
             toggleLockMenu(show) {
                 this.elements.lockOptionsMenu.style.display = show ? 'block' : 'none';
             },
 
-            // Funções de UI para a área restrita
             toggleRestrictedArea(show) {
                 state.isRestrictedAreaOpen = show;
                 this.elements.restrictedAreaWrapper.classList.toggle('visible', show);
@@ -984,7 +934,7 @@
                     : state.allIcons;
 
                 if (state.searchTerm) {
-                    searchResultsContainer.style.display = 'grid';
+                    searchResultsContainer.style.display = 'flex';
                     allCategoriesGrid.style.display = 'none';
                     if (filteredIcons.length) {
                         filteredIcons.forEach(i => searchResultsContainer.appendChild(this.createIconElement(i)));
@@ -1031,7 +981,6 @@
                     });
                 }
                 
-                // Dispara o evento de scroll para garantir o reposicionamento do FAB após a renderização
                 window.dispatchEvent(new Event('scroll'));
             },
             
@@ -1043,7 +992,7 @@
                 }
             },
             openModal(data = null) {
-                this.toggleFabMenu(false); // Fe
+                this.toggleFabMenu(false); 
                 const { iconForm, modalTitle, generatorModal, modalOverlay, submitIconBtn } = this.elements;
                 iconForm.reset();
                 iconForm.elements.iconIdInput.value = '';
@@ -1088,7 +1037,6 @@
                 document.querySelectorAll('.context-menu').forEach(menu => menu.remove());
                 const menu = document.createElement('ul');
                 menu.className = 'context-menu';
-                // Posição ajustada para ícones.
                 menu.style.right = '10px';
                 menu.style.top = '50px';
                 
@@ -1208,34 +1156,31 @@
                     mainFabButton, fabItemSearch, fabItemTheme, fabItemLockMenu, lockOptionsMenu, lockModal
                 } = UIManager.elements;
                 
-                // NOVO: Evento do Botão FAB Principal
                 mainFabButton.addEventListener('click', () => {
                     UIManager.toggleFabMenu(!state.isFabOpen);
-                    UIManager.closeLockModal(); // Garante o fechamento do modal de login
-                    UIManager.toggleLockMenu(false); // Garante o fechamento do menu de opções do cadeado
+                    UIManager.closeLockModal(); 
+                    UIManager.toggleLockMenu(false); 
                 });
 
-                // NOVO: Evento dos Itens do FAB
                 fabItemSearch.addEventListener('click', () => {
                     UIManager.toggleSearchBar(!state.isSearchBarOpen);
-                    UIManager.toggleFabMenu(false); // Fe
+                    UIManager.toggleFabMenu(false); 
                 });
 
                 fabItemTheme.addEventListener('click', () => {
                     const isDark = !document.body.classList.contains('dark-mode');
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                     UIManager.toggleTheme(isDark);
-                    UIManager.toggleFabMenu(false); // Fecha o FAB
+                    UIManager.toggleFabMenu(false); 
                 });
 
                 fabItemLockMenu.addEventListener('click', () => {
-                    UIManager.toggleLockMenu(true); // Abre o menu de opções (Área Restrita / Add Ícone)
-                    UIManager.toggleFabMenu(false); // Fecha o FAB
-                    UIManager.toggleSearchBar(false); // Fe
+                    UIManager.toggleLockMenu(true); 
+                    UIManager.toggleFabMenu(false); 
+                    UIManager.toggleSearchBar(false); 
                 });
 
 
-                // Eventos de Busca e Tema (MANTIDOS)
                 let searchTimeout;
                 searchInput.addEventListener('input', e => {
                     clearTimeout(searchTimeout);
@@ -1254,7 +1199,6 @@
                 modalOverlay.addEventListener('click', () => UIManager.closeModal());
                 iconForm.addEventListener('submit', this.handleFormSubmit);
 
-                // Tratamento do menu de opções do cadeado (lockOptionsMenu)
                 lockOptionsMenu.addEventListener('click', (e) => {
                     const action = e.target.dataset.action;
                     UIManager.toggleLockMenu(false); 
@@ -1266,17 +1210,13 @@
                     }
                 });
 
-                // Fechar modais/menus ao clicar fora
                 document.addEventListener('click', (e) => {
-                    // Fecha o FAB ao clicar fora
                     if (state.isFabOpen && !mainFabButton.contains(e.target) && !fabItemSearch.contains(e.target) && !fabItemTheme.contains(e.target) && !fabItemLockMenu.contains(e.target) && !lockOptionsMenu.contains(e.target)) {
                         UIManager.toggleFabMenu(false);
                     }
-                    // Fecha o menu de opções do cadeado ao clicar fora
                     if (lockOptionsMenu.style.display === 'block' && !fabItemLockMenu.contains(e.target) && !lockOptionsMenu.contains(e.target)) {
                          UIManager.toggleLockMenu(false);
                     }
-                    // Fecha o modal de login ao clicar fora
                     if (lockModal.classList.contains('visible') && !lockModal.contains(e.target) && !fabItemLockMenu.contains(e.target)) {
                         UIManager.closeLockModal();
                     }
