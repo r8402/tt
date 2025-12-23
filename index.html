@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Gratuitos!">
+    <meta name="theme-color" content="#006400">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Gratuitos!%22,%22short_name%22:%22Gratuitos!%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22#F0F2F5%22,%22theme_color%22:%22#006400%22}">
+    <title>GratuitosFixados</title> 
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/marlonexpert/icones/main/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+        1. CONFIGURAÇÃO GERAL E VARIÁVEIS DE TEMA (MODO CLARO)
+        ========================================================================== */
+        :root {
+            --bg-color: #F0F2F5;
+            --text-color: #333333;
+            --text-color-light: #4A4A4A;
+            --card-bg-color: #FFFFFF;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --header-bg-color: transparent;
+            --input-bg-color: #F8F8F8;
+            --input-border-color: #DDDDDD;
+            --button-bg-color: #E0E0E0;
+            --button-text-color: #333333;
+            --icon-bg-color: #555;
+            --separator-color: #EEEEEE;
+            --primary-color: #007BFF;
+            --primary-color-rgb: 0, 123, 255;
+            --primary-color-hover: #0069D9;
+            --danger-color: #DC3545;
+            --context-menu-bg: #FFFFFF;
+            --context-menu-border: #EEEEEE;
+            --context-menu-item-hover: #F0F0F0;
+            --header-height-desktop: 60px;
+            --header-height-mobile: 50px; 
+            --icon-add-color: #006400; 
+            --icon-add-color-rgb: 0, 100, 0; 
+            --success-color: #28A745;
+            --edit-button-color: #006400;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #EAEAEA;
+            --text-color-light: #a0a0a0;
+            --card-bg-color: #1E1E1E;
+            --card-shadow: none;
+            --header-bg-color: transparent;
+            --input-bg-color: #252525;
+            --input-border-color: #383838;
+            --button-bg-color: #333333;
+            --button-text-color: #EAEAEA;
+            --icon-bg-color: #333742;
+            --separator-color: #383838;
+            --context-menu-bg: #252525;
+            --context-menu-border: #383838;
+            --context-menu-item-hover: #383838;
+            --icon-add-color: #006400;
+            --edit-button-color: #006400;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: var(--header-height-desktop); 
+            padding-bottom: 0;
+            transition: background-color .3s ease, color .3s ease;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        body.modal-open { overflow: hidden; }
+
+        main {
+            padding: 25px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        #page-header {
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100%;
+            padding: 10px 25px;
+            background-color: rgba(var(--primary-color-rgb), 0.05); 
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease-out, background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        #page-header.scrolled-up { transform: translateY(-100%); }
+        #page-header:not(.scrolled-up) { transform: translateY(0); }
+
+        .header-content {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: flex-end; 
+            gap: 5px;
+            align-items: center;
+            position: relative; 
+        }
+
+        #gratuito-phrase {
+            position: absolute;
+            left: 20px;
+            margin-left: 20px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.7em; 
+            color: var(--text-color);
+            white-space: nowrap; 
+            cursor: pointer; 
+            transform: translateX(0);
+            z-index: 1; 
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+
+        #gratuito-phrase.hidden { opacity: 0; transform: translateX(-20px); pointer-events: none; }
+
+        #search-input {
+            flex-grow: 1;
+            padding: 8px 18px;
+            border: 1px solid var(--input-border-color);
+            border-radius: 25px;
+            font-size: 1.05em;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            outline: none;
+            transition: all .2s ease, width 0.3s ease;
+            height: 40px;
+            width: 0; 
+            opacity: 0; 
+            margin-right: 10px;
+            pointer-events: none; 
+            order: 1;
+        }
+
+        #search-input.active { width: 100%; min-width: 100px; opacity: 1; order: 1; pointer-events: all; }
+
+        .header-button {
+            flex-shrink: 0;
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            z-index: 100;
+            transition: all .2s ease;
+        }
+
+        #search-button-toggle, #auto-publish-button, #install-button, #edit-mode-toggle {
+            background-color: var(--icon-add-color);
+            color: white;
+        }
+
+        #search-button-toggle { order: 2; }
+        #edit-mode-toggle { order: 3; } 
+        #auto-publish-button { order: 4; }
+        #install-button { order: 5; display: none; }
+        #theme-toggle { order: 6; }
+
+        #theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 25px;
+            padding: 0 10px;
+            width: auto;
+            min-width: 90px;
+        }
+
+        /* Estilos dos Cards e Grids */
+        .category-card {
+            background-color: var(--card-bg-color);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px; 
+            border-radius: 12px;
+            transition: box-shadow .3s ease;
+        }
+        
+        #category-fixados {
+            margin-top: calc(0px - var(--header-height-desktop) - 25px); 
+            position: relative;
+            z-index: 999; 
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            cursor: pointer;
+        }
+
+        .category-header h2 { margin: 0; font-size: 1.2em; font-weight: 600; }
+
+        .icons-grid, #search-results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            border-top: 1px solid var(--separator-color);
+            transition: max-height 0.4s ease-in-out;
+        }
+
+        .category-card.collapsed .icons-grid {
+            max-height: 0; padding: 0; border-top-color: transparent; overflow: hidden; 
+        }
+
+        /* Estilo dos Ícones */
+        .icon-link {
+            display: flex;
+            text-decoration: none;
+            border-radius: 12px;
+            height: 90px;
+            overflow: hidden;
+            background-color: var(--icon-bg-color);
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .icon-link:hover { transform: scale(1.03); }
+
+        .icon-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 15px;
+            color: white;
+        }
+
+        .icon-title { font-size: 1em; font-weight: 600; text-align: center; text-transform: uppercase; }
+
+        .icon-actions-button {
+            position: absolute; top: 8px; right: 8px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: none; border-radius: 50%;
+            width: 32px; height: 32px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; opacity: 0; visibility: hidden;
+        }
+
+        body.edit-mode-active .icon-actions-button { opacity: 1; visibility: visible; }
+
+        /* Menu de Contexto */
+        .context-menu {
+            position: absolute; top: 45px; right: 8px;
+            background-color: var(--context-menu-bg);
+            border: 1px solid var(--context-menu-border);
+            border-radius: 8px;
+            list-style: none; padding: 8px 0;
+            z-index: 9999; min-width: 180px; display: none;
+        }
+        .context-menu.show { display: block; }
+        .context-menu li { padding: 10px 15px; cursor: pointer; }
+        .context-menu li:hover { background-color: var(--context-menu-item-hover); }
+
+        /* Cores Fixas (Classes) */
+        .verde, .gov-curso { background-color: #006400; }
+        .AZUL { background-color: #2D9BFF; }
+        .whatsapp { background-color: #40C351; }
+        /* ... demais cores mantidas via CSS customizado do Firestore ... */
+
+        /* Modal e Toasts */
+        #generator-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            z-index: 1040; display: none;
+        }
+        #generate-icon-code-section {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 600px; background: var(--card-bg-color);
+            padding: 30px; border-radius: 12px; z-index: 1050; display: none;
+        }
+        #generate-icon-code-section.visible, #generator-modal-overlay.visible { display: block; }
+
+        #confirmation-toast {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: var(--success-color); color: white; padding: 12px 20px;
+            border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 2000;
+        }
+        #confirmation-toast.show { opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { padding-top: var(--header-height-mobile); }
+            #category-fixados { margin-top: calc(0px - var(--header-height-mobile) - 15px); }
+            .icons-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+    <header id="page-header">
+        <div class="header-content">
+            <div id="gratuito-phrase">Gratuitos!</div> 
+            
+            <button id="search-button-toggle" class="header-button" title="Pesquisar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            <input type="text" id="search-input" placeholder="Pesquisar...">
+
+            <button id="edit-mode-toggle" class="header-button" title="Modo Edição">
+                <svg id="edit-mode-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+            </button>
+
+            <button id="auto-publish-button" class="header-button" title="Adicionar Rápido">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
+            </button>
+
+            <button id="install-button" class="header-button" title="Instalar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11V7c0-2.76-2.24-5-5-5S6 4.24 6 7v4H4v10h16V11h-4zm-6-4c0-1.66 1.34-3 3-3s3 1.34 3 3v4h-6V7z"/></svg>
+            </button>
+
+            <button id="theme-toggle" class="header-button">
+                <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
+                <span>Claro</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <div class="category-grid" id="all-categories-grid"></div>
+        <div id="search-results-container"></div>
+    </main>
+
+    <div id="generator-modal-overlay"></div>
+    <div id="generate-icon-code-section">
+        <button id="close-generator-modal-btn" style="float:right; cursor:pointer;">×</button>
+        <h2 id="modal-title">Novo Ícone</h2>
+        <form id="icon-form">
+            <input type="hidden" id="iconIdInput">
+            <div class="form-group"><label>Nome</label><input type="text" id="iconNameInput" required></div>
+            <div class="form-group"><label>Link/Texto</label><input type="text" id="iconLinkInput" required></div>
+            <div class="form-group"><label>Cor</label><input type="color" id="iconCustomBgColorInput" value="#006400"></div>
+            <div class="form-group">
+                <label>Categoria</label>
+                <select id="iconCategorySelect" required></select>
+            </div>
+            <button type="submit" id="submit-icon-button" style="width:100%; padding:10px; margin-top:10px; background:var(--primary-color); color:white; border:none; border-radius:5px;">Salvar</button>
+        </form>
+    </div>
+
+    <div id="confirmation-toast"><span id="toast-message">Copiado!</span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const config = {
+            firebase: {
+                apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
+                authDomain: "iconesutil.firebaseapp.com",
+                projectId: "iconesutil",
+                storageBucket: "iconesutil.appspot.com",
+                messagingSenderId: "88285859566",
+                appId: "1:88285859566:web:e15fdb0c615b494955edff"
+            },
+            categories: {
+                'servicos-utilidades': { name: 'Serviços & Utilidades' },
+                'cursos-concursos': { name: 'Cursos & Concursos' },
+                'ferramentas-downloads': { name: 'Ferramentas & Downloads' },
+                'compras-produtividade': { name: 'Compras & Produtividade' },
+                'design-audio': { name: 'Design & Áudio' },
+                'midia-entretenimento': { name: 'Mídia & Entretenimento' }
+            }
+        };
+
+        const state = { allIcons: [], isEditMode: false, searchTerm: '' };
+
+        // --- 1. CONFIGURAÇÃO FIREBASE COM PERSISTÊNCIA OFFLINE ---
+        const app = initializeApp(config.firebase);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Ativa salvamento local automático
+        enableIndexedDbPersistence(db).catch((err) => {
+            console.warn("Persistência offline falhou:", err.code);
+        });
+
+        // --- 2. SERVICE WORKER PARA CARREGAMENTO INSTANTÂNEO ---
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'gratuitos-cache-v1';
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('fetch', e => {
+                    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob));
+        }
+
+        // --- 3. LÓGICA DA INTERFACE (MANTIDA) ---
+        const UI = {
+            render() {
+                const grid = document.getElementById('all-categories-grid');
+                grid.innerHTML = '';
+                
+                // Agrupamento e Renderização (Fixados Primeiro)
+                const pinned = state.allIcons.filter(i => i.isPinned).sort((a,b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
+                
+                if(pinned.length > 0) {
+                    const card = this.createCategoryCard('fixados', '');
+                    pinned.forEach(icon => card.querySelector('.icons-grid').appendChild(this.createIconElement(icon)));
+                    grid.appendChild(card);
+                }
+
+                Object.keys(config.categories).forEach(catId => {
+                    const icons = state.allIcons.filter(i => i.category === catId && !i.isPinned);
+                    if(icons.length > 0) {
+                        const card = this.createCategoryCard(catId, config.categories[catId].name);
+                        card.classList.add('collapsed');
+                        icons.forEach(icon => card.querySelector('.icons-grid').appendChild(this.createIconElement(icon)));
+                        grid.appendChild(card);
+                    }
+                });
+            },
+
+            createIconElement(icon) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'icon-card-wrapper';
+                wrapper.style.position = 'relative';
+                
+                const isUrl = icon.link.startsWith('http');
+                wrapper.innerHTML = `
+                    <a href="${isUrl ? icon.link : '#'}" target="${isUrl ? '_blank' : '_self'}" class="icon-link">
+                        <div class="icon-visual" style="background-color: ${icon.customBgColor || '#006400'}">
+                            <span class="icon-title">${icon.name}</span>
+                        </div>
+                    </a>
+                    <button class="icon-actions-button">⚙️</button>
+                `;
+
+                wrapper.querySelector('.icon-link').onclick = (e) => {
+                    if(state.isEditMode) return e.preventDefault();
+                    if(!isUrl) {
+                        e.preventDefault();
+                        navigator.clipboard.writeText(icon.link);
+                        this.showToast("Copiado!");
+                    }
+                };
+
+                wrapper.querySelector('.icon-actions-button').onclick = (e) => {
+                    this.showMenu(e, icon, wrapper);
+                };
+
+                return wrapper;
+            },
+
+            createCategoryCard(id, name) {
+                const section = document.createElement('section');
+                section.className = 'category-card';
+                section.id = `category-${id}`;
+                section.innerHTML = `
+                    <div class="category-header"><h2>${name}</h2></div>
+                    <div class="icons-grid"></div>
+                `;
+                section.querySelector('.category-header').onclick = () => {
+                    section.classList.toggle('collapsed');
+                };
+                return section;
+            },
+
+            showToast(msg) {
+                const t = document.getElementById('confirmation-toast');
+                document.getElementById('toast-message').textContent = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2000);
+            },
+
+            showMenu(e, icon, wrapper) {
+                document.querySelectorAll('.context-menu').forEach(m => m.remove());
+                const menu = document.createElement('ul');
+                menu.className = 'context-menu show';
+                menu.innerHTML = `
+                    <li onclick="window.editIcon('${icon.id}')">Editar</li>
+                    <li onclick="window.togglePin('${icon.id}', ${icon.isPinned})">${icon.isPinned ? 'Desafixar' : 'Fixar'}</li>
+                    <li style="color:red" onclick="window.deleteIcon('${icon.id}')">Excluir</li>
+                `;
+                wrapper.appendChild(menu);
+                setTimeout(() => document.onclick = () => { menu.remove(); document.onclick = null; }, 100);
+            }
+        };
+
+        // --- 4. FUNÇÕES GLOBAIS E EVENTOS ---
+        window.editIcon = (id) => {
+            const icon = state.allIcons.find(i => i.id === id);
+            const f = document.getElementById('icon-form');
+            f.elements.iconIdInput.value = icon.id;
+            f.elements.iconNameInput.value = icon.name;
+            f.elements.iconLinkInput.value = icon.link;
+            f.elements.iconCategorySelect.value = icon.category;
+            f.elements.iconCustomBgColorInput.value = icon.customBgColor || '#006400';
+            document.getElementById('generate-icon-code-section').classList.add('visible');
+            document.getElementById('generator-modal-overlay').classList.add('visible');
+        };
+
+        window.togglePin = async (id, current) => {
+            await updateDoc(doc(db, "icones", id), { isPinned: !current });
+        };
+
+        window.deleteIcon = async (id) => {
+            if(confirm("Excluir?")) await deleteDoc(doc(db, "icones", id));
+        };
+
+        // Auto-Publish
+        document.getElementById('auto-publish-button').onclick = async () => {
+            const text = await navigator.clipboard.readText();
+            if(!text) return UI.showToast("Área de transferência vazia");
+            await addDoc(collection(db, "icones"), {
+                name: text.substring(0,10).toUpperCase(),
+                link: text,
+                category: 'servicos-utilidades',
+                customBgColor: '#006400',
+                isPinned: true,
+                createdAt: serverTimestamp()
+            });
+            UI.showToast("Publicado!");
+        };
+
+        // Escuta mudanças (Funciona em Background/Real-time)
+        onSnapshot(collection(db, "icones"), (snap) => {
+            state.allIcons = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            UI.render();
+        });
+
+        // Auth
+        signInAnonymously(auth);
+
+        // Inicializar select de categorias
+        const sel = document.getElementById('iconCategorySelect');
+        Object.keys(config.categories).forEach(k => {
+            sel.innerHTML += `<option value="${k}">${config.categories[k].name}</option>`;
+        });
+
+        // Form Submit
+        document.getElementById('icon-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const f = e.target;
+            const id = f.elements.iconIdInput.value;
+            const data = {
+                name: f.elements.iconNameInput.value,
+                link: f.elements.iconLinkInput.value,
+                category: f.elements.iconCategorySelect.value,
+                customBgColor: f.elements.iconCustomBgColorInput.value,
+                createdAt: serverTimestamp()
+            };
+            id ? await updateDoc(doc(db, "icones", id), data) : await addDoc(collection(db, "icones"), data);
+            document.getElementById('generate-icon-code-section').classList.remove('visible');
+            document.getElementById('generator-modal-overlay').classList.remove('visible');
+        };
+
+        // Modo Edição Toggle
+        document.getElementById('edit-mode-toggle').onclick = () => {
+            state.isEditMode = !state.isEditMode;
+            document.body.classList.toggle('edit-mode-active', state.isEditMode);
+            UI.showToast(state.isEditMode ? "Modo Edição Ativo" : "Modo Edição Inativo");
+        };
+
+        // Botão Fechar Modal
+        document.getElementById('close-generator-modal-btn').onclick = () => {
+            document.getElementById('generate-icon-code-section').classList.remove('visible');
+            document.getElementById('generator-modal-overlay').classList.remove('visible');
+        };
+
+        // Tema Toggle
+        document.getElementById('theme-toggle').onclick = () => {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.querySelector('#theme-toggle span').textContent = isDark ? 'Escuro' : 'Claro';
+        };
+        if(localStorage.getItem('theme') === 'dark') document.getElementById('theme-toggle').click();
+
+        // Cabeçalho que some ao rolar
+        let lastScroll = 0;
+        window.onscroll = () => {
+            const current = window.pageYOffset;
+            const header = document.getElementById('page-header');
+            if (current > lastScroll && current > 100) header.classList.add('scrolled-up');
+            else header.classList.remove('scrolled-up');
+            lastScroll = current;
+        };
+    </script>
+</body>
+</html>
