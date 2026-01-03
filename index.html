@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <title>Gratuitos! - Dashboard</title>
+    
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --primary: #2563EB;
+            --danger: #EF4444;
+            --success-toast: #006400;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --radius-ui: 20px;
+            --header-height: 70px;
+        }
+
+        body.dark {
+            --bg-body: #111827;
+            --bg-card: #1F2937;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Caveat', cursive; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s ease;
+            padding-top: calc(var(--header-height) + 20px);
+            padding-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .app-header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            z-index: 100; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        body.dark .app-header { background: rgba(17, 24, 39, 0.85); border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .logo { font-weight: 700; font-size: 1.8rem; background: linear-gradient(135deg, #2563EB, #10B981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; gap: 8px; }
+        
+        .btn-icon { background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; color: var(--text-main); }
+        .btn-icon svg { stroke: var(--text-main); }
+
+        .search-container { position: relative; display: flex; align-items: center; }
+        .search-input {
+            width: 0; opacity: 0; padding: 0; border: none; background: transparent;
+            color: var(--text-main); font-size: 1.1rem; outline: none; transition: 0.3s;
+        }
+        .search-container.active .search-input { width: 140px; opacity: 1; margin-right: 5px; border-bottom: 1px solid var(--primary); }
+
+        main { padding: 0 20px; }
+        .category-section { margin-bottom: 30px; animation: slideUp 0.5s ease forwards; opacity: 0; }
+        .category-title { font-size: 1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
+
+        .grid-wrapper { position: relative; display: flex; align-items: center; }
+        .grid, .grid-wrapped { display: flex; width: 100%; }
+        .grid { overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .grid::-webkit-scrollbar { display: none; }
+        .grid-wrapped { flex-wrap: wrap; gap: 0; overflow: hidden; }
+
+        .search-results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; width: 100%; }
+
+        .nav-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px;
+            background: rgba(255, 255, 255, 0.9); border: none; border-radius: 50%;
+            cursor: pointer; z-index: 10; display: none; align-items: center; justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); color: #333;
+        }
+        @media (min-width: 768px) { .grid-wrapper:hover .nav-arrow { display: flex; } }
+
+        .card {
+            flex: 0 0 110px; height: 100px; background-color: var(--primary);
+            position: relative; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; padding: 10px; color: white; text-align: center;
+            scroll-snap-align: start; text-decoration: none; border-right: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.1s;
+        }
+
+        .grid .card:first-child { border-top-left-radius: var(--radius-ui); border-bottom-left-radius: var(--radius-ui); }
+        .grid .card:last-child { border-top-right-radius: var(--radius-ui); border-bottom-right-radius: var(--radius-ui); border-right: none; }
+        .grid-wrapped .card { flex-grow: 1; min-width: 110px; max-width: 150px; }
+        
+        .card:active { filter: brightness(0.9); transform: scale(0.96); }
+        .card-title { font-size: 1rem; font-weight: 700; pointer-events: none; word-wrap: break-word; line-height: 1.1; }
+
+        .edit-badge { position: absolute; top: 5px; right: 5px; font-size: 14px; background: rgba(0,0,0,0.3); border-radius: 50%; width: 22px; height: 22px; display: none; align-items: center; justify-content: center; }
+        .card.shake .edit-badge { display: flex; }
+        .card.shake { animation: shake 0.3s infinite; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--bg-card); width: 95%; max-width: 420px; padding: 25px; border-radius: 24px; max-height: 90vh; overflow-y: auto; }
+        .form-group { margin-bottom: 12px; }
+        .form-input, .form-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--text-muted); background: var(--bg-body); color: var(--text-main); font-size: 1.1rem; }
+        
+        .btn-submit { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-weight: 700; cursor: pointer; font-size: 1.1rem; }
+        .btn-top { background: #10B981; margin-bottom: 10px; }
+
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success-toast); color: white; padding: 12px 24px; border-radius: 50px; transition: 0.4s; z-index: 2000; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        
+        #edit-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--danger); color: white; padding: 15px; text-align: center; transform: translateY(100%); transition: 0.3s; z-index: 90; font-weight: bold; }
+        #edit-bar.show { transform: translateY(0); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(1.5deg); } 75% { transform: rotate(-1.5deg); } }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">GRATUITOS!</div>
+        <div class="header-actions">
+            <div class="search-container" id="search-box">
+                <input type="text" class="search-input" placeholder="BUSCAR..." id="inp-search" autocomplete="off">
+                <button class="btn-icon" id="btn-search-toggle">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </div>
+            <button class="btn-icon" id="btn-paste" title="Colar Link"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></button>
+            <button class="btn-icon" id="btn-edit-mode" title="Modo Edição"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
+            <button class="btn-icon" id="btn-theme" title="Trocar Tema"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
+        </div>
+    </header>
+
+    <main id="app-content"></main>
+    <div class="toast" id="toast"></div>
+    <div id="edit-bar">MODO EDIÇÃO ATIVADO</div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 style="margin:0 0 20px 0; font-size: 1.5rem;">EDITAR ITEM</h2>
+            <form id="form-icon">
+                <input type="hidden" id="f-id">
+                <div class="form-group"><input type="text" id="f-name" class="form-input" placeholder="NOME DO APP" required></div>
+                <div class="form-group"><input type="text" id="f-link" class="form-input" placeholder="URL OU TEXTO PARA COPIAR" required></div>
+                <div class="form-group"><select id="f-category" class="form-select"></select></div>
+                <div class="form-group"><input type="text" id="f-class" class="form-input" placeholder="CLASSE DE COR OU HEX (#000)"></div>
+                
+                <div class="form-group" style="padding: 5px 0; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="f-pinned" style="width:20px; height:20px;">
+                    <label for="f-pinned" style="font-size:1.1rem; cursor:pointer;">FIXAR EM FAVORITOS</label>
+                </div>
+
+                <button type="button" class="btn-submit btn-top" id="btn-promote-first">⭐ POR EM 1º LUGAR</button>
+                
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn-submit" style="background:#EF4444" id="btn-delete">EXCLUIR</button>
+                    <button type="submit" class="btn-submit">SALVAR</button>
+                </div>
+                <button type="button" style="background:transparent; border:none; width:100%; padding:15px; color:var(--text-muted); cursor:pointer; font-size: 1.1rem;" id="btn-close-modal">CANCELAR</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs",
+            authDomain: "iconesutil.firebaseapp.com",
+            projectId: "iconesutil",
+            storageBucket: "iconesutil.appspot.com",
+            messagingSenderId: "88285859566",
+            appId: "1:88285859566:web:e15fdb0c615b494955edff"
+        };
+
+        const CATEGORIES = {
+            'servicos-utilidades': 'Serviços & Utilidades',
+            'cursos-concursos': 'Cursos & Concursos',
+            'ferramentas-downloads': 'Ferramentas & Downloads',
+            'compras-produtividade': 'Compras & Produtividade',
+            'design-audio': 'Design & Áudio',
+            'midia-entretenimento': 'Mídia & Entretenimento'
+        };
+
+        let db, allIcons = [], editMode = false;
+
+        async function init() {
+            if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            const auth = getAuth(app);
+            onAuthStateChanged(auth, u => !u && signInAnonymously(auth));
+
+            const select = document.getElementById('f-category');
+            for (const [key, val] of Object.entries(CATEGORIES)) select.innerHTML += `<option value="${key}">${val}</option>`;
+
+            onSnapshot(collection(db, "icones"), (snapshot) => {
+                allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render(document.getElementById('inp-search').value);
+            });
+            setupEventListeners();
+            setupKeyboardSearch();
+        }
+
+        // --- NOVA FUNCIONALIDADE: PESQUISA AO TECLAR NO PC ---
+        function setupKeyboardSearch() {
+            window.addEventListener('keydown', (e) => {
+                const searchBox = document.getElementById('search-box');
+                const searchInput = document.getElementById('inp-search');
+                const modal = document.getElementById('modal-overlay');
+
+                // Não ativa se o modal estiver aberto ou se já estiver digitando em um input
+                if (modal.classList.contains('open') || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+                // Teclas de atalho ignoradas (Ctrl, Alt, Meta, Shift puro, etc)
+                if (e.ctrlKey || e.altKey || e.metaKey || e.key.length > 1) return;
+
+                // Ativa a barra de busca e foca
+                if (!searchBox.classList.contains('active')) {
+                    searchBox.classList.add('active');
+                    searchInput.focus();
+                }
+            });
+        }
+
+        function render(filterText = '') {
+            const container = document.getElementById('app-content');
+            container.innerHTML = '';
+            
+            const filtered = allIcons.filter(i => i.name.toLowerCase().includes(filterText.toLowerCase()));
+
+            if (filterText.trim().length > 0) {
+                const searchGrid = document.createElement('div');
+                searchGrid.className = 'search-results-grid';
+                filtered.forEach(icon => searchGrid.appendChild(createCardDOM(icon)));
+                container.appendChild(searchGrid);
+                return;
+            }
+
+            const pinned = allIcons.filter(i => i.isPinned).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            if (pinned.length) {
+                const favSection = document.createElement('section');
+                favSection.className = 'category-section';
+                favSection.innerHTML = `<h3 class="category-title">FAVORITOS</h3>`;
+                const favGrid = document.createElement('div');
+                favGrid.className = 'grid-wrapped'; 
+                pinned.forEach((icon, idx) => {
+                    const card = createCardDOM(icon);
+                    favGrid.appendChild(card);
+                });
+                favSection.appendChild(favGrid);
+                container.appendChild(favSection);
+            }
+
+            const grouped = allIcons.reduce((acc, icon) => {
+                const cat = icon.category || 'servicos-utilidades';
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(icon);
+                return acc;
+            }, {});
+
+            for (const [key, label] of Object.entries(CATEGORIES)) {
+                if (grouped[key]) container.appendChild(createSectionDOM(label, grouped[key]));
+            }
+        }
+
+        function createCardDOM(icon) {
+            const card = document.createElement('div');
+            const isHex = icon.colorClass?.startsWith('#');
+            card.className = `card ${!isHex ? (icon.colorClass || '') : ''} ${editMode ? 'shake' : ''}`;
+            if (isHex) card.style.backgroundColor = icon.colorClass;
+            card.dataset.id = icon.id;
+            card.onclick = () => window.handleIconClick(card);
+            card.innerHTML = `<span class="card-title">${icon.name}</span><div class="edit-badge">✏️</div>`;
+            return card;
+        }
+
+        function createSectionDOM(title, icons) {
+            const section = document.createElement('section');
+            section.className = 'category-section';
+            icons.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'grid-wrapper';
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            const btnLeft = document.createElement('button');
+            btnLeft.className = 'nav-arrow arrow-left'; btnLeft.innerHTML = '❮';
+            btnLeft.onclick = () => grid.scrollBy({ left: -330, behavior: 'smooth' });
+
+            const btnRight = document.createElement('button');
+            btnRight.className = 'nav-arrow arrow-right'; btnRight.innerHTML = '❯';
+            btnRight.onclick = () => grid.scrollBy({ left: 330, behavior: 'smooth' });
+
+            icons.forEach(icon => grid.appendChild(createCardDOM(icon)));
+            wrapper.append(btnLeft, grid, btnRight);
+            section.innerHTML = `<h3 class="category-title">${title}</h3>`;
+            section.appendChild(wrapper);
+            return section;
+        }
+
+        window.handleIconClick = (el) => {
+            const icon = allIcons.find(i => i.id === el.dataset.id);
+            if (editMode) openModal(icon);
+            else {
+                if (icon.link.startsWith('http')) window.open(icon.link, '_blank');
+                else { navigator.clipboard.writeText(icon.link); showToast('COPIADO!'); }
+            }
+        };
+
+        function setupEventListeners() {
+            const searchBox = document.getElementById('search-box');
+            const searchInput = document.getElementById('inp-search');
+            
+            document.getElementById('btn-search-toggle').onclick = () => {
+                searchBox.classList.toggle('active');
+                if (searchBox.classList.contains('active')) {
+                    searchInput.focus();
+                } else {
+                    searchInput.value = '';
+                    render();
+                }
+            };
+
+            searchInput.oninput = (e) => render(e.target.value);
+
+            document.getElementById('btn-edit-mode').onclick = () => {
+                editMode = !editMode;
+                document.getElementById('edit-bar').classList.toggle('show', editMode);
+                render(searchInput.value);
+            };
+
+            document.getElementById('btn-promote-first').onclick = async () => {
+                const id = document.getElementById('f-id').value;
+                if(!id) return;
+                await updateDoc(doc(db, "icones", id), {
+                    isPinned: true,
+                    createdAt: serverTimestamp()
+                });
+                document.getElementById('modal-overlay').classList.remove('open');
+                showToast("SUBIU PARA 1º NOS FAVORITOS!");
+            };
+
+            document.getElementById('form-icon').onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('f-id').value;
+                const data = {
+                    name: document.getElementById('f-name').value,
+                    link: document.getElementById('f-link').value,
+                    category: document.getElementById('f-category').value,
+                    colorClass: document.getElementById('f-class').value,
+                    isPinned: document.getElementById('f-pinned').checked,
+                    createdAt: serverTimestamp()
+                };
+                id ? await updateDoc(doc(db, "icones", id), data) : await addDoc(collection(db, "icones"), data);
+                document.getElementById('modal-overlay').classList.remove('open');
+                showToast("SALVO!");
+            };
+
+            document.getElementById('btn-paste').onclick = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) openModal({ name: 'NOVO', link: text }, true);
+                } catch (err) {
+                    showToast("ERRO AO LER CLIPBOARD");
+                }
+            };
+
+            document.getElementById('btn-theme').onclick = () => {
+                document.body.classList.toggle('dark');
+                localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            };
+
+            document.getElementById('btn-delete').onclick = async () => {
+                if(confirm('EXCLUIR?')) { 
+                    await deleteDoc(doc(db, "icones", document.getElementById('f-id').value)); 
+                    document.getElementById('modal-overlay').classList.remove('open'); 
+                }
+            };
+            document.getElementById('btn-close-modal').onclick = () => document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        function openModal(data = {}, isNew = false) {
+            document.getElementById('f-id').value = isNew ? '' : data.id;
+            document.getElementById('f-name').value = data.name || '';
+            document.getElementById('f-link').value = data.link || '';
+            document.getElementById('f-category').value = data.category || 'servicos-utilidades';
+            document.getElementById('f-class').value = data.colorClass || '';
+            document.getElementById('f-pinned').checked = !!data.isPinned;
+            document.getElementById('btn-promote-first').style.display = isNew ? 'none' : 'block';
+            document.getElementById('btn-delete').style.display = isNew ? 'none' : 'block';
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
