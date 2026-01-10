@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <title>Dashboard - Meus Apps</title>
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================= Variaveis ================= */
+        :root {
+            --bg-body: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --primary: #006400;
+            --primary-gradient: linear-gradient(135deg, #006400, #10B981);
+            --danger: #EF4444;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --radius-ui: 16px;
+            --fab-size: 60px;
+        }
+
+        /* MODO NOTURNO AMOLED */
+        body.dark {
+            --bg-body: #000000;
+            --bg-card: #121212;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+        }
+
+        /* ================= Reset & Base ================= */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Caveat', cursive;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            outline: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.2s ease;
+            padding-top: 5px;
+            padding-bottom: 120px; /* Aumentado para o FAB central não cobrir */
+            font-size: 1.1rem;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ================= Grid & Estilos ================= */
+        main {
+            padding: 0 10px;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        
+        /* Classe para ocultar o fundo na pesquisa */
+        .hidden-background {
+            display: none;
+        }
+
+        .category-section {
+            margin-bottom: 25px;
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+            position: relative;
+        }
+
+        .category-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            margin-left: 5px;
+            border-left: 3px solid var(--primary);
+            padding-left: 8px;
+        }
+
+        .grid-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .grid, .grid-wrapped {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Grid Horizontal (Scroll) */
+        .grid {
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding-bottom: 5px;
+        }
+        .grid::-webkit-scrollbar { display: none; }
+
+        /* Grid Favoritos (Wrap) - ÍCONES COLADOS */
+        .grid-wrapped {
+            flex-wrap: wrap;
+            gap: 0; 
+            overflow: hidden;
+        }
+
+        /* Container de Resultados da Pesquisa */
+        #search-results-overlay {
+            position: fixed;
+            bottom: 200px; /* Ajustado para ficar acima do FAB expandido */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 600px;
+            z-index: 190;
+            display: none;
+            flex-direction: column-reverse;
+        }
+        #search-results-overlay.active { display: flex; }
+
+        /* BARRA DE PESQUISA HORIZONTAL */
+        .search-results-bar {
+            background: var(--bg-card);
+            border-radius: var(--radius-ui);
+            padding: 5px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            justify-content: flex-start;
+            gap: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 100%;
+        }
+        .search-results-bar::-webkit-scrollbar { display: none; }
+
+        /* Setas de Navegação (Desktop) */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            color: #333;
+        }
+        body.dark .nav-arrow { background: rgba(31, 41, 55, 0.9); color: white; }
+        .arrow-left { left: -5px; }
+        .arrow-right { right: -5px; }
+        @media (min-width: 768px) { .grid-wrapper:hover .nav-arrow { display: flex; } }
+
+        /* Card Base */
+        .card {
+            flex: 0 0 100px;
+            height: 100px;
+            width: 100px;
+            background-color: var(--primary);
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            color: white;
+            text-align: center;
+            scroll-snap-align: start;
+            text-decoration: none;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.1s;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        /* LÓGICA DE BORDAS */
+        .grid .card:first-child, .search-results-bar .card:first-child { border-top-left-radius: var(--radius-ui); border-bottom-left-radius: 0; }
+        .grid .card:last-child, .search-results-bar .card:last-child { border-top-right-radius: 0; border-bottom-right-radius: var(--radius-ui); border-right: none; }
+        .search-results-bar .card { flex: 0 0 100px; min-width: 100px; }
+        
+        .grid-wrapped .card { flex-grow: 1; min-width: 100px; max-width: 140px; }
+        .grid-wrapped .card:first-child { border-top-left-radius: var(--radius-ui); border-bottom-left-radius: 0; }
+        .grid-wrapped .card:last-child { border-top-right-radius: 0; border-bottom-right-radius: var(--radius-ui); border-right: none; }
+
+        .card:active { filter: brightness(0.9); transform: scale(0.96); }
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            pointer-events: none;
+            line-height: 1.1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            word-break: break-word;
+        }
+
+        /* Classes Customizadas */
+        .verde { background-color: #89C623; }
+        .AZUL { background-color: #2D9BFF; }
+        .whatsapp { background-color: #40C351; }
+        .bloqueador { background-color: #EE3433; }
+        .codepen { background-color: #1E1F26; }
+        .mercadolivre { background-color: #ffe600; color: #333 !important; }
+        .mercadolivre .card-title { color: #333; text-shadow: none; }
+
+        .edit-badge {
+            position: absolute;
+            top: 4px; right: 4px;
+            font-size: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+        .card.shake .edit-badge { display: flex; }
+        .card.shake { animation: shake 0.3s infinite; cursor: alias; }
+
+        /* ================= FAB (Floating Action Button) CENTRALIZADO ================= */
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%; /* Centraliza Horizontalmente */
+            transform: translateX(-50%); /* Corrige o centro */
+            z-index: 200;
+            display: flex;
+            flex-direction: column; /* Ordem de cima para baixo */
+            align-items: center; /* Centraliza itens internos */
+            justify-content: flex-end;
+            pointer-events: none; /* Deixa passar clique quando fechado */
+        }
+        
+        .fab-container > * {
+            pointer-events: auto; /* Restaura clique nos filhos */
+        }
+
+        /* Botão Principal */
+        .fab-main {
+            width: var(--fab-size);
+            height: var(--fab-size);
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(0,100,0, 0.4);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 202;
+            margin-top: 10px; /* Espaço entre ações e o botão */
+        }
+
+        .fab-main:active { transform: scale(0.9) translateX(-50%); } /* Ajuste no active para manter centro */
+        .fab-main svg { width: 28px; height: 28px; transition: 0.3s; }
+        
+        .fab-container.active .fab-main svg { transform: rotate(90deg); opacity: 0; }
+        .fab-main::after {
+            content: "+";
+            font-size: 30px;
+            position: absolute;
+            transform: rotate(45deg) scale(0);
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .fab-container.active .fab-main::after { transform: rotate(45deg) scale(1); opacity: 1; }
+
+        /* Botões de Ação (Horizontal) */
+        .fab-actions {
+            display: flex;
+            flex-direction: row; /* Horizontal */
+            align-items: center;
+            gap: 20px; /* Espaço entre ícones */
+            margin-bottom: 5px;
+            pointer-events: none;
+        }
+        
+        .fab-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-main);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.5); /* Efeito de Zoom */
+            transition: 0.3s ease;
+        }
+
+        .fab-container.active .fab-actions { pointer-events: auto; }
+        .fab-container.active .fab-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Input de Pesquisa (Topo do FAB) */
+        .search-wrapper {
+            background: var(--bg-card);
+            border-radius: 30px;
+            padding: 5px 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            width: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 0;
+            margin-bottom: 10px;
+            pointer-events: none;
+        }
+
+        .fab-container.active .search-wrapper {
+            width: 260px;
+            height: 50px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .search-input-fab {
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 1rem;
+            width: 100%;
+            font-weight: bold;
+            text-align: center; /* Texto centralizado */
+        }
+        
+        /* Tooltip dos botões (Ajustado para cima) */
+        .fab-btn::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -30px; /* Acima do botão */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.2s;
+        }
+        .fab-container.active .fab-btn:hover::before { opacity: 1; }
+
+        /* ================= Modais ================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--bg-card);
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--text-muted);
+            background: var(--bg-body);
+            color: var(--text-main);
+            margin-bottom: 12px;
+            user-select: auto;
+            -webkit-user-select: auto;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        #edit-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--danger);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: 0.3s;
+            z-index: 190;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        #edit-bar.show { transform: translateY(0); padding-right: 20px; text-align: left; padding-left: 20px;}
+
+        .row-inputs { display: flex; gap: 10px; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(1deg); } 75% { transform: rotate(-1deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="search-results-overlay"> </div>
+    <main id="app-content"></main>
+    <div id="edit-bar">MODO EDIÇÃO ATIVO</div>
+
+    <div class="fab-container" id="fab-container">
+        
+        <div class="search-wrapper">
+            <input type="text" class="search-input-fab" placeholder="O QUE VOCÊ PROCURA?" id="inp-search" autocomplete="off">
+        </div>
+
+        <div class="fab-actions">
+            <button class="fab-btn" id="btn-theme" data-label="Tema">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+            <button class="fab-btn" id="btn-paste" data-label="Colar">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </button>
+        </div>
+
+        <button class="fab-main" id="fab-trigger" aria-label="Menu Principal">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </button>
+
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h2 style="margin:0 0 20px 0; font-size: 1.5rem;">EDITAR ITEM</h2>
+            <form id="form-icon">
+                <input type="hidden" id="f-id">
+                <input type="text" id="f-name" class="form-input" placeholder="NOME DO APP" required>
+                <input type="text" id="f-link" class="form-input" placeholder="URL OU TEXTO PARA COPIAR" required>
+                <select id="f-category" class="form-select"></select>
+                <input type="text" id="f-image" class="form-input" placeholder="URL DA IMAGEM (OPCIONAL)">
+                <div class="row-inputs">
+                    <input type="text" id="f-class" class="form-input" placeholder="COR/HEX" style="flex: 2;">
+                    <input type="number" id="f-order" class="form-input" placeholder="ORDEM" style="flex: 1;">
+                </div>
+                
+                <div style="padding: 10px 0;"><label><input type="checkbox" id="f-pinned"> FIXAR NO TOPO</label></div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button type="button" class="btn-submit" style="background:#EF4444" id="btn-delete">EXCLUIR</button>
+                    <button type="submit" class="btn-submit">SALVAR</button>
+                </div>
+                <button type="button" style="background:transparent; border:none; width:100%; padding:15px; color:var(--text-muted); cursor:pointer;" id="btn-close-modal">CANCELAR</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs", authDomain: "iconesutil.firebaseapp.com", projectId: "iconesutil", storageBucket: "iconesutil.appspot.com", messagingSenderId: "88285859566", appId: "1:88285859566:web:e15fdb0c615b494955edff" };
+
+        const CATEGORIES = { 'servicos-utilidades': 'Serviços & Utilidades', 'cursos-concursos': 'Cursos & Concursos', 'ferramentas-downloads': 'Ferramentas & Downloads', 'compras-produtividade': 'Compras & Produtividade', 'design-audio': 'Design & Áudio', 'midia-entretenimento': 'Mídia & Entretenimento' };
+        const CORES_PT = { 'vermelho': '#EF4444', 'azul': '#3B82F6', 'verde': '#10B981', 'amarelo': '#F59E0B', 'roxo': '#8B5CF6', 'rosa': '#EC4899', 'preto': '#000000', 'branco': '#FFFFFF', 'laranja': '#F97316', 'cinza': '#6B7280', 'marrom': '#78350F', 'ciano': '#06B6D4', 'lima': '#84CC16', 'indigo': '#6366F1', 'fucsia': '#D946EF', 'vinho': '#881337', 'ouro': '#FFD700', 'prata': '#C0C0C0' };
+
+        let db, allIcons = [], editMode = false;
+
+        async function init() {
+            if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            const auth = getAuth(app);
+            onAuthStateChanged(auth, u => !u && signInAnonymously(auth));
+
+            const select = document.getElementById('f-category');
+            for (const [key, val] of Object.entries(CATEGORIES)) select.innerHTML += `<option value="${key}">${val}</option>`;
+
+            onSnapshot(collection(db, "icones"), (snapshot) => {
+                allIcons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                render(document.getElementById('inp-search').value);
+            });
+            setupEventListeners();
+        }
+
+        function createCardDOM(icon) {
+            const card = document.createElement('div');
+            let colorValue = (icon.colorClass || '').trim();
+            const imageUrl = icon.imageUrl || '';
+            card.className = `card ${editMode ? 'shake' : ''}`;
+            
+            if (imageUrl.trim() !== '') {
+                card.style.backgroundImage = `url('${imageUrl}')`;
+                card.innerHTML = `<div class="edit-badge">✏️</div>`;
+            } else {
+                if (colorValue !== '') {
+                    if (CORES_PT[colorValue.toLowerCase()]) colorValue = CORES_PT[colorValue.toLowerCase()];
+                    if (colorValue.startsWith('#') || (window.CSS && CSS.supports('color', colorValue))) {
+                        card.style.backgroundColor = colorValue;
+                        if(['#ffffff', 'white', '#fff'].includes(colorValue.toLowerCase())) { card.style.border = '1px solid #ddd'; card.style.color = '#333'; }
+                    } else card.classList.add(colorValue);
+                }
+                if(!card.innerHTML) card.innerHTML = `<span class="card-title">${icon.name}</span><div class="edit-badge">✏️</div>`;
+                else card.innerHTML += `<span class="card-title">${icon.name}</span><div class="edit-badge">✏️</div>`;
+            }
+
+            card.dataset.id = icon.id;
+            card.onclick = () => window.handleIconClick(card);
+            card.oncontextmenu = (e) => { e.preventDefault(); toggleEditMode(); };
+            return card;
+        }
+
+        function render(filterText = '') {
+            const container = document.getElementById('app-content');
+            const searchOverlay = document.getElementById('search-results-overlay');
+            const sortFn = (a, b) => {
+                const orderA = a.order !== undefined ? Number(a.order) : 99999;
+                const orderB = b.order !== undefined ? Number(b.order) : 99999;
+                if (orderA !== orderB) return orderA - orderB;
+                return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+            };
+
+            // MODO DE PESQUISA
+            if (filterText.trim().length > 0) {
+                container.classList.add('hidden-background');
+                searchOverlay.classList.add('active');
+                searchOverlay.innerHTML = ''; 
+
+                const filtered = allIcons.filter(i => i.name.toLowerCase().includes(filterText.toLowerCase()));
+                const resultsBar = document.createElement('div');
+                resultsBar.className = 'search-results-bar';
+
+                if (filtered.length > 0) {
+                    filtered.sort(sortFn).forEach(icon => resultsBar.appendChild(createCardDOM(icon)));
+                } else {
+                    resultsBar.innerHTML = '<span style="padding:10px; width:100%; text-align:center; font-weight:bold; color:var(--text-muted)">SEM RESULTADOS</span>';
+                }
+                searchOverlay.appendChild(resultsBar);
+                return;
+            }
+
+            // MODO NORMAL
+            container.classList.remove('hidden-background');
+            searchOverlay.classList.remove('active');
+            container.innerHTML = '';
+            
+            const pinned = allIcons.filter(i => i.isPinned).sort(sortFn);
+            if (pinned.length) {
+                const favSection = document.createElement('section');
+                favSection.className = 'category-section';
+                favSection.innerHTML = `<h3 class="category-title">FAVORITOS</h3>`;
+                const favGrid = document.createElement('div');
+                favGrid.className = 'grid-wrapped';
+                pinned.forEach((icon, idx) => {
+                    const card = createCardDOM(icon);
+                    favGrid.appendChild(card);
+                });
+                favSection.appendChild(favGrid);
+                container.appendChild(favSection);
+            }
+
+            const unpinned = allIcons.filter(i => !i.isPinned);
+            const grouped = unpinned.reduce((acc, icon) => {
+                const cat = icon.category || 'servicos-utilidades';
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(icon);
+                return acc;
+            }, {});
+
+            for (const [key, label] of Object.entries(CATEGORIES)) {
+                if (grouped[key]) {
+                    grouped[key].sort(sortFn);
+                    container.appendChild(createSectionDOM(label, grouped[key]));
+                }
+            }
+        }
+
+        function createSectionDOM(title, icons) {
+            const section = document.createElement('section');
+            section.className = 'category-section';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'grid-wrapper';
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            
+            const btnLeft = Object.assign(document.createElement('button'), { className: 'nav-arrow arrow-left', innerHTML: '❮', onclick: () => grid.scrollBy({ left: -300, behavior: 'smooth' }) });
+            const btnRight = Object.assign(document.createElement('button'), { className: 'nav-arrow arrow-right', innerHTML: '❯', onclick: () => grid.scrollBy({ left: 300, behavior: 'smooth' }) });
+
+            icons.forEach(icon => grid.appendChild(createCardDOM(icon)));
+            wrapper.append(btnLeft, grid, btnRight);
+            section.innerHTML = `<h3 class="category-title">${title}</h3>`;
+            section.appendChild(wrapper);
+            return section;
+        }
+
+        window.handleIconClick = (el) => {
+            const icon = allIcons.find(i => i.id === el.dataset.id);
+            if (editMode) openModal(icon);
+            else {
+                if (icon.link.startsWith('http')) window.open(icon.link, '_blank');
+                else navigator.clipboard.writeText(icon.link);
+            }
+        };
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            document.getElementById('edit-bar').classList.toggle('show', editMode);
+            const fab = document.getElementById('fab-container');
+            if(fab.classList.contains('active')) fab.classList.remove('active');
+            if(navigator.vibrate) navigator.vibrate(50);
+            render(document.getElementById('inp-search').value);
+        }
+
+        function setupEventListeners() {
+            const fabContainer = document.getElementById('fab-container');
+            const fabTrigger = document.getElementById('fab-trigger');
+            const searchInput = document.getElementById('inp-search');
+
+            fabTrigger.onclick = () => {
+                fabContainer.classList.toggle('active');
+                if(fabContainer.classList.contains('active')) {
+                    setTimeout(() => searchInput.focus(), 300);
+                } else {
+                    searchInput.value = '';
+                    render();
+                }
+            };
+            searchInput.oninput = (e) => render(e.target.value);
+
+            // Teclado
+            document.addEventListener('keydown', (e) => {
+                if (e.target.matches('input, textarea') || e.ctrlKey || e.altKey || e.metaKey || e.key.length > 1) {
+                    if(e.key === 'Backspace' && fabContainer.classList.contains('active')) {
+                        searchInput.focus();
+                        return;
+                    }
+                    return;
+                }
+                if(!fabContainer.classList.contains('active')) { fabContainer.classList.add('active'); }
+                searchInput.focus();
+            });
+
+            window.addEventListener('contextmenu', (e) => {
+                if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault(); toggleEditMode();
+                }
+            });
+
+            // Mobile Long Press
+            let pressTimer;
+            const longPressDuration = 800;
+            window.addEventListener('touchstart', (e) => {
+                if(e.target.closest('.fab-main') || e.target.closest('.modal') || e.target.closest('.fab-actions')) return;
+                pressTimer = setTimeout(() => { toggleEditMode(); }, longPressDuration);
+            }, { passive: true });
+            
+            const cancelTimer = () => clearTimeout(pressTimer);
+            window.addEventListener('touchend', cancelTimer);
+            window.addEventListener('touchmove', cancelTimer);
+
+            // Paste Button
+            document.getElementById('btn-paste').onclick = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    openModal({ name: 'NOVO ITEM', link: text }, true);
+                    fabContainer.classList.remove('active');
+                } catch(e) { alert('Permita acesso à área de transferência'); }
+            };
+
+            // Theme Button
+            document.getElementById('btn-theme').onclick = () => {
+                document.body.classList.toggle('dark');
+                localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+            };
+
+            // Form Submit
+            document.getElementById('form-icon').onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('f-id').value;
+                const data = {
+                    name: document.getElementById('f-name').value,
+                    link: document.getElementById('f-link').value,
+                    category: document.getElementById('f-category').value,
+                    colorClass: document.getElementById('f-class').value,
+                    imageUrl: document.getElementById('f-image').value,
+                    order: Number(document.getElementById('f-order').value) || 9999,
+                    isPinned: document.getElementById('f-pinned').checked,
+                    createdAt: serverTimestamp()
+                };
+                id ? await updateDoc(doc(db, "icones", id), data) : await addDoc(collection(db, "icones"), data);
+                document.getElementById('modal-overlay').classList.remove('open');
+            };
+
+            // Delete
+            document.getElementById('btn-delete').onclick = async () => {
+                if(confirm('EXCLUIR?')) {
+                    await deleteDoc(doc(db, "icones", document.getElementById('f-id').value));
+                    document.getElementById('modal-overlay').classList.remove('open');
+                }
+            };
+            document.getElementById('btn-close-modal').onclick = () => document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        function openModal(data = {}, isNew = false) {
+            document.getElementById('f-id').value = isNew ? '' : data.id;
+            document.getElementById('f-name').value = data.name || '';
+            document.getElementById('f-link').value = data.link || '';
+            document.getElementById('f-category').value = data.category || 'servicos-utilidades';
+            document.getElementById('f-class').value = data.colorClass || '';
+            document.getElementById('f-image').value = data.imageUrl || '';
+            document.getElementById('f-order').value = data.order !== undefined ? data.order : '';
+            document.getElementById('f-pinned').checked = !!data.isPinned;
+            document.getElementById('btn-delete').style.display = isNew ? 'none' : 'block';
+            document.getElementById('modal-overlay').classList.add('open');
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
