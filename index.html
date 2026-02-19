@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head> 
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+<meta name="theme-color" content="#f0f2f5"> 
+<title>Hub Digital</title> 
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/marlonexpert/icones/main/logo1.png"> 
+<link rel="preconnect" href="https://fonts.googleapis.com"> 
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet"> 
+<style> 
+/* ================= VARIÁVEIS & TEMA ================= */ 
+:root { --bg-body: #f0f2f5; --bg-glass: rgba(255, 255, 255, 0.65); --bg-overlay: rgba(255, 255, 255, 0.95); --border-glass: rgba(255, 255, 255, 0.5); --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05); --shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.1); --text-main: #111827; --text-muted: #6B7280; --primary: #10B981; --danger: #EF4444; --radius-card: 20px; --input-bg: rgba(255, 255, 255, 0.6); }
+body.dark { --bg-body: #0f172a; --bg-glass: rgba(30, 41, 59, 0.65); --bg-overlay: rgba(15, 23, 42, 0.95); --border-glass: rgba(255, 255, 255, 0.08); --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3); --text-main: #F3F4F6; --text-muted: #9CA3AF; --input-bg: rgba(0, 0, 0, 0.3); }
+
+/* ================= RESET & BASE ================= */ 
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; } 
+body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; transition: background-color 0.3s ease; min-height: 100vh; padding-bottom: 40px; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; } 
+body::before { content: ''; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.15), transparent 60%); z-index: -1; pointer-events: none; }
+
+/* ================= HEADER DINÂMICO ================= */ 
+header { padding: 30px 20px; width: 100%; max-width: 800px; margin: 0 auto; position: relative; height: 100px; display: flex; align-items: center; justify-content: center; z-index: 100; } 
+.header-identity { display: flex; align-items: center; justify-content: center; gap: 15px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: absolute; }
+.header-identity.hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
+.header-text-group { display: flex; flex-direction: column; align-items: flex-end; }
+.header-row { display: flex; align-items: baseline; gap: 8px; }
+.greeting { font-family: 'Caveat', cursive; font-size: 1.8rem; color: var(--primary); margin: 0; } 
+.app-title { font-size: 1.8rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; line-height: 1; }
+
+.fab-search-trigger { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); transition: transform 0.2s, background 0.2s; }
+.fab-search-trigger:hover { transform: scale(1.1); background: #059669; }
+.fab-search-trigger:active { transform: scale(0.95); }
+
+/* ================= BARRA UNIFICADA ================= */ 
+.unified-bar-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); width: 100%; max-width: 650px; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding: 0 10px; display: flex; justify-content: center; }
+.unified-bar-wrapper.active { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: all; }
+.unified-bar { display: flex; align-items: center; width: 100%; height: 60px; background: var(--input-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); padding: 5px 8px; }
+.search-input-unified { flex: 1; height: 100%; border: none; background: transparent; font-size: 1.05rem; color: var(--text-main); padding: 0 15px; min-width: 0; } 
+.search-input-unified::placeholder { color: var(--text-muted); opacity: 0.6; }
+.icon-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: transparent; color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; position: relative; margin: 0 2px; } 
+.icon-btn:hover { background: rgba(125, 125, 125, 0.15); color: var(--text-main); } 
+.icon-btn svg { width: 22px; height: 22px; }
+.icon-btn.primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(16,185,129,0.3); } 
+.icon-btn.primary:hover { background: #059669; transform: scale(1.05); }
+.icon-btn.close-mode { color: var(--danger); background: rgba(239, 68, 68, 0.1); margin-right: 5px; }
+.icon-btn.close-mode:hover { background: var(--danger); color: white; }
+.divider { width: 1px; height: 24px; background: var(--text-muted); opacity: 0.2; margin: 0 6px; }
+.tooltip { position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); background: #000; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; opacity: 0; transition: 0.2s; pointer-events: none; white-space: nowrap; z-index: 70; } 
+.icon-btn:hover .tooltip { opacity: 1; bottom: -45px; }
+
+@media (max-width: 480px) { .header-identity { flex-direction: row; } .unified-bar { height: 54px; padding: 4px; } .icon-btn { width: 38px; height: 38px; } .search-input-unified { font-size: 0.95rem; padding: 0 10px; } .greeting { font-size: 1.5rem; } .app-title { font-size: 1.5rem; } }
+
+/* ================= GRID SYSTEM & RECENTES ================= */ 
+main { width: 100%; max-width: 1000px; margin: 0 auto; padding: 20px; transition: opacity 0.3s, filter 0.3s; display: flex; flex-direction: column; align-items: stretch; } 
+body.search-active main { opacity: 0.1; filter: blur(4px); pointer-events: none; }
+.category-group { margin-bottom: 50px; animation: fadeIn 0.6s ease forwards; } 
+.category-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 20px; white-space: nowrap; } 
+.category-header::before, .category-header::after { content: ''; flex: 1; height: 1px; border-radius: 1px; } 
+.category-header::before { background: linear-gradient(to left, var(--border-glass), transparent); } 
+.category-header::after { background: linear-gradient(to right, var(--border-glass), transparent); }
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 20px; justify-content: center; }
+
+/* AMBIENTE DISCRETO DE RECENTES */
+.recent-group { margin-bottom: 30px; opacity: 0.9; }
+.recent-group .category-header { font-size: 0.7rem; margin-bottom: 15px; opacity: 0.7; }
+.recent-cards { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none; }
+.recent-cards::-webkit-scrollbar { display: none; }
+.recent-cards .app-card { min-width: 90px; width: 90px; padding: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px dashed var(--border-glass); }
+.recent-cards .card-visual { width: 38px; height: 38px; font-size: 1rem; margin-bottom: 8px; border-radius: 10px; }
+.recent-cards .app-name { font-size: 0.75rem; color: var(--text-muted); }
+
+/* ================= CARD ================= */ 
+.app-card { background: var(--bg-glass); border: 1px solid var(--border-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: var(--radius-card); aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; box-shadow: var(--shadow-card); padding: 15px; text-align: center; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); } 
+.app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--primary); } 
+.app-card:active { transform: scale(0.95); } 
+.card-visual { width: 48px; height: 48px; border-radius: 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.3rem; color: white; background-size: cover; background-position: center; box-shadow: 0 8px 15px rgba(0,0,0,0.08); } 
+.app-name { font-size: 0.85rem; font-weight: 600; line-height: 1.3; color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; } 
+.edit-badge { position: absolute; top: -5px; right: -5px; width: 24px; height: 24px; background: var(--danger); border-radius: 50%; color: white; font-size: 12px; display: none; align-items: center; justify-content: center; z-index: 10; border: 2px solid var(--bg-body); } 
+.app-card.shake { animation: shake 0.3s infinite; cursor: alias; } 
+.app-card.shake .edit-badge { display: flex; }
+
+/* ================= SEARCH RESULTS OVERLAY ================= */ 
+#search-overlay { position: fixed; top: 150px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 900px; bottom: 20px; background: var(--bg-overlay); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-glass); border-radius: 24px; z-index: 90; display: none; padding: 30px; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); flex-direction: column; } 
+body.search-active #search-overlay { display: flex; animation: fadeIn 0.2s ease-out; }
+
+/* ================= MODAL & UTILS ================= */ 
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; align-items: center; justify-content: center; } 
+.modal-backdrop.open { display: flex; animation: fadeIn 0.2s; } 
+.modal-card { background: var(--bg-body); width: 90%; max-width: 400px; border-radius: 24px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid var(--border-glass); } 
+.form-control { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.03); color: var(--text-main); margin-bottom: 15px; } 
+body.dark .form-control { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); } 
+.btn-block { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.btn-block:active { transform: scale(0.98); }
+#edit-bar { position: fixed; top: 0; left: 0; right: 0; background: var(--danger); color: white; padding: 10px; text-align: center; font-weight: 700; font-size: 0.8rem; transform: translateY(-100%); transition: 0.3s; z-index: 200; cursor: pointer; } 
+#edit-bar.show { transform: translateY(0); } 
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--text-main); color: var(--bg-body); padding: 10px 24px; border-radius: 30px; font-weight: 600; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 2000; } 
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 
+@keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(1.5deg); } 75% { transform: rotate(-1.5deg); } } 
+</style>
+</head>
+<body>
+<div id="edit-bar">MODO EDIÇÃO ATIVADO (Toque para desativar)</div> 
+<div id="toast" class="toast">Notificação</div>
+
+<header> 
+    <div class="header-identity" id="header-identity">
+        <div class="header-row">
+            <h2 class="greeting" id="greeting-text">Olá</h2> 
+            <h1 class="app-title">Hub Digital</h1>
+        </div>
+        <button class="fab-search-trigger" id="fab-trigger" aria-label="Abrir Pesquisa">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </button>
+    </div>
+
+    <div class="unified-bar-wrapper" id="unified-bar-wrapper">
+        <div class="unified-bar"> 
+            <button class="icon-btn close-mode" id="btn-close-bar">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            
+            <input type="text" class="search-input-unified" id="inp-search" placeholder="O que você procura?" autocomplete="off"> 
+            
+            <div class="divider"></div>
+
+            <button class="icon-btn" id="btn-theme"> 
+                <span class="tooltip">Tema</span> 
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg> 
+            </button> 
+            
+            <button class="icon-btn" id="btn-fullscreen"> 
+                <span class="tooltip">Tela Cheia</span> 
+                <svg id="icon-enter-fullscreen" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg> 
+                <svg id="icon-exit-fullscreen" style="display:none;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14H5.25A2.25 2.25 0 013 11.75V11.75c0-1.243 1.007-2.25 2.25-2.25H10m0 0V5.25C10 4.007 11.007 3 12.25 3v0c1.243 0 2.25 1.007 2.25 2.25V10m0 0h4.75A2.25 2.25 0 0121 12.25v0c0 1.243-1.007 2.25-2.25 2.25H14m0 0v4.75c0 1.243-1.007 2.25-2.25 2.25v0c-1.243 0-2.25-1.007-2.25-2.25V14" /></svg> 
+            </button>
+
+            <button class="icon-btn" id="btn-paste"> 
+                <span class="tooltip">Colar Link</span> 
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> 
+            </button>
+            
+            <button class="icon-btn primary" id="btn-add"> 
+                <span class="tooltip">Novo App</span> 
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg> 
+            </button> 
+        </div>
+    </div>
+</header>
+
+<div id="search-overlay"> 
+    <h3 style="color:var(--text-muted); margin:0 0 20px 0; font-size:0.9rem; text-align:center;">RESULTADOS</h3> 
+    <div class="grid-container" id="search-results"></div> 
+</div>
+
+<main id="app-content"></main>
+
+<div class="modal-backdrop" id="modal-overlay"> 
+    <div class="modal-card"> 
+        <h2 style="margin:0 0 20px 0; font-size: 1.2rem; text-align:center;">Gerenciar Item</h2> 
+        <form id="form-icon"> 
+            <input type="hidden" id="f-id"> 
+            <input type="text" id="f-name" class="form-control" placeholder="Nome do App" required> 
+            <input type="text" id="f-link" class="form-control" placeholder="Link (URL)" required> 
+            <select id="f-category" class="form-control"></select> 
+            <input type="text" id="f-image" class="form-control" placeholder="URL da Imagem (Opcional)"> 
+            <div style="display:flex; gap:10px;"> 
+                <input type="text" id="f-class" class="form-control" placeholder="Cor Hex" style="flex:1"> 
+                <input type="number" id="f-order" class="form-control" placeholder="Ordem" style="width:80px"> 
+            </div> 
+            <div style="margin-bottom:15px; display:flex; align-items:center; justify-content:center;"> 
+                <input type="checkbox" id="f-pinned" style="width:20px; height:20px; margin-right:10px;"> 
+                <label for="f-pinned">Fixar no Topo</label> 
+            </div> 
+            <div style="display:flex; gap:10px;"> 
+                <button type="button" class="btn-block" id="btn-delete" style="background:var(--danger); color:white; display:none;">Excluir</button> 
+                <button type="submit" class="btn-block" style="background:var(--primary); color:white; flex:2">Salvar</button> 
+            </div> 
+            <button type="button" class="btn-block" id="btn-close-modal" style="background:transparent; color:var(--text-muted); margin-top:10px;">Cancelar</button> 
+        </form> 
+    </div> 
+</div>
+
+<script type="module"> 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"; 
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"; 
+import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const firebaseConfig = { apiKey: "AIzaSyDo4HgnZG9To1aeDoAbUd7vbfgSUAHHtSs", authDomain: "iconesutil.firebaseapp.com", projectId: "iconesutil", storageBucket: "iconesutil.appspot.com", messagingSenderId: "88285859566", appId: "1:88285859566:web:e15fdb0c615b494955edff" }; 
+const CATEGORIES = { 'servicos-utilidades': 'Serviços & Utilidades', 'cursos-concursos': 'Cursos & Concursos', 'ferramentas-downloads': 'Ferramentas', 'compras-produtividade': 'Compras & Produtividade', 'design-audio': 'Design & Áudio', 'midia-entretenimento': 'Lazer & Mídia' }; 
+const COLORS = { 'vermelho': '#EF4444', 'azul': '#3B82F6', 'verde': '#10B981', 'amarelo': '#F59E0B', 'roxo': '#8B5CF6', 'rosa': '#EC4899', 'preto': '#1F2937', 'laranja': '#F97316' }; 
+
+let db, allIcons = [], editMode = false;
+
+async function init() { 
+    const h = new Date().getHours(); 
+    document.getElementById('greeting-text').innerText = h < 12 ? 'Bom dia,' : (h < 18 ? 'Boa tarde,' : 'Boa noite,'); 
+    if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark'); }
+    
+    const app = initializeApp(firebaseConfig); 
+    db = getFirestore(app); 
+    const auth = getAuth(app); 
+    onAuthStateChanged(auth, u => !u && signInAnonymously(auth));
+    
+    const sel = document.getElementById('f-category'); 
+    for (const [k, v] of Object.entries(CATEGORIES)) sel.innerHTML += `<option value="${k}">${v}</option>`;
+    
+    onSnapshot(collection(db, "icones"), (sn) => { 
+        allIcons = sn.docs.map(d => ({ id: d.id, ...d.data() })); 
+        render(); 
+    }); 
+    
+    setupEvents(); 
+}
+
+function createCard(icon) { 
+    const card = document.createElement('div'); 
+    card.className = `app-card ${editMode ? 'shake' : ''}`; 
+    card.dataset.id = icon.id; 
+    
+    const vis = document.createElement('div'); 
+    vis.className = 'card-visual'; 
+    let c = icon.class || icon.colorClass || '#10B981'; 
+    
+    if (icon.image || icon.imageUrl) { 
+        vis.style.backgroundImage = `url('${icon.image || icon.imageUrl}')`; 
+        vis.style.backgroundColor = 'transparent'; 
+    } else { 
+        if(COLORS[c.toLowerCase()]) c = COLORS[c.toLowerCase()]; 
+        vis.style.backgroundColor = c; 
+        vis.innerText = (icon.name || '').substring(0,2).toUpperCase(); 
+    } 
+    
+    card.innerHTML = `<div class="app-name">${icon.name}</div><div class="edit-badge">✎</div>`; 
+    card.prepend(vis); 
+    
+    let clickTimer = null;
+    card.onclick = (e) => { 
+        if (editMode) { openModal(icon); return; } 
+        if (clickTimer) clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => { handleClick(icon, false); }, 250);
+    }; 
+    card.ondblclick = (e) => {
+        if (editMode) return;
+        if (clickTimer) clearTimeout(clickTimer);
+        handleClick(icon, true);
+    };
+    card.oncontextmenu = (e) => { e.preventDefault(); toggleEditMode(); }; 
+    return card; 
+}
+
+function render(filter = '') { 
+    const main = document.getElementById('app-content'); 
+    const res = document.getElementById('search-results'); 
+    const sortFn = (a, b) => {
+        if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+        return (Number(a.order)||999) - (Number(b.order)||999);
+    };
+
+    if (filter) { 
+        document.body.classList.add('search-active'); 
+        res.innerHTML = ''; 
+        const f = allIcons.filter(i => (i.name || '').toLowerCase().includes(filter.toLowerCase())).sort(sortFn); 
+        if(f.length === 0) res.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:5px;">Nenhum resultado</div>'; 
+        f.forEach(i => res.appendChild(createCard(i))); 
+        return; 
+    }
+    
+    document.body.classList.remove('search-active');
+    main.innerHTML = '';
+    
+    // RENDERIZAÇÃO DE RECENTES
+    let recents = JSON.parse(localStorage.getItem('hubRecents') || '[]');
+    // Filtra para remover IDs que não existem mais
+    recents = recents.filter(id => allIcons.find(i => i.id === id));
+    
+    if (recents.length > 0 && !editMode) {
+        const recentDiv = document.createElement('div');
+        recentDiv.className = 'recent-group';
+        recentDiv.innerHTML = `<div class="category-header">Recentes</div><div class="recent-cards"></div>`;
+        const rContainer = recentDiv.querySelector('.recent-cards');
+        
+        recents.forEach(id => {
+            const icon = allIcons.find(i => i.id === id);
+            if(icon) rContainer.appendChild(createCard(icon));
+        });
+        main.appendChild(recentDiv);
+    }
+
+    // RENDERIZAÇÃO POR CATEGORIA
+    for (const [catId, catName] of Object.entries(CATEGORIES)) {
+        const items = allIcons.filter(i => i.category === catId).sort(sortFn);
+        if (items.length > 0) {
+            const grp = document.createElement('div');
+            grp.className = 'category-group';
+            grp.innerHTML = `<div class="category-header">${catName}</div><div class="grid-container"></div>`;
+            const grid = grp.querySelector('.grid-container');
+            items.forEach(i => grid.appendChild(createCard(i)));
+            main.appendChild(grp);
+        }
+    }
+}
+
+function handleClick(icon, isBlank) {
+    saveRecent(icon.id);
+    window.open(icon.link, isBlank ? '_blank' : '_self');
+    setTimeout(() => render(), 100); // Atualiza os recentes sutilmente
+}
+
+function saveRecent(id) {
+    let recents = JSON.parse(localStorage.getItem('hubRecents') || '[]');
+    recents = recents.filter(r => r !== id); // Remove se já existir
+    recents.unshift(id); // Adiciona no começo
+    if (recents.length > 8) recents.pop(); // Limite de 8 recentes
+    localStorage.setItem('hubRecents', JSON.stringify(recents));
+}
+
+function toggleEditMode() {
+    editMode = !editMode;
+    document.getElementById('edit-bar').classList.toggle('show', editMode);
+    render();
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function openModal(icon = null) {
+    document.getElementById('modal-overlay').classList.add('open');
+    if (icon) {
+        document.getElementById('f-id').value = icon.id;
+        document.getElementById('f-name').value = icon.name || '';
+        document.getElementById('f-link').value = icon.link || '';
+        document.getElementById('f-category').value = icon.category || 'servicos-utilidades';
+        document.getElementById('f-image').value = icon.image || icon.imageUrl || '';
+        document.getElementById('f-class').value = icon.class || icon.colorClass || '';
+        document.getElementById('f-order').value = icon.order || '';
+        document.getElementById('f-pinned').checked = !!icon.pinned;
+        document.getElementById('btn-delete').style.display = 'block';
+    } else {
+        document.getElementById('form-icon').reset();
+        document.getElementById('f-id').value = '';
+        document.getElementById('btn-delete').style.display = 'none';
+    }
+}
+
+function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function setupEvents() {
+    // Interações Header e Barra
+    document.getElementById('fab-trigger').onclick = () => {
+        document.getElementById('unified-bar-wrapper').classList.add('active');
+        document.getElementById('header-identity').classList.add('hidden');
+        document.getElementById('inp-search').focus();
+    };
+    document.getElementById('btn-close-bar').onclick = () => {
+        document.getElementById('unified-bar-wrapper').classList.remove('active');
+        document.getElementById('header-identity').classList.remove('hidden');
+        document.getElementById('inp-search').value = '';
+        render();
+    };
+    
+    document.getElementById('inp-search').oninput = (e) => render(e.target.value);
+    
+    // Interações Extras
+    document.getElementById('edit-bar').onclick = toggleEditMode;
+    document.getElementById('btn-close-modal').onclick = closeModal;
+    document.getElementById('btn-add').onclick = () => openModal();
+    
+    document.getElementById('btn-theme').onclick = () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    };
+    
+    document.getElementById('btn-fullscreen').onclick = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            document.getElementById('icon-enter-fullscreen').style.display = 'none';
+            document.getElementById('icon-exit-fullscreen').style.display = 'block';
+        } else {
+            document.exitFullscreen();
+            document.getElementById('icon-enter-fullscreen').style.display = 'block';
+            document.getElementById('icon-exit-fullscreen').style.display = 'none';
+        }
+    };
+
+    document.getElementById('btn-paste').onclick = async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            openModal();
+            document.getElementById('f-link').value = text;
+        } catch (e) {
+            showToast('Erro ao ler área de transferência');
+        }
+    };
+
+    // Firebase Interações
+    document.getElementById('form-icon').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('f-id').value;
+        const data = {
+            name: document.getElementById('f-name').value,
+            link: document.getElementById('f-link').value,
+            category: document.getElementById('f-category').value,
+            image: document.getElementById('f-image').value,
+            class: document.getElementById('f-class').value,
+            order: Number(document.getElementById('f-order').value) || 999,
+            pinned: document.getElementById('f-pinned').checked,
+            timestamp: serverTimestamp()
+        };
+        
+        try {
+            if (id) {
+                await updateDoc(doc(db, "icones", id), data);
+                showToast('Atualizado com sucesso!');
+            } else {
+                await addDoc(collection(db, "icones"), data);
+                showToast('Adicionado com sucesso!');
+            }
+            closeModal();
+        } catch (err) {
+            showToast('Erro ao salvar');
+            console.error(err);
+        }
+    };
+
+    document.getElementById('btn-delete').onclick = async () => {
+        const id = document.getElementById('f-id').value;
+        if (id && confirm('Tem certeza que deseja excluir?')) {
+            try {
+                await deleteDoc(doc(db, "icones", id));
+                showToast('Excluído com sucesso!');
+                closeModal();
+            } catch (err) {
+                showToast('Erro ao excluir');
+            }
+        }
+    };
+}
+
+init(); 
+</script>
+</body>
+</html>
+
